@@ -4,6 +4,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Hero } from "@/components/Hero";
 import { ProductCard } from "@/components/ProductCard";
+import { CategoryGrid } from "@/components/CategoryGrid";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Package } from "lucide-react";
@@ -20,13 +21,28 @@ interface Product {
   };
 }
 
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  icon?: string;
+  description?: string;
+}
+
 const Index = () => {
   const navigate = useNavigate();
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     fetchFeaturedProducts();
+    fetchCategories();
   }, []);
+
+  const fetchCategories = async () => {
+    const { data } = await supabase.from("categories").select("*");
+    if (data) setCategories(data);
+  };
 
   const fetchFeaturedProducts = async () => {
     const { data } = await supabase
@@ -44,6 +60,8 @@ const Index = () => {
       <Navbar />
       <Hero />
       <main className="flex-1">
+        <CategoryGrid categories={categories} />
+        
         <section className="container py-16">
           <div className="mb-12 text-center">
             <h2 className="mb-4 text-3xl font-bold">Featured Products</h2>

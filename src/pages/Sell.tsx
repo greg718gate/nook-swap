@@ -29,6 +29,9 @@ const Sell = () => {
     price: "",
     category_id: "",
     condition: "good",
+    shipping_evri: "",
+    shipping_royal_mail: "",
+    shipping_inpost: "",
   });
 
   useEffect(() => {
@@ -63,6 +66,9 @@ const Sell = () => {
         category_id: formData.category_id,
         condition: formData.condition,
         status: "active",
+        shipping_evri: parseFloat(formData.shipping_evri) || 0,
+        shipping_royal_mail: parseFloat(formData.shipping_royal_mail) || 0,
+        shipping_inpost: parseFloat(formData.shipping_inpost) || 0,
       });
 
       if (error) throw error;
@@ -165,11 +171,65 @@ const Sell = () => {
                     <SelectContent>
                       {categories.map((category) => (
                         <SelectItem key={category.id} value={category.id}>
-                          {category.name}
+                          {category.icon} {category.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Shipping Options (£)</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Set shipping costs for each carrier. Buyer will pay for shipping.
+                  </p>
+                  
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="shipping_evri">Evri</Label>
+                      <Input
+                        id="shipping_evri"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.shipping_evri}
+                        onChange={(e) =>
+                          setFormData({ ...formData, shipping_evri: e.target.value })
+                        }
+                        placeholder="0.00"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="shipping_royal_mail">Royal Mail</Label>
+                      <Input
+                        id="shipping_royal_mail"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.shipping_royal_mail}
+                        onChange={(e) =>
+                          setFormData({ ...formData, shipping_royal_mail: e.target.value })
+                        }
+                        placeholder="0.00"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="shipping_inpost">InPost</Label>
+                      <Input
+                        id="shipping_inpost"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.shipping_inpost}
+                        onChange={(e) =>
+                          setFormData({ ...formData, shipping_inpost: e.target.value })
+                        }
+                        placeholder="0.00"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex gap-4">

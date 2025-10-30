@@ -18,6 +18,9 @@ interface CartItem {
     price: number;
     images: string[];
     status: string;
+    shipping_evri: number;
+    shipping_royal_mail: number;
+    shipping_inpost: number;
   };
 }
 
@@ -26,6 +29,7 @@ const Cart = () => {
   const [user, setUser] = useState<User | null>(null);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [shippingMethod, setShippingMethod] = useState<string>("evri");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -45,7 +49,7 @@ const Cart = () => {
       .select(`
         id,
         quantity,
-        products (id, title, price, images, status)
+        products (id, title, price, images, status, shipping_evri, shipping_royal_mail, shipping_inpost)
       `)
       .order("created_at", { ascending: false });
 
@@ -64,10 +68,25 @@ const Cart = () => {
     }
   };
 
-  const total = cartItems.reduce(
+  const getShippingCost = () => {
+    return cartItems.reduce((sum, item) => {
+      const shippingCost =
+        shippingMethod === "evri"
+          ? item.products.shipping_evri
+          : shippingMethod === "royal_mail"
+          ? item.products.shipping_royal_mail
+          : item.products.shipping_inpost;
+      return sum + shippingCost;
+    }, 0);
+  };
+
+  const subtotal = cartItems.reduce(
     (sum, item) => sum + item.products.price * item.quantity,
     0
   );
+
+  const shippingCost = getShippingCost();
+  const total = subtotal + shippingCost;
 
   if (loading) {
     return (
@@ -140,19 +159,68 @@ const Cart = () => {
               <div className="lg:col-span-1">
                 <Card className="sticky top-24 p-6">
                   <h2 className="mb-4 text-xl font-semibold">Order Summary</h2>
+                  
+                  <div className="mb-6 space-y-3">
+                    <h3 className="font-medium">Shipping Method</h3>
+                    <div className="space-y-2">
+                      <label className="flex cursor-pointer items-center justify-between rounded-lg border p-3 hover:bg-accent">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="radio"
+                            name="shipping"
+                            value="evri"
+                            checked={shippingMethod === "evri"}
+                            onChange={(e) => setShippingMethod(e.target.value)}
+                            className="h-4 w-4"
+                          />
+                          <span>Evri</span>
+                        </div>
+                        <span className="font-medium">£{getShippingCost().toFixed(2)}</span>
+                      </label>
+                      <label className="flex cursor-pointer items-center justify-between rounded-lg border p-3 hover:bg-accent">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="radio"
+                            name="shipping"
+                            value="royal_mail"
+                            checked={shippingMethod === "royal_mail"}
+                            onChange={(e) => setShippingMethod(e.target.value)}
+                            className="h-4 w-4"
+                          />
+                          <span>Royal Mail</span>
+                        </div>
+                        <span className="font-medium">£{cartItems.reduce((sum, item) => sum + item.products.shipping_royal_mail, 0).toFixed(2)}</span>
+                      </label>
+                      <label className="flex cursor-pointer items-center justify-between rounded-lg border p-3 hover:bg-accent">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="radio"
+                            name="shipping"
+                            value="inpost"
+                            checked={shippingMethod === "inpost"}
+                            onChange={(e) => setShippingMethod(e.target.value)}
+                            className="h-4 w-4"
+                          />
+                          <span>InPost</span>
+                        </div>
+                        <span className="font-medium">£{cartItems.reduce((sum, item) => sum + item.products.shipping_inpost, 0).toFixed(2)}</span>
+                      </label>
+                    </div>
+                  </div>
+
                   <div className="space-y-3">
                     <div className="flex justify-between text-muted-foreground">
                       <span>Subtotal</span>
-                      <span>${total.toFixed(2)}</span>
+                      <span>£{subtotal.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-muted-foreground">
-                      <span>Shipping</span>
-                      <span>Calculated at checkout</span>
+                      <span>Shipping ({shippingMethod === "evri" ? "Evri" : shippingMethod === "royal_mail" ? "Royal Mail" : "InPost"})</span>
+                      <span>£{shippingCost.toFixed(2)}</span>
                     </div>
                     <div className="border-t pt-3">
                       <div className="flex justify-between text-xl font-bold">
                         <span>Total</span>
-                        <span className="text-primary">${total.toFixed(2)}</span>
+                        <span className="text-primary">£{total.toFixed(2)}</span>
                       </div>
                     </div>
                   </div>

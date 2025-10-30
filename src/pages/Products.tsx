@@ -23,6 +23,7 @@ interface Category {
   id: string;
   name: string;
   slug: string;
+  icon?: string;
 }
 
 const Products = () => {
@@ -81,27 +82,31 @@ const Products = () => {
       <main className="flex-1">
         <div className="container py-8">
           <div className="mb-8">
-            <h1 className="mb-4 text-3xl font-bold">Browse Products</h1>
-            <div className="flex flex-wrap gap-2">
+            <h1 className="mb-6 text-3xl font-bold">Browse by Category</h1>
+            <div className="mb-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               <Button
                 variant={selectedCategory === null ? "default" : "outline"}
+                className="h-auto flex-col gap-2 py-4"
                 onClick={() => {
                   setSelectedCategory(null);
                   window.location.href = "/products";
                 }}
               >
-                All
+                <span className="text-2xl">🛍️</span>
+                <span>All Products</span>
               </Button>
               {categories.map((category) => (
                 <Button
                   key={category.id}
                   variant={selectedCategory === category.slug ? "default" : "outline"}
+                  className="h-auto flex-col gap-2 py-4"
                   onClick={() => {
                     setSelectedCategory(category.slug);
                     window.location.href = `/products?category=${category.slug}`;
                   }}
                 >
-                  {category.name}
+                  <span className="text-2xl">{category.icon}</span>
+                  <span>{category.name}</span>
                 </Button>
               ))}
             </div>
