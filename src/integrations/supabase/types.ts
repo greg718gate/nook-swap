@@ -138,6 +138,8 @@ export type Database = {
           created_at: string | null
           id: string
           shipping_address: string | null
+          shipping_cost: number | null
+          shipping_method: string | null
           status: string | null
           total_amount: number
         }
@@ -146,6 +148,8 @@ export type Database = {
           created_at?: string | null
           id?: string
           shipping_address?: string | null
+          shipping_cost?: number | null
+          shipping_method?: string | null
           status?: string | null
           total_amount: number
         }
@@ -154,6 +158,8 @@ export type Database = {
           created_at?: string | null
           id?: string
           shipping_address?: string | null
+          shipping_cost?: number | null
+          shipping_method?: string | null
           status?: string | null
           total_amount?: number
         }
@@ -177,6 +183,9 @@ export type Database = {
           images: string[] | null
           price: number
           seller_id: string
+          shipping_evri: number | null
+          shipping_inpost: number | null
+          shipping_royal_mail: number | null
           status: string | null
           title: string
           updated_at: string | null
@@ -191,6 +200,9 @@ export type Database = {
           images?: string[] | null
           price: number
           seller_id: string
+          shipping_evri?: number | null
+          shipping_inpost?: number | null
+          shipping_royal_mail?: number | null
           status?: string | null
           title: string
           updated_at?: string | null
@@ -205,6 +217,9 @@ export type Database = {
           images?: string[] | null
           price?: number
           seller_id?: string
+          shipping_evri?: number | null
+          shipping_inpost?: number | null
+          shipping_royal_mail?: number | null
           status?: string | null
           title?: string
           updated_at?: string | null
