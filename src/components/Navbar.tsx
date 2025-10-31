@@ -62,19 +62,19 @@ export const Navbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center space-x-2">
-          <div className="h-8 w-8 rounded-lg bg-gradient-hero" />
-          <span className="text-xl font-bold text-foreground">MarketHub</span>
+    <nav className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-md">
+      <div className="container flex h-20 items-center justify-between">
+        <Link to="/" className="group flex items-center space-x-3">
+          <div className="h-10 w-10 rounded-xl bg-gradient-hero shadow-glow transition-all duration-300 group-hover:scale-110 group-hover:shadow-glow" />
+          <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">MarketHub</span>
         </Link>
 
         <div className="flex flex-1 items-center justify-center px-8">
           <div className="relative w-full max-w-xl">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground transition-colors" />
             <Input
               placeholder="Search products..."
-              className="pl-10"
+              className="pl-12 h-12 rounded-xl bg-muted/50 border-border/50 backdrop-blur-sm focus:bg-background transition-all shadow-sm focus:shadow-md"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   navigate(`/products?search=${e.currentTarget.value}`);
@@ -84,14 +84,14 @@ export const Navbar = () => {
           </div>
         </div>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-3">
           {user ? (
             <>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate("/sell")}
-                className="gap-2"
+                className="gap-2 hover:bg-primary/10 hover:text-primary transition-all"
               >
                 <Plus className="h-4 w-4" />
                 Sell
@@ -100,11 +100,11 @@ export const Navbar = () => {
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate("/cart")}
-                className="relative"
+                className="relative hover:bg-primary/10 hover:text-primary transition-all"
               >
                 <ShoppingCart className="h-5 w-5" />
                 {cartCount > 0 && (
-                  <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-xs font-bold text-accent-foreground">
+                  <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-accent text-xs font-bold text-accent-foreground shadow-lg animate-scale-in">
                     {cartCount}
                   </span>
                 )}
@@ -113,15 +113,16 @@ export const Navbar = () => {
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate("/profile")}
+                className="hover:bg-primary/10 hover:text-primary transition-all"
               >
                 <User className="h-5 w-5" />
               </Button>
-              <Button variant="ghost" size="sm" onClick={handleSignOut}>
+              <Button variant="ghost" size="sm" onClick={handleSignOut} className="hover:text-destructive transition-all">
                 Sign Out
               </Button>
             </>
           ) : (
-            <Button onClick={() => navigate("/auth")}>Sign In</Button>
+            <Button onClick={() => navigate("/auth")} className="shadow-lg hover:shadow-xl transition-all">Sign In</Button>
           )}
         </div>
       </div>
