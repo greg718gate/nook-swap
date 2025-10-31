@@ -14,6 +14,7 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+// Modern marketplace app
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
