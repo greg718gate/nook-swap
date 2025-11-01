@@ -5,7 +5,7 @@ export const Footer = () => {
     <footer className="relative border-t border-border/50 bg-gradient-to-br from-muted/30 via-background to-muted/20 backdrop-blur-sm">
       <div className="absolute inset-0 bg-[url('/hero-pattern.svg')] opacity-5" />
       <div className="container py-16 relative">
-        <div className="grid gap-12 md:grid-cols-4">
+        <div className="grid gap-12 md:grid-cols-5">
           <div className="space-y-4">
             <div className="flex items-center space-x-3 group">
               <div className="h-10 w-10 rounded-xl bg-gradient-hero shadow-md group-hover:shadow-glow transition-all duration-300" />
@@ -54,19 +54,34 @@ export const Footer = () => {
             <h3 className="mb-6 text-lg font-bold text-foreground">Support</h3>
             <ul className="space-y-3 text-sm">
               <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors duration-200 hover:translate-x-1 inline-block">
-                  Help Center
-                </a>
+                <Link to="/faq" className="text-muted-foreground hover:text-primary transition-colors duration-200 hover:translate-x-1 inline-block">
+                  FAQ
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors duration-200 hover:translate-x-1 inline-block">
-                  Safety Tips
-                </a>
+                <Link to="/shipping" className="text-muted-foreground hover:text-primary transition-colors duration-200 hover:translate-x-1 inline-block">
+                  Shipping Info
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors duration-200 hover:translate-x-1 inline-block">
-                  Contact Us
-                </a>
+                <Link to="/returns" className="text-muted-foreground hover:text-primary transition-colors duration-200 hover:translate-x-1 inline-block">
+                  Returns & Refunds
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="mb-6 text-lg font-bold text-foreground">Legal</h3>
+            <ul className="space-y-3 text-sm">
+              <li>
+                <Link to="/terms" className="text-muted-foreground hover:text-primary transition-colors duration-200 hover:translate-x-1 inline-block">
+                  Terms of Service
+                </Link>
+              </li>
+              <li>
+                <Link to="/privacy" className="text-muted-foreground hover:text-primary transition-colors duration-200 hover:translate-x-1 inline-block">
+                  Privacy Policy
+                </Link>
               </li>
             </ul>
           </div>
