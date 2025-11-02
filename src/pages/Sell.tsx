@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { Sparkles, Loader2 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 const Sell = () => {
@@ -23,6 +24,8 @@ const Sell = () => {
   const [user, setUser] = useState<User | null>(null);
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [aiAnalyzing, setAiAnalyzing] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string>("");
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -49,6 +52,85 @@ const Sell = () => {
   const fetchCategories = async () => {
     const { data } = await supabase.from("categories").select("*");
     if (data) setCategories(data);
+  };
+
+  const handleAIAnalysis = async () => {
+    if (!formData.title && !formData.description && !imagePreview) {
+      toast.error("Dodaj przynajmniej tytuł, opis lub zdjęcie produktu");
+      return;
+    }
+
+    setAiAnalyzing(true);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/auto-tag-product`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            imageUrl: imagePreview || null,
+            title: formData.title,
+            description: formData.description,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to analyze");
+      }
+
+      const result = await response.json();
+      
+      // Apply AI suggestions
+      if (result.suggestedTitle && !formData.title) {
+        setFormData(prev => ({ ...prev, title: result.suggestedTitle }));
+      }
+      
+      if (result.category) {
+        const matchedCategory = categories.find(
+          c => c.name.toLowerCase() === result.category.toLowerCase()
+        );
+        if (matchedCategory) {
+          setFormData(prev => ({ ...prev, category_id: matchedCategory.id }));
+        }
+      }
+
+      if (result.condition) {
+        const conditionMap: Record<string, string> = {
+          new: "new",
+          used: "good",
+          "like new": "like-new",
+        };
+        const mappedCondition = conditionMap[result.condition.toLowerCase()] || "good";
+        setFormData(prev => ({ ...prev, condition: mappedCondition }));
+      }
+
+      toast.success(`AI Analysis: ${result.insights || "Analiza zakończona!"}`);
+      
+      if (result.tags && result.tags.length > 0) {
+        toast.info(`Sugerowane tagi: ${result.tags.join(", ")}`);
+      }
+    } catch (error) {
+      console.error("AI analysis error:", error);
+      toast.error(error instanceof Error ? error.message : "Nie udało się przeanalizować produktu");
+    } finally {
+      setAiAnalyzing(false);
+    }
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -92,6 +174,53 @@ const Sell = () => {
 
             <Card className="p-6">
               <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-lg font-semibold">Automatyczne Tagowanie AI</h2>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleAIAnalysis}
+                      disabled={aiAnalyzing}
+                      className="gap-2"
+                    >
+                      {aiAnalyzing ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Analizuję...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="h-4 w-4" />
+                          Analizuj z AI
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    AI przeanalizuje Twój produkt i automatycznie wypełni kategorię, tagi i stan.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="image">Zdjęcie Produktu</Label>
+                  <Input
+                    id="image"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                  />
+                  {imagePreview && (
+                    <div className="mt-2">
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-32 h-32 object-cover rounded-lg"
+                      />
+                    </div>
+                  )}
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="title">Title *</Label>
                   <Input

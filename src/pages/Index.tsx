@@ -5,6 +5,7 @@ import { Footer } from "@/components/Footer";
 import { Hero } from "@/components/Hero";
 import { ProductCard } from "@/components/ProductCard";
 import { CategoryGrid } from "@/components/CategoryGrid";
+import { ChatAssistant } from "@/components/ChatAssistant";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Package } from "lucide-react";
@@ -155,6 +156,7 @@ const Index = () => {
         </section>
       </main>
       <Footer />
+      <ChatAssistant userType="general" />
     </div>
   );
 };
