@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
+import { ChatAssistant } from "@/components/ChatAssistant";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSearchParams } from "react-router-dom";
@@ -147,6 +148,7 @@ const Products = () => {
         </div>
       </main>
       <Footer />
+      <ChatAssistant userType="buyer" />
     </div>
   );
 };

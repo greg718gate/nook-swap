@@ -23,29 +23,29 @@ serve(async (req) => {
 
     // Different system prompts based on user type
     const systemPrompts = {
-      buyer: `Jesteś pomocnym asystentem zakupowym na platformie MarketHub.
-Pomagasz kupującym w:
-- Znalezieniu odpowiednich produktów
-- Zrozumieniu różnic między ofertami
-- Negocjacji cen
-- Pytaniach o dostawę i zwroty
-- Weryfikacji wiarygodności sprzedawców
+      buyer: `You are a helpful shopping assistant on the MarketHub platform.
+You help buyers with:
+- Finding the right products
+- Understanding differences between offers
+- Price negotiation tips
+- Questions about delivery and returns
+- Verifying seller trustworthiness
 
-Odpowiadaj po polsku, zwięźle i pomocnie.`,
+Respond in English, concisely and helpfully.`,
       
-      seller: `Jesteś ekspertem od sprzedaży na platformie MarketHub.
-Pomagasz sprzedającym w:
-- Optymalizacji opisów produktów
-- Ustalaniu konkurencyjnych cen
-- Tworzeniu atrakcyjnych ofert
-- Zwiększaniu widoczności produktów
-- Analizie trendów rynkowych
+      seller: `You are a sales expert on the MarketHub platform.
+You help sellers with:
+- Optimizing product descriptions
+- Setting competitive prices
+- Creating attractive offers
+- Increasing product visibility
+- Analyzing market trends
 
-Odpowiadaj po polsku, profesjonalnie i praktycznie.`,
+Respond in English, professionally and practically.`,
       
-      general: `Jesteś asystentem handlowym na platformie MarketHub.
-Pomagasz użytkownikom w zakupach i sprzedaży.
-Odpowiadaj po polsku, pomocnie i profesjonalnie.`
+      general: `You are a trading assistant on the MarketHub platform.
+You help users with buying and selling.
+Respond in English, helpfully and professionally.`
     };
 
     const systemPrompt = systemPrompts[userType as keyof typeof systemPrompts] || systemPrompts.general;
@@ -73,14 +73,14 @@ Odpowiadaj po polsku, pomocnie i profesjonalnie.`
       
       if (response.status === 429) {
         return new Response(
-          JSON.stringify({ error: 'Przekroczono limit zapytań. Spróbuj ponownie za chwilę.' }),
+          JSON.stringify({ error: 'Rate limit exceeded. Please try again in a moment.' }),
           { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
       
       if (response.status === 402) {
         return new Response(
-          JSON.stringify({ error: 'Brak środków na koncie AI. Dodaj kredyty w ustawieniach.' }),
+          JSON.stringify({ error: 'Insufficient AI credits. Please add credits in settings.' }),
           { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }

@@ -93,7 +93,7 @@ export const ChatAssistant = ({ userType = "general" }: ChatAssistantProps) => {
       }
     } catch (error) {
       console.error("Chat error:", error);
-      toast.error(error instanceof Error ? error.message : "Wystąpił błąd podczas komunikacji z asystentem");
+      toast.error(error instanceof Error ? error.message : "An error occurred while communicating with the assistant");
     } finally {
       setIsLoading(false);
     }
@@ -109,7 +109,7 @@ export const ChatAssistant = ({ userType = "general" }: ChatAssistantProps) => {
     return (
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg"
+        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-50"
         size="icon"
       >
         <MessageCircle className="h-6 w-6" />
@@ -118,11 +118,11 @@ export const ChatAssistant = ({ userType = "general" }: ChatAssistantProps) => {
   }
 
   return (
-    <Card className="fixed bottom-6 right-6 w-96 h-[600px] flex flex-col shadow-2xl">
+    <Card className="fixed bottom-6 right-6 w-96 h-[600px] flex flex-col shadow-2xl z-50">
       <div className="flex items-center justify-between p-4 border-b">
         <div className="flex items-center gap-2">
           <MessageCircle className="h-5 w-5" />
-          <h3 className="font-semibold">Asystent MarketHub</h3>
+          <h3 className="font-semibold">MarketHub Assistant</h3>
         </div>
         <Button
           variant="ghost"
@@ -137,8 +137,8 @@ export const ChatAssistant = ({ userType = "general" }: ChatAssistantProps) => {
         <div className="space-y-4">
           {messages.length === 0 && (
             <div className="text-center text-muted-foreground py-8">
-              <p>Witaj! Jestem asystentem MarketHub.</p>
-              <p className="text-sm mt-2">Jak mogę Ci pomóc?</p>
+              <p>Hello! I'm your MarketHub Assistant.</p>
+              <p className="text-sm mt-2">How can I help you today?</p>
             </div>
           )}
           
@@ -173,7 +173,7 @@ export const ChatAssistant = ({ userType = "general" }: ChatAssistantProps) => {
         <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Napisz wiadomość..."
+          placeholder="Type your message..."
           disabled={isLoading}
         />
         <Button type="submit" size="icon" disabled={isLoading || !input.trim()}>

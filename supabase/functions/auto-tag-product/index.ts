@@ -26,16 +26,16 @@ serve(async (req) => {
     // System prompt
     messages.push({
       role: "system",
-      content: `Jesteś ekspertem w kategoryzacji produktów e-commerce. 
-Analizujesz produkty i zwracasz precyzyjne tagi oraz kategorię.
+      content: `You are an expert in e-commerce product categorization. 
+You analyze products and return precise tags and categories.
 
-Zwróć odpowiedź w formacie JSON:
+Return response in JSON format:
 {
-  "category": "nazwa kategorii (Electronics, Fashion, Home, Sports, Books, Toys)",
+  "category": "category name (Electronics, Fashion, Home, Sports, Books, Toys)",
   "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"],
-  "suggestedTitle": "lepszy tytuł jeśli obecny jest niejasny",
-  "condition": "new lub used - oceń na podstawie opisu",
-  "insights": "krótkie wskazówki dla sprzedającego jak ulepszyć ofertę"
+  "suggestedTitle": "better title if current one is unclear",
+  "condition": "new or used - assess based on description",
+  "insights": "brief tips for seller on how to improve the listing"
 }`
     });
 
@@ -51,11 +51,11 @@ Zwróć odpowiedź w formacie JSON:
     
     userContent.push({
       type: "text",
-      text: `Przeanalizuj ten produkt:
-Tytuł: ${title || 'Brak tytułu'}
-Opis: ${description || 'Brak opisu'}
+      text: `Analyze this product:
+Title: ${title || 'No title'}
+Description: ${description || 'No description'}
 
-${imageUrl ? 'Zobacz zdjęcie powyżej.' : 'Brak zdjęcia.'}`
+${imageUrl ? 'See image above.' : 'No image provided.'}`
     });
 
     messages.push({
@@ -82,14 +82,14 @@ ${imageUrl ? 'Zobacz zdjęcie powyżej.' : 'Brak zdjęcia.'}`
       
       if (response.status === 429) {
         return new Response(
-          JSON.stringify({ error: 'Przekroczono limit zapytań. Spróbuj ponownie za chwilę.' }),
+          JSON.stringify({ error: 'Rate limit exceeded. Please try again in a moment.' }),
           { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
       
       if (response.status === 402) {
         return new Response(
-          JSON.stringify({ error: 'Brak środków na koncie AI. Dodaj kredyty w ustawieniach.' }),
+          JSON.stringify({ error: 'Insufficient AI credits. Please add credits in settings.' }),
           { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -118,7 +118,7 @@ ${imageUrl ? 'Zobacz zdjęcie powyżej.' : 'Brak zdjęcia.'}`
         tags: ["product", "item"],
         suggestedTitle: title,
         condition: "new",
-        insights: "Dodaj więcej szczegółów w opisie produktu."
+        insights: "Add more details to the product description."
       };
     }
 
