@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { ReviewSection } from "@/components/ReviewSection";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -197,6 +198,11 @@ const ProductDetail = () => {
               )}
             </div>
           </div>
+        </div>
+
+        {/* Reviews Section */}
+        <div className="container py-12">
+          <ReviewSection productId={id!} />
         </div>
       </main>
       <Footer />

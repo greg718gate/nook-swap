@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, User, Plus, Search } from "lucide-react";
+import { ShoppingCart, User, Plus, Search, BarChart3 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
@@ -95,6 +95,15 @@ export const Navbar = () => {
               >
                 <Plus className="h-4 w-4" />
                 Sell
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/dashboard")}
+                className="gap-2 hover:bg-accent/10 hover:text-accent transition-all"
+              >
+                <BarChart3 className="h-4 w-4" />
+                Dashboard
               </Button>
               <Button
                 variant="ghost"
