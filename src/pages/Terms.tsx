@@ -20,7 +20,7 @@ const Terms = () => {
           <section>
             <h2 className="mb-4 text-2xl font-bold text-foreground">1. Postanowienia Ogólne</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Niniejszy regulamin określa zasady korzystania z platformy VelvetBazaar.co.uk, warunki zawierania umów 
+              Niniejszy regulamin określa zasady korzystania z platformy VelvetBazzar.co.uk, warunki zawierania umów 
               kupna-sprzedaży oraz prawa i obowiązki użytkowników.
             </p>
           </section>
@@ -28,7 +28,7 @@ const Terms = () => {
           <section>
             <h2 className="mb-4 text-2xl font-bold text-foreground">2. Definicje</h2>
             <ul className="space-y-3 text-muted-foreground">
-              <li><strong className="text-foreground">Platforma</strong> - serwis internetowy VelvetBazaar.co.uk</li>
+              <li><strong className="text-foreground">Platforma</strong> - serwis internetowy VelvetBazzar.co.uk</li>
               <li><strong className="text-foreground">Użytkownik</strong> - osoba korzystająca z platformy</li>
               <li><strong className="text-foreground">Sprzedający</strong> - użytkownik wystawiający produkty na sprzedaż</li>
               <li><strong className="text-foreground">Kupujący</strong> - użytkownik dokonujący zakupu</li>
@@ -79,7 +79,7 @@ const Terms = () => {
           <section>
             <h2 className="mb-4 text-2xl font-bold text-foreground">6. Płatności</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Wszystkie transakcje są przetwarzane bezpiecznie. VelvetBazaar.co.uk nie przechowuje danych kart płatniczych. 
+              Wszystkie transakcje są przetwarzane bezpiecznie. VelvetBazzar.co.uk nie przechowuje danych kart płatniczych. 
               Płatności są realizowane przez zaufanych partnerów płatniczych.
             </p>
           </section>
@@ -109,7 +109,7 @@ const Terms = () => {
           <section>
             <h2 className="mb-4 text-2xl font-bold text-foreground">9. Odpowiedzialność</h2>
             <p className="text-muted-foreground leading-relaxed">
-              VelvetBazaar.co.uk pełni rolę pośrednika między kupującym a sprzedającym. Nie ponosimy odpowiedzialności za jakość 
+              VelvetBazzar.co.uk pełni rolę pośrednika między kupującym a sprzedającym. Nie ponosimy odpowiedzialności za jakość 
               produktów, terminowość wysyłki czy spory między użytkownikami, chociaż staramy się wspierać w ich rozwiązaniu.
             </p>
           </section>

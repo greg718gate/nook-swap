@@ -78,7 +78,7 @@ const Auth = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 h-12 w-12 rounded-lg bg-gradient-hero" />
-          <CardTitle className="text-2xl">Welcome to VelvetBazaar.co.uk</CardTitle>
+          <CardTitle className="text-2xl">Welcome to VelvetBazzar.co.uk</CardTitle>
           <CardDescription>Sign in to start buying and selling</CardDescription>
         </CardHeader>
         <CardContent>

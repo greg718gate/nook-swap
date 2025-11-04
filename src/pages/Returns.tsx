@@ -131,7 +131,7 @@ const Returns = () => {
           <section className="rounded-xl bg-gradient-to-br from-accent/10 to-primary/10 border border-accent/30 p-6">
             <h2 className="mb-3 text-xl font-bold text-foreground">Potrzebujesz pomocy?</h2>
             <p className="text-muted-foreground">
-              Skontaktuj się z naszym zespołem wsparcia: <span className="text-foreground font-semibold">support@velvetbazaar.co.uk</span>
+              Skontaktuj się z naszym zespołem wsparcia: <span className="text-foreground font-semibold">support@velvetbazzar.co.uk</span>
             </p>
           </section>
 

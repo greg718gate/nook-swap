@@ -26,7 +26,7 @@ const FAQ = () => {
           <Accordion type="single" collapsible className="space-y-4">
             <AccordionItem value="item-1" className="border-b border-border/50 pb-4">
               <AccordionTrigger className="text-lg font-semibold text-foreground hover:text-primary">
-                Jak zacząć sprzedawać na VelvetBazaar.co.uk?
+                Jak zacząć sprzedawać na VelvetBazzar.co.uk?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground leading-relaxed pt-2">
                 Aby zacząć sprzedawać, musisz najpierw założyć konto. Następnie kliknij przycisk "Sprzedaj" w menu, 
@@ -60,7 +60,7 @@ const FAQ = () => {
                 Ile kosztuje wystawienie produktu?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground leading-relaxed pt-2">
-                Wystawienie produktu na VelvetBazaar.co.uk jest całkowicie darmowe! Pobieramy jedynie małą prowizję od 
+                Wystawienie produktu na VelvetBazzar.co.uk jest całkowicie darmowe! Pobieramy jedynie małą prowizję od 
                 sprzedaży (3-5% w zależności od kategorii) tylko wtedy, gdy produkt zostanie sprzedany.
               </AccordionContent>
             </AccordionItem>
@@ -126,7 +126,7 @@ const FAQ = () => {
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground leading-relaxed pt-2">
                 Jeśli napotkasz problem, najpierw spróbuj rozwiązać go bezpośrednio ze sprzedającym przez wiadomości. 
-                Jeśli to nie pomoże, skontaktuj się z naszym zespołem wsparcia pod adresem support@velvetbazaar.co.uk - 
+                Jeśli to nie pomoże, skontaktuj się z naszym zespołem wsparcia pod adresem support@velvetbazzar.co.uk -
                 jesteśmy tu, aby pomóc!
               </AccordionContent>
             </AccordionItem>
@@ -136,7 +136,7 @@ const FAQ = () => {
                 Czy mogę sprzedawać produkty używane?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground leading-relaxed pt-2">
-                Tak! VelvetBazaar.co.uk jest świetnym miejscem do sprzedaży produktów używanych. Po prostu uczciwie opisz stan 
+                Tak! VelvetBazzar.co.uk jest świetnym miejscem do sprzedaży produktów używanych. Po prostu uczciwie opisz stan 
                 produktu przy wystawianiu ogłoszenia (nowy, jak nowy, używany, wymaga naprawy).
               </AccordionContent>
             </AccordionItem>
@@ -166,7 +166,7 @@ const FAQ = () => {
             </p>
             <div className="space-y-2 text-sm">
               <p className="text-muted-foreground">
-                📧 Email: <span className="text-foreground font-semibold">support@velvetbazaar.co.uk</span>
+                📧 Email: <span className="text-foreground font-semibold">support@velvetbazzar.co.uk</span>
               </p>
               <p className="text-muted-foreground">
                 📞 Telefon: <span className="text-foreground font-semibold">+48 123 456 789</span>
