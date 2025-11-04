@@ -122,7 +122,7 @@ export const ChatAssistant = ({ userType = "general" }: ChatAssistantProps) => {
       <div className="flex items-center justify-between p-4 border-b">
         <div className="flex items-center gap-2">
           <MessageCircle className="h-5 w-5" />
-          <h3 className="font-semibold">MarketHub Assistant</h3>
+          <h3 className="font-semibold">VelvetBazaar.co.uk Assistant</h3>
         </div>
         <Button
           variant="ghost"
@@ -137,7 +137,7 @@ export const ChatAssistant = ({ userType = "general" }: ChatAssistantProps) => {
         <div className="space-y-4">
           {messages.length === 0 && (
             <div className="text-center text-muted-foreground py-8">
-              <p>Hello! I'm your MarketHub Assistant.</p>
+              <p>Hello! I'm your VelvetBazaar.co.uk Assistant.</p>
               <p className="text-sm mt-2">How can I help you today?</p>
             </div>
           )}

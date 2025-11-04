@@ -9,7 +9,7 @@ export const Footer = () => {
           <div className="space-y-4">
             <div className="flex items-center space-x-3 group">
               <div className="h-10 w-10 rounded-xl bg-gradient-hero shadow-md group-hover:shadow-glow transition-all duration-300" />
-              <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">MarketHub</span>
+              <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">VelvetBazaar.co.uk</span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Your trusted marketplace for buying and selling with confidence.
@@ -87,7 +87,7 @@ export const Footer = () => {
           </div>
         </div>
         <div className="mt-12 border-t border-border/50 pt-8 text-center">
-          <p className="text-sm text-muted-foreground">&copy; 2025 <span className="font-semibold text-foreground">MarketHub</span>. All rights reserved.</p>
+          <p className="text-sm text-muted-foreground">&copy; 2025 <span className="font-semibold text-foreground">VelvetBazaar.co.uk</span>. All rights reserved.</p>
         </div>
       </div>
     </footer>

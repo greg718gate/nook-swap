@@ -20,7 +20,7 @@ const PrivacyPolicy = () => {
           <section>
             <h2 className="mb-4 text-2xl font-bold text-foreground">1. Informacje Ogólne</h2>
             <p className="text-muted-foreground leading-relaxed">
-              MarketHub zobowiązuje się do ochrony prywatności użytkowników. Niniejsza polityka prywatności wyjaśnia, 
+              VelvetBazaar.co.uk zobowiązuje się do ochrony prywatności użytkowników. Niniejsza polityka prywatności wyjaśnia, 
               jakie dane zbieramy, w jaki sposób je wykorzystujemy i jakie prawa przysługują użytkownikom.
             </p>
           </section>
@@ -95,7 +95,7 @@ const PrivacyPolicy = () => {
           <section>
             <h2 className="mb-4 text-2xl font-bold text-foreground">8. Kontakt</h2>
             <p className="text-muted-foreground leading-relaxed">
-              W sprawach dotyczących ochrony danych osobowych prosimy o kontakt: privacy@markethub.pl
+              W sprawach dotyczących ochrony danych osobowych prosimy o kontakt: privacy@velvetbazaar.co.uk
             </p>
           </section>
 

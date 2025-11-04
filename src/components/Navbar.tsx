@@ -66,7 +66,7 @@ export const Navbar = () => {
       <div className="container flex h-20 items-center justify-between">
         <Link to="/" className="group flex items-center space-x-3">
           <div className="h-10 w-10 rounded-xl bg-gradient-hero shadow-glow transition-all duration-300 group-hover:scale-110 group-hover:shadow-glow" />
-          <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">MarketHub</span>
+          <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">VelvetBazaar.co.uk</span>
         </Link>
 
         <div className="flex flex-1 items-center justify-center px-8">
