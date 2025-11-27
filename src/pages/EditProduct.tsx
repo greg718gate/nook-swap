@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -16,20 +16,34 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Sparkles, Loader2, X, Upload, ImagePlus } from "lucide-react";
+import { Loader2, X, ImagePlus, Trash2 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const MAX_IMAGES = 5;
 const MIN_IMAGES = 1;
 
-const Sell = () => {
+const EditProduct = () => {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [aiAnalyzing, setAiAnalyzing] = useState(false);
-  const [images, setImages] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [newImages, setNewImages] = useState<File[]>([]);
+  const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
+  const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
   const [uploadingImages, setUploadingImages] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
@@ -37,6 +51,7 @@ const Sell = () => {
     price: "",
     category_id: "",
     condition: "good",
+    status: "active",
     shipping_evri: "",
     shipping_royal_mail: "",
     shipping_inpost: "",
@@ -48,89 +63,62 @@ const Sell = () => {
       setUser(currentUser);
       if (!currentUser) {
         navigate("/auth");
+        return;
       }
+      fetchProduct(currentUser.id);
+      fetchCategories();
     });
-
-    fetchCategories();
-  }, [navigate]);
+  }, [navigate, id]);
 
   const fetchCategories = async () => {
     const { data } = await supabase.from("categories").select("*");
     if (data) setCategories(data);
   };
 
-  const handleAIAnalysis = async () => {
-    if (!formData.title && !formData.description && imagePreviews.length === 0) {
-      toast.error("Dodaj przynajmniej tytuł, opis lub zdjęcie produktu");
-      return;
-    }
+  const fetchProduct = async (userId: string) => {
+    if (!id) return;
 
-    setAiAnalyzing(true);
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/auto-tag-product`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({
-            imageUrl: imagePreviews[0] || null,
-            title: formData.title,
-            description: formData.description,
-          }),
-        }
-      );
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("id", id)
+        .single();
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to analyze");
+      if (error) throw error;
+
+      if (data.seller_id !== userId) {
+        toast.error("Nie masz uprawnień do edycji tego produktu");
+        navigate("/profile");
+        return;
       }
 
-      const result = await response.json();
-      
-      if (result.suggestedTitle && !formData.title) {
-        setFormData(prev => ({ ...prev, title: result.suggestedTitle }));
-      }
-      
-      if (result.category) {
-        const matchedCategory = categories.find(
-          c => c.name.toLowerCase() === result.category.toLowerCase()
-        );
-        if (matchedCategory) {
-          setFormData(prev => ({ ...prev, category_id: matchedCategory.id }));
-        }
-      }
-
-      if (result.condition) {
-        const conditionMap: Record<string, string> = {
-          new: "new",
-          used: "good",
-          "like new": "like-new",
-        };
-        const mappedCondition = conditionMap[result.condition.toLowerCase()] || "good";
-        setFormData(prev => ({ ...prev, condition: mappedCondition }));
-      }
-
-      toast.success(`AI Analysis: ${result.insights || "Analiza zakończona!"}`);
-      
-      if (result.tags && result.tags.length > 0) {
-        toast.info(`Sugerowane tagi: ${result.tags.join(", ")}`);
-      }
-    } catch (error) {
-      console.error("AI analysis error:", error);
-      toast.error(error instanceof Error ? error.message : "Nie udało się przeanalizować produktu");
+      setFormData({
+        title: data.title,
+        description: data.description,
+        price: data.price.toString(),
+        category_id: data.category_id || "",
+        condition: data.condition || "good",
+        status: data.status || "active",
+        shipping_evri: data.shipping_evri?.toString() || "",
+        shipping_royal_mail: data.shipping_royal_mail?.toString() || "",
+        shipping_inpost: data.shipping_inpost?.toString() || "",
+      });
+      setExistingImages(data.images || []);
+    } catch (error: any) {
+      toast.error("Nie udało się załadować produktu");
+      navigate("/profile");
     } finally {
-      setAiAnalyzing(false);
+      setInitialLoading(false);
     }
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
+    const totalImages = existingImages.length - imagesToDelete.length + newImages.length + files.length;
     
-    if (images.length + files.length > MAX_IMAGES) {
-      toast.error(`Możesz dodać maksymalnie ${MAX_IMAGES} zdjęć`);
+    if (totalImages > MAX_IMAGES) {
+      toast.error(`Możesz mieć maksymalnie ${MAX_IMAGES} zdjęć`);
       return;
     }
 
@@ -146,34 +134,38 @@ const Sell = () => {
       return true;
     });
 
-    setImages(prev => [...prev, ...validFiles]);
+    setNewImages(prev => [...prev, ...validFiles]);
 
     validFiles.forEach(file => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreviews(prev => [...prev, reader.result as string]);
+        setNewImagePreviews(prev => [...prev, reader.result as string]);
       };
       reader.readAsDataURL(file);
     });
   };
 
-  const removeImage = (index: number) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
-    setImagePreviews(prev => prev.filter((_, i) => i !== index));
+  const removeExistingImage = (url: string) => {
+    setImagesToDelete(prev => [...prev, url]);
   };
 
-  const uploadImagesToStorage = async (): Promise<string[]> => {
-    if (!user || images.length === 0) return [];
+  const removeNewImage = (index: number) => {
+    setNewImages(prev => prev.filter((_, i) => i !== index));
+    setNewImagePreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const uploadNewImages = async (): Promise<string[]> => {
+    if (!user || newImages.length === 0) return [];
 
     setUploadingImages(true);
     const uploadedUrls: string[] = [];
 
     try {
-      for (const file of images) {
+      for (const file of newImages) {
         const fileExt = file.name.split('.').pop();
         const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-        const { error: uploadError, data } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
           .from('product-images')
           .upload(fileName, file);
 
@@ -197,36 +189,43 @@ const Sell = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user || !id) return;
 
-    if (images.length < MIN_IMAGES) {
-      toast.error(`Dodaj przynajmniej ${MIN_IMAGES} zdjęcie produktu`);
+    const remainingExisting = existingImages.filter(img => !imagesToDelete.includes(img));
+    const totalImages = remainingExisting.length + newImages.length;
+
+    if (totalImages < MIN_IMAGES) {
+      toast.error(`Musisz mieć przynajmniej ${MIN_IMAGES} zdjęcie produktu`);
       return;
     }
 
     setLoading(true);
 
     try {
-      // Upload images first
-      const imageUrls = await uploadImagesToStorage();
+      const newImageUrls = await uploadNewImages();
+      const allImages = [...remainingExisting, ...newImageUrls];
 
-      const { error } = await supabase.from("products").insert({
-        seller_id: user.id,
-        title: formData.title,
-        description: formData.description,
-        price: parseFloat(formData.price),
-        category_id: formData.category_id || null,
-        condition: formData.condition,
-        status: "active",
-        images: imageUrls,
-        shipping_evri: parseFloat(formData.shipping_evri) || 0,
-        shipping_royal_mail: parseFloat(formData.shipping_royal_mail) || 0,
-        shipping_inpost: parseFloat(formData.shipping_inpost) || 0,
-      });
+      const { error } = await supabase
+        .from("products")
+        .update({
+          title: formData.title,
+          description: formData.description,
+          price: parseFloat(formData.price),
+          category_id: formData.category_id || null,
+          condition: formData.condition,
+          status: formData.status,
+          images: allImages,
+          shipping_evri: parseFloat(formData.shipping_evri) || 0,
+          shipping_royal_mail: parseFloat(formData.shipping_royal_mail) || 0,
+          shipping_inpost: parseFloat(formData.shipping_inpost) || 0,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", id)
+        .eq("seller_id", user.id);
 
       if (error) throw error;
 
-      toast.success("Produkt został dodany pomyślnie!");
+      toast.success("Produkt został zaktualizowany!");
       navigate("/profile");
     } catch (error: any) {
       toast.error(error.message);
@@ -235,70 +234,120 @@ const Sell = () => {
     }
   };
 
+  const handleDelete = async () => {
+    if (!user || !id) return;
+
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from("products")
+        .delete()
+        .eq("id", id)
+        .eq("seller_id", user.id);
+
+      if (error) throw error;
+
+      toast.success("Produkt został usunięty");
+      navigate("/profile");
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (initialLoading) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <Navbar />
+        <main className="flex-1 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  const remainingExistingImages = existingImages.filter(img => !imagesToDelete.includes(img));
+  const totalCurrentImages = remainingExistingImages.length + newImages.length;
+
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
       <main className="flex-1 bg-gradient-to-br from-background via-muted/20 to-background">
         <div className="container py-8">
           <div className="mx-auto max-w-2xl">
-            <h1 className="mb-8 text-3xl font-bold">Wystaw Przedmiot</h1>
+            <div className="flex items-center justify-between mb-8">
+              <h1 className="text-3xl font-bold">Edytuj Produkt</h1>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="sm">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Usuń
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Czy na pewno chcesz usunąć?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Ta akcja jest nieodwracalna. Produkt zostanie trwale usunięty.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Anuluj</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDelete}>Usuń</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
 
             <Card className="p-6">
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* AI Analysis Section */}
-                <div className="space-y-4 p-4 rounded-lg bg-gradient-to-r from-primary/5 to-accent/5 border border-primary/20">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-semibold">Automatyczne Tagowanie AI</h2>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleAIAnalysis}
-                      disabled={aiAnalyzing}
-                      className="gap-2"
-                    >
-                      {aiAnalyzing ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Analizuję...
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="h-4 w-4" />
-                          Analizuj z AI
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    AI przeanalizuje Twój produkt i automatycznie wypełni kategorię, tagi i stan.
-                  </p>
+                {/* Status */}
+                <div className="space-y-2">
+                  <Label>Status</Label>
+                  <Select
+                    value={formData.status}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, status: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Aktywny</SelectItem>
+                      <SelectItem value="inactive">Nieaktywny</SelectItem>
+                      <SelectItem value="sold">Sprzedany</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                {/* Multi-Image Upload */}
+                {/* Images */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <Label>Zdjęcia Produktu *</Label>
                     <span className="text-sm text-muted-foreground">
-                      {images.length}/{MAX_IMAGES} (min. {MIN_IMAGES})
+                      {totalCurrentImages}/{MAX_IMAGES} (min. {MIN_IMAGES})
                     </span>
                   </div>
                   
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    {imagePreviews.map((preview, index) => (
-                      <div key={index} className="relative group aspect-square">
+                    {remainingExistingImages.map((url, index) => (
+                      <div key={url} className="relative group aspect-square">
                         <img
-                          src={preview}
-                          alt={`Preview ${index + 1}`}
+                          src={url}
+                          alt={`Image ${index + 1}`}
                           className="w-full h-full object-cover rounded-lg border border-border"
                         />
                         <button
                           type="button"
-                          onClick={() => removeImage(index)}
+                          onClick={() => removeExistingImage(url)}
                           className="absolute top-2 right-2 p-1 bg-destructive text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <X className="h-4 w-4" />
                         </button>
-                        {index === 0 && (
+                        {index === 0 && newImages.length === 0 && (
                           <span className="absolute bottom-2 left-2 text-xs bg-primary text-primary-foreground px-2 py-1 rounded">
                             Główne
                           </span>
@@ -306,7 +355,27 @@ const Sell = () => {
                       </div>
                     ))}
                     
-                    {images.length < MAX_IMAGES && (
+                    {newImagePreviews.map((preview, index) => (
+                      <div key={`new-${index}`} className="relative group aspect-square">
+                        <img
+                          src={preview}
+                          alt={`New ${index + 1}`}
+                          className="w-full h-full object-cover rounded-lg border-2 border-primary/50"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeNewImage(index)}
+                          className="absolute top-2 right-2 p-1 bg-destructive text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                        <span className="absolute bottom-2 left-2 text-xs bg-accent text-accent-foreground px-2 py-1 rounded">
+                          Nowe
+                        </span>
+                      </div>
+                    ))}
+                    
+                    {totalCurrentImages < MAX_IMAGES && (
                       <label className="aspect-square flex flex-col items-center justify-center border-2 border-dashed border-muted-foreground/30 rounded-lg cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-all">
                         <ImagePlus className="h-8 w-8 text-muted-foreground mb-2" />
                         <span className="text-sm text-muted-foreground">Dodaj zdjęcie</span>
@@ -320,9 +389,6 @@ const Sell = () => {
                       </label>
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Pierwsze zdjęcie będzie głównym zdjęciem produktu. Maksymalny rozmiar: 5MB na zdjęcie.
-                  </p>
                 </div>
 
                 {/* Title */}
@@ -334,7 +400,6 @@ const Sell = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, title: e.target.value })
                     }
-                    placeholder="np. iPhone 13 Pro Max 256GB"
                     required
                     maxLength={100}
                   />
@@ -349,7 +414,6 @@ const Sell = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
                     }
-                    placeholder="Opisz szczegółowo swój przedmiot - stan, parametry, wady/zalety..."
                     rows={5}
                     required
                     maxLength={2000}
@@ -372,13 +436,12 @@ const Sell = () => {
                       onChange={(e) =>
                         setFormData({ ...formData, price: e.target.value })
                       }
-                      placeholder="0.00"
                       required
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="condition">Stan *</Label>
+                    <Label>Stan *</Label>
                     <Select
                       value={formData.condition}
                       onValueChange={(value) =>
@@ -400,7 +463,7 @@ const Sell = () => {
 
                 {/* Category */}
                 <div className="space-y-2">
-                  <Label htmlFor="category">Kategoria *</Label>
+                  <Label>Kategoria</Label>
                   <Select
                     value={formData.category_id}
                     onValueChange={(value) =>
@@ -420,13 +483,9 @@ const Sell = () => {
                   </Select>
                 </div>
 
-                {/* Shipping Options */}
+                {/* Shipping */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold">Opcje Wysyłki (£)</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Ustaw koszty wysyłki dla każdego przewoźnika. Kupujący pokryje koszt wysyłki.
-                  </p>
-                  
                   <div className="grid gap-4 sm:grid-cols-3">
                     <div className="space-y-2">
                       <Label htmlFor="shipping_evri">Evri</Label>
@@ -439,10 +498,8 @@ const Sell = () => {
                         onChange={(e) =>
                           setFormData({ ...formData, shipping_evri: e.target.value })
                         }
-                        placeholder="0.00"
                       />
                     </div>
-
                     <div className="space-y-2">
                       <Label htmlFor="shipping_royal_mail">Royal Mail</Label>
                       <Input
@@ -454,10 +511,8 @@ const Sell = () => {
                         onChange={(e) =>
                           setFormData({ ...formData, shipping_royal_mail: e.target.value })
                         }
-                        placeholder="0.00"
                       />
                     </div>
-
                     <div className="space-y-2">
                       <Label htmlFor="shipping_inpost">InPost</Label>
                       <Input
@@ -469,13 +524,12 @@ const Sell = () => {
                         onChange={(e) =>
                           setFormData({ ...formData, shipping_inpost: e.target.value })
                         }
-                        placeholder="0.00"
                       />
                     </div>
                   </div>
                 </div>
 
-                {/* Submit Buttons */}
+                {/* Buttons */}
                 <div className="flex gap-4">
                   <Button 
                     type="submit" 
@@ -485,16 +539,16 @@ const Sell = () => {
                     {loading || uploadingImages ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        {uploadingImages ? "Przesyłanie zdjęć..." : "Dodawanie..."}
+                        {uploadingImages ? "Przesyłanie..." : "Zapisywanie..."}
                       </>
                     ) : (
-                      "Wystaw Przedmiot"
+                      "Zapisz Zmiany"
                     )}
                   </Button>
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => navigate("/")}
+                    onClick={() => navigate("/profile")}
                   >
                     Anuluj
                   </Button>
@@ -509,4 +563,4 @@ const Sell = () => {
   );
 };
 
-export default Sell;
+export default EditProduct;

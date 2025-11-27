@@ -10,6 +10,7 @@ import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import Sell from "./pages/Sell";
+import EditProduct from "./pages/EditProduct";
 import SellerDashboard from "./pages/SellerDashboard";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Terms from "./pages/Terms";
@@ -35,6 +36,7 @@ const App = () => (
           <Route path="/cart" element={<Cart />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/sell" element={<Sell />} />
+          <Route path="/edit-product/:id" element={<EditProduct />} />
           <Route path="/dashboard" element={<SellerDashboard />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<Terms />} />
