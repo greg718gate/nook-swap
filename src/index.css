@@ -17,18 +17,30 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 190 95% 48%;
+    /* Primary: #4CAF50 - Green of Life & Growth */
+    --primary: 122 39% 49%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 190 95% 42%;
-    --primary-glow: 200 100% 65%;
+    --primary-hover: 122 39% 42%;
+    --primary-glow: 122 50% 60%;
     
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 222 47% 11%;
+    /* Secondary: Gradient base #6A11CB → #2575FC */
+    --secondary: 263 84% 43%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-end: 217 97% 57%;
 
-    --accent: 30 95% 58%;
+    /* Accent 1: #FF9800 - Orange of Creativity */
+    --accent: 33 100% 50%;
     --accent-foreground: 0 0% 100%;
-    --accent-hover: 30 95% 52%;
-    --accent-glow: 35 100% 70%;
+    --accent-hover: 33 100% 45%;
+    --accent-glow: 33 100% 65%;
+
+    /* Accent 2: #00BCD4 - Cyan of Technological Purity */
+    --accent-cyan: 187 100% 42%;
+    --accent-cyan-glow: 187 100% 55%;
+
+    /* Accent 3: #9C27B0 - Purple of Healing */
+    --accent-purple: 291 76% 42%;
+    --accent-purple-glow: 291 76% 55%;
 
     --muted: 220 14% 96%;
     --muted-foreground: 220 9% 46%;
@@ -38,68 +50,92 @@ All colors MUST be HSL.
 
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 190 95% 48%;
+    --ring: 122 39% 49%;
 
     --radius: 0.75rem;
 
-    --gradient-hero: linear-gradient(135deg, hsl(190 95% 48%) 0%, hsl(200 90% 55%) 50%, hsl(30 95% 58%) 100%);
-    --gradient-hero-overlay: linear-gradient(135deg, hsl(190 95% 48% / 0.95) 0%, hsl(200 90% 55% / 0.9) 50%, hsl(30 95% 58% / 0.85) 100%);
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(263 84% 43%) 0%, hsl(240 70% 50%) 50%, hsl(217 97% 57%) 100%);
+    --gradient-hero-overlay: linear-gradient(135deg, hsl(263 84% 43% / 0.95) 0%, hsl(240 70% 50% / 0.9) 50%, hsl(217 97% 57% / 0.85) 100%);
     --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(220 14% 98%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(30 95% 58%) 0%, hsl(35 100% 65%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(33 100% 50%) 0%, hsl(40 100% 60%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(263 84% 43%) 0%, hsl(217 97% 57%) 100%);
+    --gradient-healing: linear-gradient(135deg, hsl(291 76% 42%) 0%, hsl(263 84% 50%) 100%);
     --gradient-shimmer: linear-gradient(90deg, transparent 0%, hsl(0 0% 100% / 0.8) 50%, transparent 100%);
     
+    /* Shadows */
     --shadow-sm: 0 2px 4px 0 hsl(0 0% 0% / 0.06);
     --shadow-md: 0 6px 12px -2px hsl(0 0% 0% / 0.12), 0 2px 6px -1px hsl(0 0% 0% / 0.08);
     --shadow-lg: 0 15px 25px -5px hsl(0 0% 0% / 0.15), 0 6px 10px -3px hsl(0 0% 0% / 0.1);
     --shadow-xl: 0 25px 40px -8px hsl(0 0% 0% / 0.2), 0 12px 18px -6px hsl(0 0% 0% / 0.15);
-    --shadow-glow: 0 0 40px hsl(190 95% 48% / 0.6), 0 0 80px hsl(190 95% 48% / 0.3), 0 0 120px hsl(190 95% 48% / 0.15);
-    --shadow-glow-accent: 0 0 40px hsl(30 95% 58% / 0.6), 0 0 80px hsl(30 95% 58% / 0.3), 0 0 120px hsl(30 95% 58% / 0.15);
+    --shadow-glow: 0 0 40px hsl(122 39% 49% / 0.6), 0 0 80px hsl(122 39% 49% / 0.3), 0 0 120px hsl(122 39% 49% / 0.15);
+    --shadow-glow-accent: 0 0 40px hsl(33 100% 50% / 0.6), 0 0 80px hsl(33 100% 50% / 0.3), 0 0 120px hsl(33 100% 50% / 0.15);
+    --shadow-glow-secondary: 0 0 40px hsl(263 84% 43% / 0.5), 0 0 80px hsl(217 97% 57% / 0.3);
     
+    /* Transitions */
     --transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-slow: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 
   .dark {
-    --background: 222 47% 11%;
+    --background: 222 47% 8%;
     --foreground: 0 0% 98%;
 
-    --card: 222 47% 14%;
+    --card: 222 47% 12%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 222 47% 14%;
+    --popover: 222 47% 12%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 190 95% 48%;
+    /* Primary: #4CAF50 - Green of Life & Growth */
+    --primary: 122 39% 49%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 190 95% 42%;
-    --primary-glow: 200 100% 65%;
+    --primary-hover: 122 39% 55%;
+    --primary-glow: 122 50% 60%;
 
-    --secondary: 217 33% 18%;
-    --secondary-foreground: 0 0% 98%;
+    /* Secondary: Gradient base */
+    --secondary: 263 84% 50%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-end: 217 97% 60%;
 
-    --accent: 30 95% 58%;
+    /* Accent 1: #FF9800 - Orange of Creativity */
+    --accent: 33 100% 55%;
     --accent-foreground: 0 0% 100%;
-    --accent-hover: 30 95% 52%;
-    --accent-glow: 35 100% 70%;
+    --accent-hover: 33 100% 60%;
+    --accent-glow: 33 100% 70%;
+
+    /* Accent 2: #00BCD4 - Cyan */
+    --accent-cyan: 187 100% 45%;
+    --accent-cyan-glow: 187 100% 60%;
+
+    /* Accent 3: #9C27B0 - Purple of Healing */
+    --accent-purple: 291 76% 50%;
+    --accent-purple-glow: 291 76% 60%;
 
     --muted: 217 33% 18%;
     --muted-foreground: 215 20% 65%;
 
-    --destructive: 0 63% 31%;
+    --destructive: 0 63% 45%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 217 33% 18%;
+    --border: 217 33% 20%;
     --input: 217 33% 18%;
-    --ring: 190 95% 48%;
+    --ring: 122 39% 49%;
 
-    --gradient-hero: linear-gradient(135deg, hsl(190 85% 38%) 0%, hsl(200 85% 42%) 50%, hsl(30 95% 52%) 100%);
-    --gradient-hero-overlay: linear-gradient(135deg, hsl(190 85% 38% / 0.95) 0%, hsl(200 85% 42% / 0.9) 50%, hsl(30 95% 52% / 0.85) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(222 47% 14%) 0%, hsl(217 33% 16%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(30 95% 52%) 0%, hsl(35 100% 60%) 100%);
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(263 84% 35%) 0%, hsl(240 70% 40%) 50%, hsl(217 97% 50%) 100%);
+    --gradient-hero-overlay: linear-gradient(135deg, hsl(263 84% 35% / 0.95) 0%, hsl(240 70% 40% / 0.9) 50%, hsl(217 97% 50% / 0.85) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(222 47% 12%) 0%, hsl(217 33% 14%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(33 100% 55%) 0%, hsl(40 100% 65%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(263 84% 50%) 0%, hsl(217 97% 60%) 100%);
+    --gradient-healing: linear-gradient(135deg, hsl(291 76% 50%) 0%, hsl(263 84% 55%) 100%);
     --gradient-shimmer: linear-gradient(90deg, transparent 0%, hsl(0 0% 100% / 0.1) 50%, transparent 100%);
-    --shadow-glow: 0 0 40px hsl(190 95% 48% / 0.4), 0 0 80px hsl(190 95% 48% / 0.2), 0 0 120px hsl(190 95% 48% / 0.1);
-    --shadow-glow-accent: 0 0 40px hsl(30 95% 58% / 0.4), 0 0 80px hsl(30 95% 58% / 0.2), 0 0 120px hsl(30 95% 58% / 0.1);
+    
+    /* Shadows */
+    --shadow-glow: 0 0 40px hsl(122 39% 49% / 0.4), 0 0 80px hsl(122 39% 49% / 0.2), 0 0 120px hsl(122 39% 49% / 0.1);
+    --shadow-glow-accent: 0 0 40px hsl(33 100% 55% / 0.4), 0 0 80px hsl(33 100% 55% / 0.2), 0 0 120px hsl(33 100% 55% / 0.1);
+    --shadow-glow-secondary: 0 0 40px hsl(263 84% 50% / 0.4), 0 0 80px hsl(217 97% 60% / 0.3);
   }
 }
 
