@@ -1,11 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import electronicsImg from "@/assets/category-electronics.jpg";
-import fashionImg from "@/assets/category-fashion.jpg";
-import homeImg from "@/assets/category-home.jpg";
-import sportsImg from "@/assets/category-sports.jpg";
-import booksImg from "@/assets/category-books.jpg";
-import toysImg from "@/assets/category-toys.jpg";
+import consciousNourishmentImg from "@/assets/category-conscious-nourishment.jpg";
+import spiritualEducationImg from "@/assets/category-spiritual-education.jpg";
+import artWithPurposeImg from "@/assets/category-art-with-purpose.jpg";
+import consciousnessTechnologyImg from "@/assets/category-consciousness-technology.jpg";
+import healingServicesImg from "@/assets/category-healing-services.jpg";
 
 interface Category {
   id: string;
@@ -20,12 +19,11 @@ interface CategoryGridProps {
 }
 
 const categoryImages: Record<string, string> = {
-  electronics: electronicsImg,
-  fashion: fashionImg,
-  home: homeImg,
-  sports: sportsImg,
-  books: booksImg,
-  toys: toysImg,
+  "conscious-nourishment": consciousNourishmentImg,
+  "spiritual-education": spiritualEducationImg,
+  "art-with-purpose": artWithPurposeImg,
+  "consciousness-technology": consciousnessTechnologyImg,
+  "healing-services": healingServicesImg,
 };
 
 export const CategoryGrid = ({ categories }: CategoryGridProps) => {
@@ -42,7 +40,7 @@ export const CategoryGrid = ({ categories }: CategoryGridProps) => {
             Discover amazing products across all categories
           </p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
           {categories.map((category, index) => (
             <button
               key={category.id}
