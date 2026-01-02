@@ -28,6 +28,7 @@ export default {
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
+          end: "hsl(var(--secondary-end))",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -42,6 +43,10 @@ export default {
           foreground: "hsl(var(--accent-foreground))",
           hover: "hsl(var(--accent-hover))",
           glow: "hsl(var(--accent-glow))",
+          cyan: "hsl(var(--accent-cyan))",
+          "cyan-glow": "hsl(var(--accent-cyan-glow))",
+          purple: "hsl(var(--accent-purple))",
+          "purple-glow": "hsl(var(--accent-purple-glow))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -57,6 +62,8 @@ export default {
         'gradient-hero-overlay': 'var(--gradient-hero-overlay)',
         'gradient-card': 'var(--gradient-card)',
         'gradient-accent': 'var(--gradient-accent)',
+        'gradient-secondary': 'var(--gradient-secondary)',
+        'gradient-healing': 'var(--gradient-healing)',
         'gradient-shimmer': 'var(--gradient-shimmer)',
       },
       boxShadow: {
@@ -66,6 +73,7 @@ export default {
         'xl': 'var(--shadow-xl)',
         'glow': 'var(--shadow-glow)',
         'glow-accent': 'var(--shadow-glow-accent)',
+        'glow-secondary': 'var(--shadow-glow-secondary)',
       },
       transitionProperty: {
         'base': 'var(--transition-base)',

@@ -12,12 +12,13 @@ export const Hero = () => {
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${heroBg})` }}
       />
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/90 via-primary/70 to-accent/80 backdrop-blur-sm" />
+      {/* Gradient secondary (fioletowo-niebieski) - duchowa transformacja */}
+      <div className="absolute inset-0 bg-gradient-secondary backdrop-blur-sm" />
       
       {/* Floating orbs */}
       <div className="absolute top-20 left-10 h-72 w-72 rounded-full bg-white/20 blur-3xl animate-float" />
-      <div className="absolute bottom-20 right-10 h-96 w-96 rounded-full bg-accent/30 blur-3xl animate-float" style={{ animationDelay: '1s' }} />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-primary-glow/20 blur-3xl animate-pulse" />
+      <div className="absolute bottom-20 right-10 h-96 w-96 rounded-full bg-accent-purple/30 blur-3xl animate-float" style={{ animationDelay: '1s' }} />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-secondary-end/20 blur-3xl animate-pulse" />
       
       <div className="container relative z-10">
         <div className="mx-auto max-w-4xl text-center">
