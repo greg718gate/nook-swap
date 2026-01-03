@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Sparkles, Loader2, X, Upload, ImagePlus } from "lucide-react";
+import { Sparkles, Loader2, X, Upload, ImagePlus, FileUp } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 const MAX_IMAGES = 5;
@@ -31,12 +31,15 @@ const Sell = () => {
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [uploadingImages, setUploadingImages] = useState(false);
+  const [digitalFile, setDigitalFile] = useState<File | null>(null);
+  const [uploadingDigitalFile, setUploadingDigitalFile] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     price: "",
     category_id: "",
     condition: "good",
+    product_type: "physical",
     shipping_evri: "",
     shipping_royal_mail: "",
     shipping_inpost: "",
@@ -195,6 +198,41 @@ const Sell = () => {
     }
   };
 
+  const handleDigitalFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 100 * 1024 * 1024) {
+      toast.error("Plik jest zbyt duży (max 100MB)");
+      return;
+    }
+
+    setDigitalFile(file);
+  };
+
+  const uploadDigitalFile = async (): Promise<{ url: string; name: string } | null> => {
+    if (!user || !digitalFile) return null;
+
+    setUploadingDigitalFile(true);
+    try {
+      const fileExt = digitalFile.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('digital-products')
+        .upload(fileName, digitalFile);
+
+      if (uploadError) throw uploadError;
+
+      return { url: fileName, name: digitalFile.name };
+    } catch (error) {
+      console.error('Error uploading digital file:', error);
+      throw error;
+    } finally {
+      setUploadingDigitalFile(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -204,11 +242,22 @@ const Sell = () => {
       return;
     }
 
+    if (formData.product_type === "digital" && !digitalFile) {
+      toast.error("Dodaj plik do pobrania dla produktu cyfrowego");
+      return;
+    }
+
     setLoading(true);
 
     try {
       // Upload images first
       const imageUrls = await uploadImagesToStorage();
+
+      // Upload digital file if digital product
+      let digitalFileData = null;
+      if (formData.product_type === "digital") {
+        digitalFileData = await uploadDigitalFile();
+      }
 
       const { error } = await supabase.from("products").insert({
         seller_id: user.id,
@@ -216,12 +265,15 @@ const Sell = () => {
         description: formData.description,
         price: parseFloat(formData.price),
         category_id: formData.category_id || null,
-        condition: formData.condition,
+        condition: formData.product_type === "digital" ? null : formData.condition,
         status: "active",
         images: imageUrls,
-        shipping_evri: parseFloat(formData.shipping_evri) || 0,
-        shipping_royal_mail: parseFloat(formData.shipping_royal_mail) || 0,
-        shipping_inpost: parseFloat(formData.shipping_inpost) || 0,
+        product_type: formData.product_type,
+        digital_file_url: digitalFileData?.url || null,
+        digital_file_name: digitalFileData?.name || null,
+        shipping_evri: formData.product_type === "physical" ? (parseFloat(formData.shipping_evri) || 0) : 0,
+        shipping_royal_mail: formData.product_type === "physical" ? (parseFloat(formData.shipping_royal_mail) || 0) : 0,
+        shipping_inpost: formData.product_type === "physical" ? (parseFloat(formData.shipping_inpost) || 0) : 0,
       });
 
       if (error) throw error;
@@ -359,6 +411,53 @@ const Sell = () => {
                   </p>
                 </div>
 
+                {/* Product Type */}
+                <div className="space-y-2">
+                  <Label>Typ produktu *</Label>
+                  <Select
+                    value={formData.product_type}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, product_type: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="physical">Fizyczny (do wysyłki)</SelectItem>
+                      <SelectItem value="digital">Cyfrowy (do pobrania)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Digital File Upload */}
+                {formData.product_type === "digital" && (
+                  <div className="space-y-4 p-4 rounded-lg border border-primary/20 bg-primary/5">
+                    <div className="flex items-center justify-between">
+                      <Label>Plik do pobrania *</Label>
+                      {digitalFile && (
+                        <span className="text-sm text-muted-foreground">
+                          {digitalFile.name} ({(digitalFile.size / 1024 / 1024).toFixed(2)} MB)
+                        </span>
+                      )}
+                    </div>
+                    <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-muted-foreground/30 rounded-lg cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-all">
+                      <FileUp className="h-10 w-10 text-muted-foreground mb-2" />
+                      <span className="text-sm text-muted-foreground">
+                        {digitalFile ? "Zmień plik" : "Wybierz plik do pobrania"}
+                      </span>
+                      <span className="text-xs text-muted-foreground mt-1">
+                        Max 100MB
+                      </span>
+                      <input
+                        type="file"
+                        onChange={handleDigitalFileUpload}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                )}
+
                 {/* Price and Condition */}
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
@@ -377,25 +476,27 @@ const Sell = () => {
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="condition">Stan *</Label>
-                    <Select
-                      value={formData.condition}
-                      onValueChange={(value) =>
-                        setFormData({ ...formData, condition: value })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="new">Nowy</SelectItem>
-                        <SelectItem value="like-new">Jak nowy</SelectItem>
-                        <SelectItem value="good">Dobry</SelectItem>
-                        <SelectItem value="fair">Używany</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  {formData.product_type === "physical" && (
+                    <div className="space-y-2">
+                      <Label htmlFor="condition">Stan *</Label>
+                      <Select
+                        value={formData.condition}
+                        onValueChange={(value) =>
+                          setFormData({ ...formData, condition: value })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="new">Nowy</SelectItem>
+                          <SelectItem value="like-new">Jak nowy</SelectItem>
+                          <SelectItem value="good">Dobry</SelectItem>
+                          <SelectItem value="fair">Używany</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
                 </div>
 
                 {/* Category */}
@@ -420,60 +521,62 @@ const Sell = () => {
                   </Select>
                 </div>
 
-                {/* Shipping Options */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Opcje Wysyłki (£)</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Ustaw koszty wysyłki dla każdego przewoźnika. Kupujący pokryje koszt wysyłki.
-                  </p>
-                  
-                  <div className="grid gap-4 sm:grid-cols-3">
-                    <div className="space-y-2">
-                      <Label htmlFor="shipping_evri">Evri</Label>
-                      <Input
-                        id="shipping_evri"
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={formData.shipping_evri}
-                        onChange={(e) =>
-                          setFormData({ ...formData, shipping_evri: e.target.value })
-                        }
-                        placeholder="0.00"
-                      />
-                    </div>
+                {/* Shipping Options - only for physical products */}
+                {formData.product_type === "physical" && (
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">Opcje Wysyłki (£)</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Ustaw koszty wysyłki dla każdego przewoźnika. Kupujący pokryje koszt wysyłki.
+                    </p>
+                    
+                    <div className="grid gap-4 sm:grid-cols-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="shipping_evri">Evri</Label>
+                        <Input
+                          id="shipping_evri"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={formData.shipping_evri}
+                          onChange={(e) =>
+                            setFormData({ ...formData, shipping_evri: e.target.value })
+                          }
+                          placeholder="0.00"
+                        />
+                      </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="shipping_royal_mail">Royal Mail</Label>
-                      <Input
-                        id="shipping_royal_mail"
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={formData.shipping_royal_mail}
-                        onChange={(e) =>
-                          setFormData({ ...formData, shipping_royal_mail: e.target.value })
-                        }
-                        placeholder="0.00"
-                      />
-                    </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="shipping_royal_mail">Royal Mail</Label>
+                        <Input
+                          id="shipping_royal_mail"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={formData.shipping_royal_mail}
+                          onChange={(e) =>
+                            setFormData({ ...formData, shipping_royal_mail: e.target.value })
+                          }
+                          placeholder="0.00"
+                        />
+                      </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="shipping_inpost">InPost</Label>
-                      <Input
-                        id="shipping_inpost"
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={formData.shipping_inpost}
-                        onChange={(e) =>
-                          setFormData({ ...formData, shipping_inpost: e.target.value })
-                        }
-                        placeholder="0.00"
-                      />
+                      <div className="space-y-2">
+                        <Label htmlFor="shipping_inpost">InPost</Label>
+                        <Input
+                          id="shipping_inpost"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={formData.shipping_inpost}
+                          onChange={(e) =>
+                            setFormData({ ...formData, shipping_inpost: e.target.value })
+                          }
+                          placeholder="0.00"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
                 {/* Submit Buttons */}
                 <div className="flex gap-4">

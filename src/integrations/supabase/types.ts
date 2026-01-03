@@ -236,30 +236,42 @@ export type Database = {
           buyer_id: string
           created_at: string | null
           id: string
+          platform_fee: number | null
+          seller_payout: number | null
           shipping_address: string | null
           shipping_cost: number | null
           shipping_method: string | null
           status: string | null
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
           total_amount: number
         }
         Insert: {
           buyer_id: string
           created_at?: string | null
           id?: string
+          platform_fee?: number | null
+          seller_payout?: number | null
           shipping_address?: string | null
           shipping_cost?: number | null
           shipping_method?: string | null
           status?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
           total_amount: number
         }
         Update: {
           buyer_id?: string
           created_at?: string | null
           id?: string
+          platform_fee?: number | null
+          seller_payout?: number | null
           shipping_address?: string | null
           shipping_cost?: number | null
           shipping_method?: string | null
           status?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
           total_amount?: number
         }
         Relationships: [
@@ -278,9 +290,12 @@ export type Database = {
           condition: string | null
           created_at: string | null
           description: string
+          digital_file_name: string | null
+          digital_file_url: string | null
           id: string
           images: string[] | null
           price: number
+          product_type: string
           seller_id: string
           shipping_evri: number | null
           shipping_inpost: number | null
@@ -295,9 +310,12 @@ export type Database = {
           condition?: string | null
           created_at?: string | null
           description: string
+          digital_file_name?: string | null
+          digital_file_url?: string | null
           id?: string
           images?: string[] | null
           price: number
+          product_type?: string
           seller_id: string
           shipping_evri?: number | null
           shipping_inpost?: number | null
@@ -312,9 +330,12 @@ export type Database = {
           condition?: string | null
           created_at?: string | null
           description?: string
+          digital_file_name?: string | null
+          digital_file_url?: string | null
           id?: string
           images?: string[] | null
           price?: number
+          product_type?: string
           seller_id?: string
           shipping_evri?: number | null
           shipping_inpost?: number | null
@@ -350,6 +371,8 @@ export type Database = {
           id: string
           location: string | null
           rating: number | null
+          stripe_account_id: string | null
+          stripe_onboarded: boolean | null
           total_reviews: number | null
           updated_at: string | null
           username: string
@@ -362,6 +385,8 @@ export type Database = {
           id: string
           location?: string | null
           rating?: number | null
+          stripe_account_id?: string | null
+          stripe_onboarded?: boolean | null
           total_reviews?: number | null
           updated_at?: string | null
           username: string
@@ -374,11 +399,61 @@ export type Database = {
           id?: string
           location?: string | null
           rating?: number | null
+          stripe_account_id?: string | null
+          stripe_onboarded?: boolean | null
           total_reviews?: number | null
           updated_at?: string | null
           username?: string
         }
         Relationships: []
+      }
+      purchases: {
+        Row: {
+          buyer_id: string
+          created_at: string | null
+          download_count: number | null
+          id: string
+          max_downloads: number | null
+          order_id: string | null
+          product_id: string | null
+          seller_id: string
+        }
+        Insert: {
+          buyer_id: string
+          created_at?: string | null
+          download_count?: number | null
+          id?: string
+          max_downloads?: number | null
+          order_id?: string | null
+          product_id?: string | null
+          seller_id: string
+        }
+        Update: {
+          buyer_id?: string
+          created_at?: string | null
+          download_count?: number | null
+          id?: string
+          max_downloads?: number | null
+          order_id?: string | null
+          product_id?: string | null
+          seller_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchases_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchases_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reviews: {
         Row: {
