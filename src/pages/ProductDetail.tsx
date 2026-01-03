@@ -7,9 +7,10 @@ import { ReviewSection } from "@/components/ReviewSection";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Star, ShoppingCart, User } from "lucide-react";
+import { Star, ShoppingCart, User, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
+import { useMessages } from "@/hooks/useMessages";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -17,6 +18,8 @@ const ProductDetail = () => {
   const [product, setProduct] = useState<any>(null);
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [contactingLoading, setContactingLoading] = useState(false);
+  const { startConversation } = useMessages(user?.id);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -81,6 +84,30 @@ const ProductDetail = () => {
       } else {
         toast.error("Failed to add to cart");
       }
+    }
+  };
+
+  const handleContactSeller = async () => {
+    if (!user) {
+      toast.error("Zaloguj się, aby skontaktować się ze sprzedawcą");
+      navigate("/auth");
+      return;
+    }
+
+    if (user.id === product.seller_id) {
+      toast.error("Nie możesz napisać do siebie");
+      return;
+    }
+
+    setContactingLoading(true);
+    try {
+      const conversationId = await startConversation(product.seller_id, id);
+      if (conversationId) {
+        navigate(`/profile?tab=messages&conversation=${conversationId}`);
+        toast.success("Rozmowa rozpoczęta!");
+      }
+    } finally {
+      setContactingLoading(false);
     }
   };
 
@@ -186,8 +213,15 @@ const ProductDetail = () => {
                   <ShoppingCart className="h-5 w-5" />
                   Add to Cart
                 </Button>
-                <Button size="lg" variant="outline" className="flex-1">
-                  Contact Seller
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="flex-1 gap-2"
+                  onClick={handleContactSeller}
+                  disabled={contactingLoading || product.seller_id === user?.id}
+                >
+                  <MessageCircle className="h-5 w-5" />
+                  {contactingLoading ? "Łączenie..." : "Napisz do sprzedawcy"}
                 </Button>
               </div>
 

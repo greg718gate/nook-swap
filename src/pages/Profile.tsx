@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Star, User, Edit, Eye, Trash2 } from "lucide-react";
+import { Star, User, Edit, Eye, Trash2, MessageCircle } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,13 +21,19 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
+import { MessagesSection } from "@/components/MessagesSection";
+import { useMessages } from "@/hooks/useMessages";
 
 const Profile = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [profile, setProfile] = useState<any>(null);
   const [products, setProducts] = useState<any[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
+  const { unreadCount } = useMessages(user?.id);
+  
+  const defaultTab = searchParams.get('tab') || 'listings';
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -151,10 +157,19 @@ const Profile = () => {
             </div>
           </Card>
 
-          <Tabs defaultValue="listings">
+          <Tabs defaultValue={defaultTab}>
             <TabsList className="mb-6">
               <TabsTrigger value="listings">Moje Ogłoszenia</TabsTrigger>
               <TabsTrigger value="orders">Moje Zamówienia</TabsTrigger>
+              <TabsTrigger value="messages" className="relative">
+                <MessageCircle className="h-4 w-4 mr-2" />
+                Wiadomości
+                {unreadCount > 0 && (
+                  <Badge className="ml-2 h-5 w-5 p-0 flex items-center justify-center bg-accent-orange text-white">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </Badge>
+                )}
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="listings" className="space-y-4">
@@ -288,6 +303,11 @@ const Profile = () => {
                   ))}
                 </div>
               )}
+            </TabsContent>
+
+            <TabsContent value="messages">
+              <h2 className="mb-6 text-2xl font-bold">Wiadomości</h2>
+              <MessagesSection userId={user.id} />
             </TabsContent>
           </Tabs>
         </div>
