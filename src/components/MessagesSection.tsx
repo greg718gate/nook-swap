@@ -1,0 +1,61 @@
+import { useState } from "react";
+import { ConversationList } from "./ConversationList";
+import { ChatDialog } from "./ChatDialog";
+import { useMessages, Conversation } from "@/hooks/useMessages";
+
+interface MessagesSectionProps {
+  userId: string;
+}
+
+export const MessagesSection = ({ userId }: MessagesSectionProps) => {
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
+  
+  const { 
+    conversations, 
+    loading, 
+    sendMessage, 
+    markAsRead 
+  } = useMessages(userId);
+
+  const selectedConversation = conversations.find(c => c.id === selectedConversationId) || null;
+
+  return (
+    <div className="grid gap-4 lg:grid-cols-[350px_1fr] h-[600px]">
+      <div className="overflow-auto">
+        <ConversationList
+          conversations={conversations}
+          selectedId={selectedConversationId}
+          onSelect={setSelectedConversationId}
+          loading={loading}
+        />
+      </div>
+      <div className="hidden lg:block">
+        <ChatDialog
+          conversation={selectedConversation}
+          currentUserId={userId}
+          onSendMessage={sendMessage}
+          onMarkAsRead={markAsRead}
+        />
+      </div>
+      {/* Mobile: Show chat in place of list when selected */}
+      {selectedConversationId && (
+        <div className="lg:hidden fixed inset-0 z-50 bg-background p-4">
+          <button 
+            onClick={() => setSelectedConversationId(null)}
+            className="mb-4 text-sm text-primary hover:underline"
+          >
+            ← Powrót do listy
+          </button>
+          <div className="h-[calc(100vh-80px)]">
+            <ChatDialog
+              conversation={selectedConversation}
+              currentUserId={userId}
+              onSendMessage={sendMessage}
+              onMarkAsRead={markAsRead}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

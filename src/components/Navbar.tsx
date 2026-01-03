@@ -1,16 +1,17 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, User, Plus, Search, BarChart3 } from "lucide-react";
+import { ShoppingCart, User, Plus, Search, BarChart3, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { Input } from "@/components/ui/input";
+import { useMessages } from "@/hooks/useMessages";
 
 export const Navbar = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [cartCount, setCartCount] = useState(0);
-
+  const { unreadCount } = useMessages(user?.id);
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
@@ -104,6 +105,19 @@ export const Navbar = () => {
               >
                 <BarChart3 className="h-4 w-4" />
                 Dashboard
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate("/profile?tab=messages")}
+                className="relative hover:bg-accent-healing/10 hover:text-accent-healing transition-all"
+              >
+                <MessageCircle className="h-5 w-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-accent-orange text-xs font-bold text-white shadow-lg animate-scale-in">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
               </Button>
               <Button
                 variant="ghost"
