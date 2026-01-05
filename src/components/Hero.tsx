@@ -32,18 +32,18 @@ export const Hero = () => {
             </span>
           </h1>
           <p className="mb-12 text-xl md:text-2xl text-white/95 animate-fade-in drop-shadow-lg leading-relaxed" style={{ animationDelay: '0.2s' }}>
-            Join thousands of buyers and sellers in the most trusted marketplace.
+            Join thousands buying and selling fashion, vintage, handmade items and more
             <br className="hidden md:block" />
-            Find great deals or turn your items into cash today.
+            on the UK's trusted marketplace.
           </p>
           <div className="flex flex-col items-center justify-center gap-5 sm:flex-row animate-fade-in" style={{ animationDelay: '0.3s' }}>
             <Button
               size="lg"
-              onClick={() => navigate("/products")}
+              onClick={() => navigate("/auth")}
               className="group w-full sm:w-auto text-lg px-10 py-7 bg-white text-primary hover:bg-white/90 shadow-2xl hover:shadow-glow hover:scale-110 transition-all duration-300 font-bold"
             >
               <span className="relative flex items-center gap-2">
-                🛍️ Start Shopping
+                🚀 Get Started
               </span>
             </Button>
             <Button

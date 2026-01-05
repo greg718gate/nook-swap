@@ -12,6 +12,7 @@ export const Navbar = () => {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [cartCount, setCartCount] = useState(0);
   const { unreadCount } = useMessages(user?.id);
+  
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
@@ -86,17 +87,33 @@ export const Navbar = () => {
         </div>
 
         <div className="flex items-center space-x-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate("/")}
+            className="hover:bg-primary/10 hover:text-primary transition-all"
+          >
+            Home
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate("/products")}
+            className="hover:bg-primary/10 hover:text-primary transition-all"
+          >
+            Browse
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate("/sell")}
+            className="gap-2 hover:bg-primary/10 hover:text-primary transition-all"
+          >
+            <Plus className="h-4 w-4" />
+            Sell
+          </Button>
           {user ? (
             <>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/sell")}
-                className="gap-2 hover:bg-primary/10 hover:text-primary transition-all"
-              >
-                <Plus className="h-4 w-4" />
-                Sell
-              </Button>
               <Button
                 variant="ghost"
                 size="sm"
@@ -145,7 +162,7 @@ export const Navbar = () => {
               </Button>
             </>
           ) : (
-            <Button onClick={() => navigate("/auth")} className="shadow-lg hover:shadow-xl transition-all">Sign In</Button>
+            <Button onClick={() => navigate("/auth")} className="shadow-lg hover:shadow-xl transition-all">Log In / Sign Up</Button>
           )}
         </div>
       </div>
