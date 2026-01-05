@@ -1,10 +1,4 @@
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import consciousNourishmentImg from "@/assets/category-conscious-nourishment.jpg";
-import spiritualEducationImg from "@/assets/category-spiritual-education.jpg";
-import artWithPurposeImg from "@/assets/category-art-with-purpose.jpg";
-import consciousnessTechnologyImg from "@/assets/category-consciousness-technology.jpg";
-import healingServicesImg from "@/assets/category-healing-services.jpg";
 
 interface Category {
   id: string;
@@ -18,12 +12,20 @@ interface CategoryGridProps {
   categories: Category[];
 }
 
-const categoryImages: Record<string, string> = {
-  "conscious-nourishment": consciousNourishmentImg,
-  "spiritual-education": spiritualEducationImg,
-  "art-with-purpose": artWithPurposeImg,
-  "consciousness-technology": consciousnessTechnologyImg,
-  "healing-services": healingServicesImg,
+// Gradient backgrounds for categories without images
+const categoryGradients: Record<string, string> = {
+  "womens-clothing": "from-pink-400 to-rose-500",
+  "mens-clothing": "from-blue-400 to-indigo-500",
+  "shoes-bags": "from-amber-400 to-orange-500",
+  "accessories-jewellery": "from-purple-400 to-fuchsia-500",
+  "beauty-health": "from-rose-300 to-pink-500",
+  "home-garden": "from-green-400 to-emerald-500",
+  "kids-baby": "from-yellow-300 to-amber-400",
+  "electronics-tech": "from-slate-400 to-gray-600",
+  "handmade-crafts": "from-orange-300 to-red-400",
+  "sports-outdoors": "from-teal-400 to-cyan-500",
+  "books-media-hobbies": "from-indigo-400 to-violet-500",
+  "other": "from-gray-400 to-slate-500",
 };
 
 export const CategoryGrid = ({ categories }: CategoryGridProps) => {
@@ -49,18 +51,7 @@ export const CategoryGrid = ({ categories }: CategoryGridProps) => {
               style={{ animationDelay: `${index * 0.05}s` }}
             >
               <div className="aspect-square overflow-hidden relative">
-                {categoryImages[category.slug] ? (
-                  <>
-                    <img
-                      src={categoryImages[category.slug]}
-                      alt={category.name}
-                      className="h-full w-full object-cover transition-all duration-500 group-hover:scale-125 group-hover:rotate-3"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300" />
-                  </>
-                ) : (
-                  <div className="h-full w-full bg-gradient-to-br from-primary/20 to-accent/20" />
-                )}
+                <div className={`h-full w-full bg-gradient-to-br ${categoryGradients[category.slug] || "from-primary/20 to-accent/20"}`} />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center transform transition-all duration-300 group-hover:scale-110">
                     {category.icon && (
