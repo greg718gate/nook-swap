@@ -52,7 +52,7 @@ export const ProductCard = ({
             {title}
           </h3>
           <div className="mb-4 text-2xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-            ${price.toFixed(2)}
+            £{price.toFixed(2)}
           </div>
           <div className="flex items-center justify-between text-sm text-muted-foreground border-t border-border/50 pt-3">
             <span className="font-medium">{seller.username}</span>
