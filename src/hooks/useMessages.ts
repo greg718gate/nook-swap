@@ -223,6 +223,12 @@ export const useMessages = (userId: string | undefined) => {
         });
 
       if (error) throw error;
+
+      // Send email notification to the other participant (fire-and-forget)
+      supabase.functions.invoke('notify-new-message', {
+        body: { conversationId, messageContent: content }
+      }).catch(err => console.error('Email notification error:', err));
+
       return true;
     } catch (error) {
       console.error('Error sending message:', error);
