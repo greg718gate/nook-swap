@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -6,7 +6,15 @@ import { ProductCard } from "@/components/ProductCard";
 import { ChatAssistant } from "@/components/ChatAssistant";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useSearchParams } from "react-router-dom";
+import { Loader2 } from "lucide-react";
 
 interface Product {
   id: string;
@@ -27,37 +35,76 @@ interface Category {
   icon?: string;
 }
 
+type SortOption = "newest" | "price_asc" | "price_desc";
+
+const PAGE_SIZE = 12;
+
 const Products = () => {
   const [searchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<SortOption>("newest");
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(0);
 
   useEffect(() => {
     fetchCategories();
-    fetchProducts();
-  }, [searchParams]);
+  }, []);
+
+  useEffect(() => {
+    // Reset and fetch when search/category/sort changes
+    setProducts([]);
+    setPage(0);
+    setHasMore(true);
+    fetchProducts(0, true);
+  }, [searchParams, sortBy]);
 
   const fetchCategories = async () => {
     const { data } = await supabase.from("categories").select("*");
     if (data) setCategories(data);
   };
 
-  const fetchProducts = async () => {
-    setLoading(true);
-    let query = supabase
-      .from("products")
-      .select("id, title, price, images, condition, profiles(username, rating)")
-      .eq("status", "active")
-      .order("created_at", { ascending: false });
+  const buildQuery = useCallback(
+    (offset: number) => {
+      let query = supabase
+        .from("products")
+        .select("id, title, price, images, condition, profiles(username, rating)")
+        .eq("status", "active");
 
-    const search = searchParams.get("search");
-    const category = searchParams.get("category");
+      const search = searchParams.get("search");
+      const category = searchParams.get("category");
 
-    if (search) {
-      query = query.ilike("title", `%${search}%`);
-    }
+      if (search) {
+        query = query.ilike("title", `%${search}%`);
+      }
+
+      // Sort
+      if (sortBy === "price_asc") {
+        query = query.order("price", { ascending: true });
+      } else if (sortBy === "price_desc") {
+        query = query.order("price", { ascending: false });
+      } else {
+        query = query.order("created_at", { ascending: false });
+      }
+
+      query = query.range(offset, offset + PAGE_SIZE - 1);
+
+      return { query, category };
+    },
+    [searchParams, sortBy]
+  );
+
+  const fetchProducts = async (pageNum: number, reset: boolean) => {
+    if (reset) setLoading(true);
+    else setLoadingMore(true);
+
+    const offset = pageNum * PAGE_SIZE;
+    const { query, category } = buildQuery(offset);
+
+    let finalQuery = query;
 
     if (category) {
       const { data: categoryData } = await supabase
@@ -65,16 +112,38 @@ const Products = () => {
         .select("id")
         .eq("slug", category)
         .single();
-      
+
       if (categoryData) {
-        query = query.eq("category_id", categoryData.id);
+        finalQuery = finalQuery.eq("category_id", categoryData.id);
         setSelectedCategory(category);
       }
+    } else {
+      setSelectedCategory(searchParams.get("category"));
     }
 
-    const { data } = await query;
-    if (data) setProducts(data as Product[]);
+    const { data } = await finalQuery;
+
+    if (data) {
+      const typed = data as Product[];
+      if (reset) {
+        setProducts(typed);
+      } else {
+        setProducts((prev) => [...prev, ...typed]);
+      }
+      setHasMore(typed.length === PAGE_SIZE);
+      setPage(pageNum);
+    }
+
     setLoading(false);
+    setLoadingMore(false);
+  };
+
+  const handleLoadMore = () => {
+    fetchProducts(page + 1, false);
+  };
+
+  const handleSortChange = (value: string) => {
+    setSortBy(value as SortOption);
   };
 
   return (
@@ -113,6 +182,23 @@ const Products = () => {
             </div>
           </div>
 
+          {/* Sort controls */}
+          <div className="mb-6 flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              {!loading && `${products.length} product${products.length !== 1 ? "s" : ""}`}
+            </p>
+            <Select value={sortBy} onValueChange={handleSortChange}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Newest First</SelectItem>
+                <SelectItem value="price_asc">Price: Low to High</SelectItem>
+                <SelectItem value="price_desc">Price: High to Low</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           {loading ? (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {[...Array(8)].map((_, i) => (
@@ -128,22 +214,45 @@ const Products = () => {
               <p className="text-muted-foreground">No products found</p>
             </div>
           ) : (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {products.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  id={product.id}
-                  title={product.title}
-                  price={product.price}
-                  image={product.images[0]}
-                  condition={product.condition}
-                  seller={{
-                    username: product.profiles.username,
-                    rating: product.profiles.rating,
-                  }}
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {products.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    id={product.id}
+                    title={product.title}
+                    price={product.price}
+                    image={product.images[0]}
+                    condition={product.condition}
+                    seller={{
+                      username: product.profiles.username,
+                      rating: product.profiles.rating,
+                    }}
+                  />
+                ))}
+              </div>
+
+              {hasMore && (
+                <div className="mt-10 text-center">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={handleLoadMore}
+                    disabled={loadingMore}
+                    className="min-w-[200px]"
+                  >
+                    {loadingMore ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Ładowanie...
+                      </>
+                    ) : (
+                      "Załaduj więcej"
+                    )}
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </main>
