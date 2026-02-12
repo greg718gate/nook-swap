@@ -24,6 +24,7 @@ import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { MessagesSection } from "@/components/MessagesSection";
 import { useMessages } from "@/hooks/useMessages";
 import { ProfileEditForm } from "@/components/ProfileEditForm";
+import { StripeConnectSection } from "@/components/StripeConnectSection";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -311,10 +312,14 @@ const Profile = () => {
               )}
             </TabsContent>
 
-            <TabsContent value="edit">
+            <TabsContent value="edit" className="space-y-6">
               <ProfileEditForm
                 profile={profile}
                 onSaved={() => fetchProfile(user.id)}
+              />
+              <StripeConnectSection
+                userId={user.id}
+                stripeOnboarded={profile.stripe_onboarded}
               />
             </TabsContent>
 
