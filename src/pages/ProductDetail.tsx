@@ -7,7 +7,7 @@ import { ReviewSection } from "@/components/ReviewSection";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Star, ShoppingCart, User, MessageCircle } from "lucide-react";
+import { Star, ShoppingCart, User, MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { useMessages } from "@/hooks/useMessages";
@@ -19,6 +19,7 @@ const ProductDetail = () => {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [contactingLoading, setContactingLoading] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const { startConversation } = useMessages(user?.id);
 
   useEffect(() => {
@@ -142,11 +143,11 @@ const ProductDetail = () => {
         <div className="container py-8">
           <div className="grid gap-8 lg:grid-cols-2">
             <div>
-              <div className="aspect-square overflow-hidden rounded-lg bg-muted">
-                {product.images && product.images[0] ? (
+              <div className="relative aspect-square overflow-hidden rounded-lg bg-muted">
+                {product.images && product.images[selectedImageIndex] ? (
                   <img
-                    src={product.images[0]}
-                    alt={product.title}
+                    src={product.images[selectedImageIndex]}
+                    alt={`${product.title} - image ${selectedImageIndex + 1}`}
                     className="h-full w-full object-cover"
                   />
                 ) : (
@@ -154,7 +155,40 @@ const ProductDetail = () => {
                     No Image
                   </div>
                 )}
+                {product.images && product.images.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => setSelectedImageIndex((prev: number) => (prev - 1 + product.images.length) % product.images.length)}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-2 shadow-md backdrop-blur-sm hover:bg-background transition-colors"
+                    >
+                      <ChevronLeft className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => setSelectedImageIndex((prev: number) => (prev + 1) % product.images.length)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-2 shadow-md backdrop-blur-sm hover:bg-background transition-colors"
+                    >
+                      <ChevronRight className="h-5 w-5" />
+                    </button>
+                  </>
+                )}
               </div>
+              {product.images && product.images.length > 1 && (
+                <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
+                  {product.images.map((img: string, idx: number) => (
+                    <button
+                      key={idx}
+                      onClick={() => setSelectedImageIndex(idx)}
+                      className={`h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border-2 transition-all ${
+                        idx === selectedImageIndex
+                          ? "border-primary ring-2 ring-primary/30"
+                          : "border-transparent opacity-70 hover:opacity-100"
+                      }`}
+                    >
+                      <img src={img} alt={`Thumbnail ${idx + 1}`} className="h-full w-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="space-y-6">
@@ -166,7 +200,7 @@ const ProductDetail = () => {
               </div>
 
               <div className="text-4xl font-bold text-primary">
-                ${product.price.toFixed(2)}
+                £{product.price.toFixed(2)}
               </div>
 
               {product.condition && (
