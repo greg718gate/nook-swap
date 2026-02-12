@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { MessagesSection } from "@/components/MessagesSection";
 import { useMessages } from "@/hooks/useMessages";
+import { ProfileEditForm } from "@/components/ProfileEditForm";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -133,9 +134,13 @@ const Profile = () => {
         <div className="container py-8">
           <Card className="mb-8 p-6">
             <div className="flex items-start gap-6">
-              <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-hero">
-                <User className="h-12 w-12 text-white" />
-              </div>
+              {profile.avatar_url ? (
+                <img src={profile.avatar_url} alt="Avatar" className="h-24 w-24 rounded-full object-cover" />
+              ) : (
+                <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-hero">
+                  <User className="h-12 w-12 text-white" />
+                </div>
+              )}
               <div className="flex-1">
                 <h1 className="mb-2 text-3xl font-bold">{profile.username}</h1>
                 <div className="mb-4 flex items-center gap-4 text-muted-foreground">
@@ -161,6 +166,7 @@ const Profile = () => {
             <TabsList className="mb-6">
               <TabsTrigger value="listings">Moje Ogłoszenia</TabsTrigger>
               <TabsTrigger value="orders">Moje Zamówienia</TabsTrigger>
+              <TabsTrigger value="edit">Edytuj Profil</TabsTrigger>
               <TabsTrigger value="messages" className="relative">
                 <MessageCircle className="h-4 w-4 mr-2" />
                 Wiadomości
@@ -303,6 +309,13 @@ const Profile = () => {
                   ))}
                 </div>
               )}
+            </TabsContent>
+
+            <TabsContent value="edit">
+              <ProfileEditForm
+                profile={profile}
+                onSaved={() => fetchProfile(user.id)}
+              />
             </TabsContent>
 
             <TabsContent value="messages">
