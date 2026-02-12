@@ -9,7 +9,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, stripe-signature",
 };
 
-const handler = async (req: Request): Promise<Response> => {
+serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -18,24 +18,18 @@ const handler = async (req: Request): Promise<Response> => {
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
     const resendKey = Deno.env.get("RESEND_API_KEY");
-    
-    if (!stripeKey) {
-      throw new Error("Stripe secret key not configured");
-    }
+    if (!stripeKey) throw new Error("Stripe secret key not configured");
 
-    const stripe = new Stripe(stripeKey, {
-      apiVersion: "2023-10-16",
-    });
-
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
 
     const body = await req.text();
     const signature = req.headers.get("stripe-signature");
 
     let event: Stripe.Event;
-
     if (webhookSecret && signature) {
       try {
         event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
@@ -47,7 +41,6 @@ const handler = async (req: Request): Promise<Response> => {
         });
       }
     } else {
-      // For testing without webhook secret
       event = JSON.parse(body);
     }
 
@@ -61,6 +54,9 @@ const handler = async (req: Request): Promise<Response> => {
       const platformFee = parseFloat(metadata.platform_fee) / 100;
       const sellerPayout = parseFloat(metadata.seller_payout) / 100;
       const items = JSON.parse(metadata.items_json);
+      const sellerTransfers = metadata.seller_transfers
+        ? JSON.parse(metadata.seller_transfers)
+        : null;
 
       // Create order
       const { data: order, error: orderError } = await supabase
@@ -84,9 +80,8 @@ const handler = async (req: Request): Promise<Response> => {
         throw orderError;
       }
 
-      // Create order items and purchases
+      // Create order items
       for (const item of items) {
-        // Create order item
         await supabase.from("order_items").insert({
           order_id: order.id,
           product_id: item.product_id,
@@ -95,7 +90,6 @@ const handler = async (req: Request): Promise<Response> => {
           price: item.price,
         });
 
-        // Create purchase record (for digital downloads)
         if (item.product_type === "digital") {
           await supabase.from("purchases").insert({
             order_id: order.id,
@@ -105,7 +99,6 @@ const handler = async (req: Request): Promise<Response> => {
           });
         }
 
-        // Update product status to sold (for single items)
         await supabase
           .from("products")
           .update({ status: "sold" })
@@ -115,23 +108,52 @@ const handler = async (req: Request): Promise<Response> => {
       // Clear cart
       await supabase.from("cart_items").delete().eq("user_id", userId);
 
-      // Get buyer info
+      // ====== STRIPE CONNECT TRANSFERS ======
+      if (sellerTransfers && session.payment_intent) {
+        for (const [sellerId, transferInfo] of Object.entries(sellerTransfers)) {
+          const { amount_cents, stripe_account_id } = transferInfo as {
+            amount_cents: number;
+            stripe_account_id: string;
+          };
+
+          try {
+            const transfer = await stripe.transfers.create({
+              amount: amount_cents,
+              currency: "gbp",
+              destination: stripe_account_id,
+              transfer_group: order.id,
+              source_transaction: undefined,
+              metadata: {
+                order_id: order.id,
+                seller_id: sellerId,
+              },
+            });
+            console.log(
+              `Transfer created for seller ${sellerId}: ${transfer.id}, amount: ${amount_cents}`
+            );
+          } catch (transferError) {
+            console.error(
+              `Failed to transfer to seller ${sellerId} (${stripe_account_id}):`,
+              transferError
+            );
+            // Continue with other sellers even if one fails
+          }
+        }
+      }
+
+      // ====== EMAIL NOTIFICATIONS ======
       const { data: buyerProfile } = await supabase
         .from("profiles")
         .select("username, full_name")
         .eq("id", userId)
         .single();
 
-      // Send emails if Resend is configured
       if (resendKey) {
         const resend = new Resend(resendKey);
-
-        // Get buyer email from auth
         const { data: authUser } = await supabase.auth.admin.getUserById(userId);
         const buyerEmail = authUser?.user?.email;
 
         if (buyerEmail) {
-          // Email to buyer
           await resend.emails.send({
             from: "VelvetBazzar <noreply@resend.dev>",
             to: [buyerEmail],
@@ -147,10 +169,11 @@ const handler = async (req: Request): Promise<Response> => {
           });
         }
 
-        // Notify each seller
         const sellerIds = [...new Set(items.map((i: any) => i.seller_id))];
         for (const sellerId of sellerIds) {
-          const { data: sellerAuth } = await supabase.auth.admin.getUserById(sellerId as string);
+          const { data: sellerAuth } = await supabase.auth.admin.getUserById(
+            sellerId as string
+          );
           const sellerEmail = sellerAuth?.user?.email;
 
           if (sellerEmail) {
@@ -159,6 +182,9 @@ const handler = async (req: Request): Promise<Response> => {
               (sum: number, i: any) => sum + i.price * i.quantity,
               0
             );
+            const sellerTransferAmount = sellerTransfers?.[sellerId as string]
+              ? (sellerTransfers[sellerId as string] as any).amount_cents / 100
+              : sellerTotal * 0.95;
 
             await resend.emails.send({
               from: "VelvetBazzar <noreply@resend.dev>",
@@ -171,7 +197,8 @@ const handler = async (req: Request): Promise<Response> => {
                 <ul>
                   ${sellerItems.map((i: any) => `<li>${i.quantity}x - £${i.price}</li>`).join("")}
                 </ul>
-                <p><strong>Do wypłaty (95%):</strong> £${(sellerTotal * 0.95).toFixed(2)}</p>
+                <p><strong>Wypłata (95%):</strong> £${sellerTransferAmount.toFixed(2)}</p>
+                <p>💰 Pieniądze zostały automatycznie przelane na Twoje konto Stripe.</p>
                 <p>Proszę przygotować i nadać przesyłkę.</p>
                 <p>Z pozdrowieniami,<br>Zespół VelvetBazzar</p>
               `,
@@ -190,14 +217,9 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     console.error("Webhook error:", error);
-    return new Response(
-      JSON.stringify({ error: errorMessage }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 400,
-      }
-    );
+    return new Response(JSON.stringify({ error: errorMessage }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 400,
+    });
   }
-};
-
-serve(handler);
+});
