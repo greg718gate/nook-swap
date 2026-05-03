@@ -242,6 +242,8 @@ const handler = async (req: Request): Promise<Response> => {
         shipping_address: shipping_address || "",
         platform_fee: platformFee.toString(),
         seller_payout: sellerPayout.toString(),
+        coupon_code: appliedCouponCode || "",
+        discount_amount: discount.toFixed(2),
         seller_transfers: JSON.stringify(sellerTransfers),
         items_json: JSON.stringify(
           items.map((i) => ({
