@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/select";
 import { useSearchParams } from "react-router-dom";
 import { Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { SeoHead } from "@/components/SeoHead";
 
 interface Product {
   id: string;
@@ -157,6 +159,10 @@ const Products = () => {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <SeoHead
+        title="Przeglądaj produkty | VelvetBazzar UK"
+        description="Tysiące unikalnych produktów: moda, vintage, handmade i więcej. Bezpieczne zakupy w UK."
+      />
       <Navbar />
       <main className="flex-1">
         <div className="container py-8">
@@ -191,22 +197,57 @@ const Products = () => {
             </div>
           </div>
 
-          {/* Sort controls */}
-          <div className="mb-6 flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              {!loading && `${products.length} product${products.length !== 1 ? "s" : ""}`}
-            </p>
-            <Select value={sortBy} onValueChange={handleSortChange}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="newest">Newest First</SelectItem>
-                <SelectItem value="price_asc">Price: Low to High</SelectItem>
-                <SelectItem value="price_desc">Price: High to Low</SelectItem>
-              </SelectContent>
-            </Select>
+          {/* Filters + Sort */}
+          <div className="mb-6 flex flex-wrap items-end gap-3">
+            <div className="flex-1 min-w-[200px]">
+              <p className="text-xs text-muted-foreground mb-1">Cena (£)</p>
+              <div className="flex gap-2">
+                <Input
+                  type="number"
+                  placeholder="Min"
+                  value={priceMin}
+                  onChange={(e) => setPriceMin(e.target.value)}
+                />
+                <Input
+                  type="number"
+                  placeholder="Max"
+                  value={priceMax}
+                  onChange={(e) => setPriceMax(e.target.value)}
+                />
+              </div>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">Stan</p>
+              <Select value={conditionFilter} onValueChange={setConditionFilter}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Wszystkie</SelectItem>
+                  <SelectItem value="new">Nowy</SelectItem>
+                  <SelectItem value="like_new">Jak nowy</SelectItem>
+                  <SelectItem value="good">Dobry</SelectItem>
+                  <SelectItem value="fair">Akceptowalny</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">Sortuj</p>
+              <Select value={sortBy} onValueChange={handleSortChange}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="newest">Najnowsze</SelectItem>
+                  <SelectItem value="price_asc">Cena: rosnąco</SelectItem>
+                  <SelectItem value="price_desc">Cena: malejąco</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            {!loading && `${products.length} produkt${products.length !== 1 ? "ów" : ""}`}
+          </p>
 
           {loading ? (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
