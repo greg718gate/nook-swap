@@ -136,19 +136,6 @@ const Cart = () => {
       const items = cartItems.map((item) => ({
         product_id: item.products.id,
         quantity: item.quantity,
-        title: item.products.title,
-        price: item.products.price,
-        seller_id: item.products.seller_id,
-        image_url: item.products.images?.[0] || undefined,
-        product_type: item.products.product_type,
-        shipping_cost:
-          item.products.product_type === "physical"
-            ? shippingMethod === "evri"
-              ? item.products.shipping_evri
-              : shippingMethod === "royal_mail"
-              ? item.products.shipping_royal_mail
-              : item.products.shipping_inpost
-            : 0,
       }));
 
       const response = await fetch(

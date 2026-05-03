@@ -50,7 +50,7 @@ const CheckoutSuccess = () => {
         product_id,
         download_count,
         max_downloads,
-        products (title, product_type, digital_file_url, digital_file_name)
+        products (title, product_type)
       `)
       .eq("buyer_id", session.session.user.id)
       .order("created_at", { ascending: false })
@@ -63,33 +63,30 @@ const CheckoutSuccess = () => {
   };
 
   const handleDownload = async (purchase: Purchase) => {
-    if (!purchase.products?.digital_file_url) return;
+    // Server-side check + atomic increment via RPC
+    const { data: rpcData, error: rpcError } = await supabase
+      .rpc("request_digital_download", { _purchase_id: purchase.id });
 
-    if (purchase.download_count >= purchase.max_downloads) {
+    if (rpcError || !rpcData || rpcData.length === 0) {
+      console.error("Download error:", rpcError);
       return;
     }
 
-    // Update download count
-    await supabase
-      .from("purchases")
-      .update({ download_count: purchase.download_count + 1 })
-      .eq("id", purchase.id);
+    const { file_url, file_name } = rpcData[0] as { file_url: string; file_name: string | null };
 
-    // Download file
     const { data, error } = await supabase.storage
       .from("digital-products")
-      .download(purchase.products.digital_file_url);
+      .download(file_url);
 
     if (error) {
       console.error("Download error:", error);
       return;
     }
 
-    // Create download link
     const url = URL.createObjectURL(data);
     const a = document.createElement("a");
     a.href = url;
-    a.download = purchase.products.digital_file_name || "download";
+    a.download = file_name || "download";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
