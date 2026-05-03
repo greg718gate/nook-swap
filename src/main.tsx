@@ -1,5 +1,4 @@
 import { createRoot } from "react-dom/client";
-import { Component, type ErrorInfo, type ReactNode } from "react";
 import App from "./App.tsx";
 import "./index.css";
 
@@ -17,46 +16,22 @@ if (typeof Node === "function" && Node.prototype) {
   };
 }
 
-class RootErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
-  state = { hasError: false };
+const showStaticFallback = () => {
+  document.getElementById("static-fallback")?.removeAttribute("hidden");
+};
 
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
+window.addEventListener("error", showStaticFallback);
+window.addEventListener("unhandledrejection", showStaticFallback);
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("Root render failed", error, errorInfo);
-  }
+const rootElement = document.getElementById("root");
 
-  render() {
-    if (this.state.hasError) {
-      return (
-        <main className="min-h-screen bg-background px-6 py-16 text-foreground">
-          <div className="mx-auto flex max-w-md flex-col items-center gap-5 text-center">
-            <div className="text-2xl font-semibold">VelvetBazzar</div>
-            <p className="text-muted-foreground">
-              Strona nie załadowała się poprawnie. Odświeżenie pobierze najnowszą wersję aplikacji.
-            </p>
-            <button
-              className="rounded-md bg-primary px-5 py-3 font-medium text-primary-foreground"
-              onClick={() => window.location.reload()}
-              type="button"
-            >
-              Odśwież stronę
-            </button>
-          </div>
-        </main>
-      );
-    }
+if (rootElement) {
+  createRoot(rootElement).render(<App />);
 
-    return this.props.children;
-  }
+  requestAnimationFrame(() => {
+    document.documentElement.dataset.appLoaded = "true";
+    document.getElementById("static-fallback")?.remove();
+  });
+} else {
+  showStaticFallback();
 }
-
-createRoot(document.getElementById("root")!).render(
-  <RootErrorBoundary>
-    <App />
-  </RootErrorBoundary>,
-);
-
-document.getElementById("static-fallback")?.remove();
