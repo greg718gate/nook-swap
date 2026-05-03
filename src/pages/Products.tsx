@@ -25,9 +25,9 @@ interface Product {
   images: string[];
   condition: string;
   profiles: {
-    username: string;
-    rating: number;
-  };
+    username?: string | null;
+    rating?: number | null;
+  } | null;
 }
 
 interface Category {
@@ -272,11 +272,11 @@ const Products = () => {
                     id={product.id}
                     title={product.title}
                     price={product.price}
-                    image={product.images[0]}
+                    image={product.images?.[0]}
                     condition={product.condition}
                     seller={{
-                      username: product.profiles.username,
-                      rating: product.profiles.rating,
+                      username: product.profiles?.username,
+                      rating: product.profiles?.rating,
                     }}
                   />
                 ))}
