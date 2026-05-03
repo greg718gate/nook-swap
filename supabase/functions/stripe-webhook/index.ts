@@ -29,19 +29,29 @@ serve(async (req: Request) => {
     const body = await req.text();
     const signature = req.headers.get("stripe-signature");
 
+    if (!webhookSecret) {
+      console.error("STRIPE_WEBHOOK_SECRET not configured");
+      return new Response(JSON.stringify({ error: "Webhook secret not configured" }), {
+        status: 500,
+        headers: corsHeaders,
+      });
+    }
+    if (!signature) {
+      return new Response(JSON.stringify({ error: "Missing stripe-signature" }), {
+        status: 400,
+        headers: corsHeaders,
+      });
+    }
+
     let event: Stripe.Event;
-    if (webhookSecret && signature) {
-      try {
-        event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-      } catch (err) {
-        console.error("Webhook signature verification failed:", err);
-        return new Response(JSON.stringify({ error: "Invalid signature" }), {
-          status: 400,
-          headers: corsHeaders,
-        });
-      }
-    } else {
-      event = JSON.parse(body);
+    try {
+      event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    } catch (err) {
+      console.error("Webhook signature verification failed:", err);
+      return new Response(JSON.stringify({ error: "Invalid signature" }), {
+        status: 400,
+        headers: corsHeaders,
+      });
     }
 
     if (event.type === "checkout.session.completed") {
