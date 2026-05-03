@@ -384,6 +384,30 @@ const Cart = () => {
                     </div>
                   )}
 
+                  <div className="mb-4 space-y-2">
+                    <Label htmlFor="coupon">Kod rabatowy</Label>
+                    {appliedCoupon ? (
+                      <div className="flex items-center justify-between rounded-lg border border-primary/30 bg-primary/10 p-3">
+                        <span className="font-mono font-bold text-primary">{appliedCoupon.code}</span>
+                        <Button variant="ghost" size="sm" onClick={() => { setAppliedCoupon(null); setCouponCode(""); }}>
+                          Usuń
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2">
+                        <Input
+                          id="coupon"
+                          placeholder="np. LATO20"
+                          value={couponCode}
+                          onChange={(e) => setCouponCode(e.target.value)}
+                        />
+                        <Button variant="outline" onClick={applyCoupon} disabled={couponLoading}>
+                          Zastosuj
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+
                   <div className="space-y-3">
                     <div className="flex justify-between text-muted-foreground">
                       <span>Produkty</span>
@@ -395,6 +419,12 @@ const Cart = () => {
                           Wysyłka ({shippingMethod === "evri" ? "Evri" : shippingMethod === "royal_mail" ? "Royal Mail" : "InPost"})
                         </span>
                         <span>£{shippingCost.toFixed(2)}</span>
+                      </div>
+                    )}
+                    {discount > 0 && (
+                      <div className="flex justify-between text-primary font-medium">
+                        <span>Rabat ({appliedCoupon?.code})</span>
+                        <span>-£{discount.toFixed(2)}</span>
                       </div>
                     )}
                     <div className="border-t pt-3">
