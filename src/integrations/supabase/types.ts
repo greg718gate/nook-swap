@@ -699,6 +699,13 @@ export type Database = {
         }
         Returns: boolean
       }
+      request_digital_download: {
+        Args: { _purchase_id: string }
+        Returns: {
+          file_name: string
+          file_url: string
+        }[]
+      }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
     }
