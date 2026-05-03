@@ -113,6 +113,7 @@ export const Navbar = () => {
                   </span>
                 )}
               </Button>
+              <NotificationBell userId={user.id} />
               <Button variant="ghost" size="icon" onClick={() => navigate("/cart")} className="relative">
                 <ShoppingCart className="h-5 w-5" />
                 {cartCount > 0 && (
