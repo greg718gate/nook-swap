@@ -8,19 +8,13 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-interface CartItem {
+interface CartItemRequest {
   product_id: string;
   quantity: number;
-  title: string;
-  price: number;
-  seller_id: string;
-  image_url?: string;
-  product_type: string;
-  shipping_cost: number;
 }
 
 interface CheckoutRequest {
-  items: CartItem[];
+  items: CartItemRequest[];
   shipping_method: string;
   shipping_address?: string;
 }
@@ -47,8 +41,61 @@ const handler = async (req: Request): Promise<Response> => {
     const { data: userData, error: userError } = await supabase.auth.getUser(token);
     if (userError || !userData.user) throw new Error("Invalid user token");
 
-    const { items, shipping_method, shipping_address }: CheckoutRequest = await req.json();
-    if (!items || items.length === 0) throw new Error("No items in cart");
+    const body: CheckoutRequest = await req.json();
+    const { items: clientItems, shipping_method, shipping_address } = body;
+
+    // Validate input
+    if (!Array.isArray(clientItems) || clientItems.length === 0) {
+      throw new Error("No items in cart");
+    }
+    for (const i of clientItems) {
+      if (typeof i.product_id !== "string" || !i.product_id) throw new Error("Invalid product_id");
+      if (!Number.isInteger(i.quantity) || i.quantity < 1 || i.quantity > 100) {
+        throw new Error("Invalid quantity");
+      }
+    }
+    if (typeof shipping_method !== "string" || shipping_method.length > 50) {
+      throw new Error("Invalid shipping method");
+    }
+    if (shipping_address && (typeof shipping_address !== "string" || shipping_address.length > 1000)) {
+      throw new Error("Invalid shipping address");
+    }
+
+    // Fetch authoritative product data server-side (NEVER trust client prices)
+    const productIds = [...new Set(clientItems.map((i) => i.product_id))];
+    const { data: dbProducts, error: prodError } = await supabase
+      .from("products")
+      .select("id, title, price, seller_id, product_type, status, images, shipping_inpost, shipping_royal_mail, shipping_evri")
+      .in("id", productIds);
+
+    if (prodError) throw new Error("Failed to fetch products");
+    if (!dbProducts || dbProducts.length !== productIds.length) {
+      throw new Error("One or more products not found");
+    }
+
+    // Build authoritative items list
+    const items = clientItems.map((ci) => {
+      const p = dbProducts.find((dp) => dp.id === ci.product_id)!;
+      if (p.status !== "active") throw new Error(`Product unavailable: ${p.title}`);
+      const shippingCostMap: Record<string, number> = {
+        inpost: Number(p.shipping_inpost) || 0,
+        royal_mail: Number(p.shipping_royal_mail) || 0,
+        evri: Number(p.shipping_evri) || 0,
+      };
+      const shipping_cost = p.product_type === "physical"
+        ? (shippingCostMap[shipping_method] ?? 0)
+        : 0;
+      return {
+        product_id: p.id,
+        quantity: ci.quantity,
+        title: p.title,
+        price: Number(p.price),
+        seller_id: p.seller_id,
+        image_url: Array.isArray(p.images) && p.images[0] ? p.images[0] : undefined,
+        product_type: p.product_type,
+        shipping_cost,
+      };
+    });
 
     // Verify all sellers have Stripe Connect accounts
     const sellerIds = [...new Set(items.map((i) => i.seller_id))];
@@ -75,7 +122,7 @@ const handler = async (req: Request): Promise<Response> => {
       sellerStripeMap[s.id] = s.stripe_account_id!;
     });
 
-    // Calculate totals
+    // Calculate totals (server-side prices only)
     const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const shippingCost = items.reduce(
       (sum, item) => sum + (item.product_type === "physical" ? item.shipping_cost : 0),
@@ -107,7 +154,7 @@ const handler = async (req: Request): Promise<Response> => {
       };
     }
 
-    // Create line items for Stripe
+    // Create line items for Stripe (using server-fetched prices/titles)
     const lineItems = items.map((item) => ({
       price_data: {
         currency: "gbp",
