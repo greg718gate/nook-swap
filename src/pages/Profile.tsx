@@ -54,7 +54,7 @@ const Profile = () => {
   const fetchProfile = async (userId: string) => {
     const { data } = await supabase
       .from("profiles")
-      .select("*")
+      .select("id, username, full_name, avatar_url, bio, location, rating, total_reviews, stripe_onboarded, created_at, updated_at")
       .eq("id", userId)
       .single();
     if (data) setProfile(data);
