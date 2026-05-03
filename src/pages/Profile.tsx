@@ -56,8 +56,8 @@ const Profile = () => {
       .from("profiles")
       .select("id, username, full_name, avatar_url, bio, location, rating, total_reviews, stripe_onboarded, created_at, updated_at")
       .eq("id", userId)
-      .single();
-    if (data) setProfile(data);
+      .maybeSingle();
+    setProfile(data ?? { id: userId, username: null, rating: 0, total_reviews: 0 });
   };
 
   const fetchProducts = async (userId: string) => {
