@@ -126,11 +126,11 @@ const handler = async (req: Request): Promise<Response> => {
         subject: `Nowa wiadomość od ${senderName} - VelvetBazzar`,
         html: `
           <h2>Masz nową wiadomość!</h2>
-          <p><strong>${senderName}</strong> wysłał(a) Ci wiadomość${productTitle ? ` w sprawie produktu <em>"${productTitle}"</em>` : ""}:</p>
+          <p><strong>${escapeHtml(senderName)}</strong> wysłał(a) Ci wiadomość${productTitle ? ` w sprawie produktu <em>"${escapeHtml(productTitle)}"</em>` : ""}:</p>
           <blockquote style="border-left: 3px solid #8B5CF6; padding: 12px 16px; margin: 16px 0; background: #f9f9f9; border-radius: 4px;">
-            ${truncatedMessage}
+            ${escapeHtml(truncatedMessage)}
           </blockquote>
-          <p><a href="https://nook-swap.lovable.app/profile?tab=messages" style="background: #8B5CF6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; display: inline-block;">Odpowiedz na wiadomość</a></p>
+          <p><a href="https://velvetbazzar.co.uk/profile?tab=messages" style="background: #8B5CF6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; display: inline-block;">Odpowiedz na wiadomość</a></p>
           <p style="color: #666; font-size: 12px; margin-top: 24px;">Z pozdrowieniami,<br>Zespół VelvetBazzar</p>
         `,
       });
