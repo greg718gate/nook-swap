@@ -143,14 +143,14 @@ const Profile = () => {
                 </div>
               )}
               <div className="flex-1">
-                <h1 className="mb-2 text-3xl font-bold">{profile.username}</h1>
+                <h1 className="mb-2 text-3xl font-bold">{profile.username || "Użytkownik"}</h1>
                 <div className="mb-4 flex items-center gap-4 text-muted-foreground">
                   <div className="flex items-center gap-1">
                     <Star className="h-4 w-4 fill-accent text-accent" />
-                    <span>{profile.rating.toFixed(1)} rating</span>
+                    <span>{(profile.rating ?? 0).toFixed(1)} rating</span>
                   </div>
                   <span>•</span>
-                  <span>{profile.total_reviews} reviews</span>
+                  <span>{profile.total_reviews ?? 0} reviews</span>
                   {profile.location && (
                     <>
                       <span>•</span>
