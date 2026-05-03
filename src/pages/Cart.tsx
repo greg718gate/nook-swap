@@ -37,6 +37,9 @@ const Cart = () => {
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [shippingMethod, setShippingMethod] = useState<string>("evri");
   const [shippingAddress, setShippingAddress] = useState("");
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -104,8 +107,39 @@ const Cart = () => {
   );
 
   const shippingCost = getShippingCost();
-  const platformFee = (subtotal + shippingCost) * 0.05;
-  const total = subtotal + shippingCost;
+  const discount = appliedCoupon?.discount ?? 0;
+  const platformFee = (subtotal + shippingCost - discount) * 0.05;
+  const total = Math.max(0, subtotal + shippingCost - discount);
+
+  const applyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    if (cartItems.length === 0) return;
+    // Coupons are per-seller; require single-seller cart
+    const sellers = new Set(cartItems.map((i) => i.products.seller_id));
+    if (sellers.size > 1) {
+      toast.error("Kupon można zastosować tylko gdy w koszyku są produkty od jednego sprzedawcy");
+      return;
+    }
+    setCouponLoading(true);
+    const sellerId = [...sellers][0];
+    const { data, error } = await supabase.rpc("validate_coupon", {
+      _code: couponCode.trim().toUpperCase(),
+      _seller_id: sellerId,
+      _subtotal: subtotal,
+    });
+    setCouponLoading(false);
+    if (error || !data || data.length === 0) {
+      toast.error("Błąd walidacji kuponu");
+      return;
+    }
+    const r = data[0] as any;
+    if (!r.coupon_id) {
+      toast.error(r.message || "Nieprawidłowy kod");
+      return;
+    }
+    setAppliedCoupon({ code: couponCode.trim().toUpperCase(), discount: Number(r.discount) });
+    toast.success(`Zastosowano rabat -£${Number(r.discount).toFixed(2)}`);
+  };
 
   const handleCheckout = async () => {
     if (!user) {
@@ -150,6 +184,7 @@ const Cart = () => {
             items,
             shipping_method: shippingMethod,
             shipping_address: shippingAddress,
+            coupon_code: appliedCoupon?.code,
           }),
         }
       );
@@ -349,6 +384,30 @@ const Cart = () => {
                     </div>
                   )}
 
+                  <div className="mb-4 space-y-2">
+                    <Label htmlFor="coupon">Kod rabatowy</Label>
+                    {appliedCoupon ? (
+                      <div className="flex items-center justify-between rounded-lg border border-primary/30 bg-primary/10 p-3">
+                        <span className="font-mono font-bold text-primary">{appliedCoupon.code}</span>
+                        <Button variant="ghost" size="sm" onClick={() => { setAppliedCoupon(null); setCouponCode(""); }}>
+                          Usuń
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2">
+                        <Input
+                          id="coupon"
+                          placeholder="np. LATO20"
+                          value={couponCode}
+                          onChange={(e) => setCouponCode(e.target.value)}
+                        />
+                        <Button variant="outline" onClick={applyCoupon} disabled={couponLoading}>
+                          Zastosuj
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+
                   <div className="space-y-3">
                     <div className="flex justify-between text-muted-foreground">
                       <span>Produkty</span>
@@ -360,6 +419,12 @@ const Cart = () => {
                           Wysyłka ({shippingMethod === "evri" ? "Evri" : shippingMethod === "royal_mail" ? "Royal Mail" : "InPost"})
                         </span>
                         <span>£{shippingCost.toFixed(2)}</span>
+                      </div>
+                    )}
+                    {discount > 0 && (
+                      <div className="flex justify-between text-primary font-medium">
+                        <span>Rabat ({appliedCoupon?.code})</span>
+                        <span>-£{discount.toFixed(2)}</span>
                       </div>
                     )}
                     <div className="border-t pt-3">

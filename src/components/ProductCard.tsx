@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star } from "lucide-react";
 import { Link } from "react-router-dom";
+import { WishlistButton } from "@/components/WishlistButton";
 
 interface ProductCardProps {
   id: string;
@@ -32,6 +33,7 @@ export const ProductCard = ({
               <img
                 src={image}
                 alt={title}
+                loading="lazy"
                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -41,6 +43,7 @@ export const ProductCard = ({
               No Image
             </div>
           )}
+          <WishlistButton productId={id} className="absolute top-3 left-3 h-9 w-9" />
           {condition && (
             <Badge variant="secondary" className="absolute top-3 right-3 shadow-lg backdrop-blur-sm bg-background/90">
               {condition}

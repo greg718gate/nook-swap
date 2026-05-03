@@ -17,6 +17,7 @@ interface CheckoutRequest {
   items: CartItemRequest[];
   shipping_method: string;
   shipping_address?: string;
+  coupon_code?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -42,7 +43,7 @@ const handler = async (req: Request): Promise<Response> => {
     if (userError || !userData.user) throw new Error("Invalid user token");
 
     const body: CheckoutRequest = await req.json();
-    const { items: clientItems, shipping_method, shipping_address } = body;
+    const { items: clientItems, shipping_method, shipping_address, coupon_code } = body;
 
     // Validate input
     if (!Array.isArray(clientItems) || clientItems.length === 0) {
@@ -128,7 +129,37 @@ const handler = async (req: Request): Promise<Response> => {
       (sum, item) => sum + (item.product_type === "physical" ? item.shipping_cost : 0),
       0
     );
-    const total = subtotal + shippingCost;
+
+    // Validate and apply coupon (server-side)
+    let discount = 0;
+    let appliedCouponCode: string | null = null;
+    if (coupon_code && typeof coupon_code === "string") {
+      const sellerSet = new Set(items.map((i) => i.seller_id));
+      if (sellerSet.size === 1) {
+        const sellerId = [...sellerSet][0];
+        const { data: cdata } = await supabase.rpc("validate_coupon", {
+          _code: coupon_code.trim().toUpperCase(),
+          _seller_id: sellerId,
+          _subtotal: subtotal,
+        });
+        if (cdata && cdata[0]?.coupon_id) {
+          discount = Number(cdata[0].discount) || 0;
+          appliedCouponCode = coupon_code.trim().toUpperCase();
+          // Increment uses_count atomically
+          const { data: cur } = await supabase
+            .from("coupons")
+            .select("uses_count")
+            .eq("id", cdata[0].coupon_id)
+            .single();
+          await supabase
+            .from("coupons")
+            .update({ uses_count: (cur?.uses_count ?? 0) + 1 })
+            .eq("id", cdata[0].coupon_id);
+        }
+      }
+    }
+
+    const total = Math.max(0, subtotal + shippingCost - discount);
     const platformFee = Math.round(total * 0.05 * 100); // 5% in cents
     const sellerPayout = Math.round(total * 0.95 * 100); // 95% in cents
 
@@ -145,11 +176,14 @@ const handler = async (req: Request): Promise<Response> => {
         sellerAmounts[sellerId] += shippingCost * proportion;
       }
     }
-    // Apply 95% to each seller
+    // Apply discount proportionally, then 95% to each seller
+    const grossPreDiscount = subtotal + shippingCost;
     const sellerTransfers: Record<string, { amount_cents: number; stripe_account_id: string }> = {};
     for (const [sellerId, amount] of Object.entries(sellerAmounts)) {
+      const sellerDiscount = grossPreDiscount > 0 ? (amount / grossPreDiscount) * discount : 0;
+      const net = amount - sellerDiscount;
       sellerTransfers[sellerId] = {
-        amount_cents: Math.round(amount * 0.95 * 100),
+        amount_cents: Math.round(net * 0.95 * 100),
         stripe_account_id: sellerStripeMap[sellerId],
       };
     }
@@ -181,11 +215,23 @@ const handler = async (req: Request): Promise<Response> => {
       });
     }
 
+    let stripeDiscounts: any[] | undefined;
+    if (discount > 0) {
+      const stripeCoupon = await stripe.coupons.create({
+        amount_off: Math.round(discount * 100),
+        currency: "gbp",
+        duration: "once",
+        name: `Rabat ${appliedCouponCode}`,
+      });
+      stripeDiscounts = [{ coupon: stripeCoupon.id }];
+    }
+
     const origin = req.headers.get("origin") || "https://nook-swap.lovable.app";
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: lineItems,
+      discounts: stripeDiscounts,
       mode: "payment",
       success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/cart`,
@@ -196,6 +242,8 @@ const handler = async (req: Request): Promise<Response> => {
         shipping_address: shipping_address || "",
         platform_fee: platformFee.toString(),
         seller_payout: sellerPayout.toString(),
+        coupon_code: appliedCouponCode || "",
+        discount_amount: discount.toFixed(2),
         seller_transfers: JSON.stringify(sellerTransfers),
         items_json: JSON.stringify(
           items.map((i) => ({

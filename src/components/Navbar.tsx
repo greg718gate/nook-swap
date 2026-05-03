@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, User, Plus, Search, BarChart3, MessageCircle, Menu, LogOut, Package, Store, Home, ShoppingBag } from "lucide-react";
+import { ShoppingCart, User, Plus, Search, BarChart3, MessageCircle, Menu, LogOut, Package, Store, Home, ShoppingBag, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
@@ -113,6 +113,9 @@ export const Navbar = () => {
                   </span>
                 )}
               </Button>
+              <Button variant="ghost" size="icon" onClick={() => navigate("/wishlist")} aria-label="Ulubione">
+                <Heart className="h-5 w-5" />
+              </Button>
               <NotificationBell userId={user.id} />
               <Button variant="ghost" size="icon" onClick={() => navigate("/cart")} className="relative">
                 <ShoppingCart className="h-5 w-5" />
@@ -221,6 +224,9 @@ export const Navbar = () => {
                       </Button>
                       <Button variant="ghost" className="justify-start gap-3 h-12" onClick={() => go("/my-orders")}>
                         <ShoppingBag className="h-5 w-5" /> Moje zakupy
+                      </Button>
+                      <Button variant="ghost" className="justify-start gap-3 h-12" onClick={() => go("/wishlist")}>
+                        <Heart className="h-5 w-5" /> Ulubione
                       </Button>
                       <Button variant="ghost" className="justify-start gap-3 h-12" onClick={() => go("/sales")}>
                         <Package className="h-5 w-5" /> Moja sprzedaż

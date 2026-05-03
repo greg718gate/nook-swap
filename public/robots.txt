@@ -12,3 +12,9 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /profile
+Disallow: /cart
+Disallow: /checkout
+
+Sitemap: https://velvetbazzar.co.uk/sitemap.xml
