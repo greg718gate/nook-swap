@@ -155,7 +155,11 @@ export const Navbar = () => {
                 )}
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[85vw] max-w-sm p-0 flex flex-col">
+            <SheetContent
+              side="right"
+              className="w-[85vw] max-w-sm p-0 flex flex-col"
+              onOpenAutoFocus={(e) => e.preventDefault()}
+            >
               <SheetHeader className="p-4 border-b">
                 <SheetTitle className="text-left">
                   {user ? (
