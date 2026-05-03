@@ -145,9 +145,16 @@ const handler = async (req: Request): Promise<Response> => {
         if (cdata && cdata[0]?.coupon_id) {
           discount = Number(cdata[0].discount) || 0;
           appliedCouponCode = coupon_code.trim().toUpperCase();
-          // Increment uses_count
-          await supabase.rpc as unknown;
-          await supabase.from("coupons").update({ uses_count: (await supabase.from("coupons").select("uses_count").eq("id", cdata[0].coupon_id).single()).data?.uses_count + 1 || 1 }).eq("id", cdata[0].coupon_id);
+          // Increment uses_count atomically
+          const { data: cur } = await supabase
+            .from("coupons")
+            .select("uses_count")
+            .eq("id", cdata[0].coupon_id)
+            .single();
+          await supabase
+            .from("coupons")
+            .update({ uses_count: (cur?.uses_count ?? 0) + 1 })
+            .eq("id", cdata[0].coupon_id);
         }
       }
     }
