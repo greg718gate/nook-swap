@@ -14,6 +14,7 @@ import Sell from "./pages/Sell";
 import EditProduct from "./pages/EditProduct";
 import SellerDashboard from "./pages/SellerDashboard";
 import MyOrders from "./pages/MyOrders";
+import Wishlist from "./pages/Wishlist";
 import SellerOrders from "./pages/SellerOrders";
 import Admin from "./pages/Admin";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -44,6 +45,7 @@ const App = () => (
           <Route path="/edit-product/:id" element={<EditProduct />} />
           <Route path="/dashboard" element={<SellerDashboard />} />
           <Route path="/my-orders" element={<MyOrders />} />
+          <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/sales" element={<SellerOrders />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
