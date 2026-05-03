@@ -11,8 +11,8 @@ interface ProductCardProps {
   image?: string;
   condition?: string;
   seller: {
-    username: string;
-    rating: number;
+    username?: string | null;
+    rating?: number | string | null;
   };
 }
 
@@ -24,6 +24,10 @@ export const ProductCard = ({
   condition,
   seller,
 }: ProductCardProps) => {
+  const safePrice = Number(price) || 0;
+  const safeRating = Number(seller?.rating) || 0;
+  const sellerName = seller?.username || "Sprzedawca";
+
   return (
     <Link to={`/product/${id}`} className="group">
       <Card className="overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-border/50 hover:border-primary/30 bg-gradient-card">
@@ -55,13 +59,13 @@ export const ProductCard = ({
             {title}
           </h3>
           <div className="mb-4 text-2xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-            £{price.toFixed(2)}
+            £{safePrice.toFixed(2)}
           </div>
           <div className="flex items-center justify-between text-sm text-muted-foreground border-t border-border/50 pt-3">
-            <span className="font-medium">{seller.username}</span>
+            <span className="font-medium">{sellerName}</span>
             <div className="flex items-center gap-1.5 bg-accent/10 px-2 py-1 rounded-full">
               <Star className="h-3.5 w-3.5 fill-accent text-accent drop-shadow-sm" />
-              <span className="font-semibold text-accent-foreground">{seller.rating.toFixed(1)}</span>
+              <span className="font-semibold text-accent-foreground">{safeRating.toFixed(1)}</span>
             </div>
           </div>
         </div>
