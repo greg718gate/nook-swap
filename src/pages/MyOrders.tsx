@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Loader2, Package, Truck, CheckCircle2, XCircle } from "lucide-react";
+import { Loader2, Package, Truck, CheckCircle2, XCircle, Star } from "lucide-react";
 
 interface OrderItem {
   id: string;
@@ -195,7 +195,7 @@ const MyOrders = () => {
                         Zwrócono: £{Number(o.refund_amount).toFixed(2)}
                       </div>
                     )}
-                    <div className="flex gap-2 pt-2">
+                    <div className="flex flex-wrap gap-2 pt-2">
                       {(o.status === "shipped" || o.status === "delivered") && (
                         <Button
                           size="sm"
@@ -217,6 +217,18 @@ const MyOrders = () => {
                           Zażądaj zwrotu
                         </Button>
                       )}
+                      {(o.status === "delivered" || o.status === "completed") &&
+                        o.order_items?.map((it) => (
+                          <Button
+                            key={it.id}
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => navigate(`/product/${it.product_id}#reviews`)}
+                          >
+                            <Star className="mr-2 h-4 w-4" />
+                            Wystaw opinię
+                          </Button>
+                        ))}
                     </div>
                   </CardContent>
                 </Card>

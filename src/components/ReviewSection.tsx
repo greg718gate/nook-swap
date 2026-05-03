@@ -127,12 +127,13 @@ export const ReviewSection = ({ productId }: ReviewSectionProps) => {
 
       setComment("");
       setRating(5);
+      setAlreadyReviewed(true);
       fetchReviews();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting review:", error);
       toast({
         title: "Error",
-        description: "Failed to submit review",
+        description: error?.message || "Failed to submit review",
         variant: "destructive",
       });
     } finally {
