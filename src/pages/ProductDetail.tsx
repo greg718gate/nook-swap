@@ -12,6 +12,8 @@ import { toast } from "sonner";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { useMessages } from "@/hooks/useMessages";
 import { ReportButton } from "@/components/ReportButton";
+import { SeoHead } from "@/components/SeoHead";
+import { WishlistButton } from "@/components/WishlistButton";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -137,8 +139,40 @@ const ProductDetail = () => {
     );
   }
 
+  const seoTitle = `${product.title} - £${Number(product.price).toFixed(2)} | VelvetBazzar`;
+  const seoDesc = (product.description || product.title).slice(0, 160);
+  const productImage = product.images?.[0];
+
   return (
     <div className="flex min-h-screen flex-col">
+      <SeoHead
+        title={seoTitle}
+        description={seoDesc}
+        image={productImage}
+        jsonLd={{
+          "@context": "https://schema.org/",
+          "@type": "Product",
+          name: product.title,
+          description: product.description,
+          image: product.images || [],
+          offers: {
+            "@type": "Offer",
+            priceCurrency: "GBP",
+            price: Number(product.price).toFixed(2),
+            availability:
+              product.status === "active"
+                ? "https://schema.org/InStock"
+                : "https://schema.org/OutOfStock",
+          },
+          aggregateRating: product.profiles?.total_reviews
+            ? {
+                "@type": "AggregateRating",
+                ratingValue: Number(product.profiles.rating).toFixed(1),
+                reviewCount: product.profiles.total_reviews,
+              }
+            : undefined,
+        }}
+      />
       <Navbar />
       <main className="flex-1">
         <div className="container py-8">
