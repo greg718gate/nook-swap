@@ -8,6 +8,7 @@ import { TrendingUp, DollarSign, Package, Star, Eye, ShoppingBag } from "lucide-
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { CouponsManager } from "@/components/CouponsManager";
 
 interface DashboardStats {
   totalRevenue: number;
@@ -27,6 +28,7 @@ interface TrendData {
 const SellerDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [userId, setUserId] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<DashboardStats>({
     totalRevenue: 0,
@@ -53,6 +55,7 @@ const SellerDashboard = () => {
       navigate("/auth");
       return;
     }
+    setUserId(session.user.id);
     fetchDashboardData(session.user.id);
   };
 
@@ -219,12 +222,15 @@ const SellerDashboard = () => {
           </div>
 
           <Tabs defaultValue="trends" className="animate-fade-in" style={{ animationDelay: '0.25s' }}>
-            <TabsList className="grid w-full grid-cols-2 mb-6 bg-muted/50 p-1">
+            <TabsList className="grid w-full grid-cols-3 mb-6 bg-muted/50 p-1">
               <TabsTrigger value="trends" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-accent data-[state=active]:text-white">
                 Market Trends
               </TabsTrigger>
               <TabsTrigger value="insights" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-accent data-[state=active]:text-white">
                 Insights
+              </TabsTrigger>
+              <TabsTrigger value="coupons" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-accent data-[state=active]:text-white">
+                Kupony
               </TabsTrigger>
             </TabsList>
 
