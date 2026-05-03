@@ -248,10 +248,16 @@ export type Database = {
       orders: {
         Row: {
           buyer_id: string
+          cancellation_reason: string | null
+          carrier: string | null
+          confirmed_at: string | null
           created_at: string | null
+          delivered_at: string | null
           id: string
           platform_fee: number | null
+          refund_amount: number | null
           seller_payout: number | null
+          shipped_at: string | null
           shipping_address: string | null
           shipping_cost: number | null
           shipping_method: string | null
@@ -259,13 +265,21 @@ export type Database = {
           stripe_payment_intent_id: string | null
           stripe_session_id: string | null
           total_amount: number
+          tracking_number: string | null
+          updated_at: string
         }
         Insert: {
           buyer_id: string
+          cancellation_reason?: string | null
+          carrier?: string | null
+          confirmed_at?: string | null
           created_at?: string | null
+          delivered_at?: string | null
           id?: string
           platform_fee?: number | null
+          refund_amount?: number | null
           seller_payout?: number | null
+          shipped_at?: string | null
           shipping_address?: string | null
           shipping_cost?: number | null
           shipping_method?: string | null
@@ -273,13 +287,21 @@ export type Database = {
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
           total_amount: number
+          tracking_number?: string | null
+          updated_at?: string
         }
         Update: {
           buyer_id?: string
+          cancellation_reason?: string | null
+          carrier?: string | null
+          confirmed_at?: string | null
           created_at?: string | null
+          delivered_at?: string | null
           id?: string
           platform_fee?: number | null
+          refund_amount?: number | null
           seller_payout?: number | null
+          shipped_at?: string | null
           shipping_address?: string | null
           shipping_cost?: number | null
           shipping_method?: string | null
@@ -287,6 +309,8 @@ export type Database = {
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
           total_amount?: number
+          tracking_number?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
@@ -483,6 +507,45 @@ export type Database = {
           },
         ]
       }
+      reports: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          description: string | null
+          id: string
+          reason: string
+          reporter_id: string
+          status: string
+          target_id: string
+          target_type: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          reason: string
+          reporter_id: string
+          status?: string
+          target_id: string
+          target_type: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          reason?: string
+          reporter_id?: string
+          status?: string
+          target_id?: string
+          target_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           comment: string | null
@@ -532,6 +595,27 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       public_profiles: {
@@ -572,10 +656,18 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -702,6 +794,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
