@@ -179,6 +179,7 @@ const ProductDetail = () => {
           <div className="grid gap-8 lg:grid-cols-2">
             <div>
               <div className="relative aspect-square overflow-hidden rounded-lg bg-muted">
+                <WishlistButton productId={product.id} className="absolute top-3 right-3 z-10 h-10 w-10" />
                 {product.images && product.images[selectedImageIndex] ? (
                   <img
                     src={product.images[selectedImageIndex]}
