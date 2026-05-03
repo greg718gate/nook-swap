@@ -50,7 +50,7 @@ const CheckoutSuccess = () => {
         product_id,
         download_count,
         max_downloads,
-        products (title, product_type, digital_file_url, digital_file_name)
+        products (title, product_type)
       `)
       .eq("buyer_id", session.session.user.id)
       .order("created_at", { ascending: false })
