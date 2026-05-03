@@ -176,11 +176,14 @@ const handler = async (req: Request): Promise<Response> => {
         sellerAmounts[sellerId] += shippingCost * proportion;
       }
     }
-    // Apply 95% to each seller
+    // Apply discount proportionally, then 95% to each seller
+    const grossPreDiscount = subtotal + shippingCost;
     const sellerTransfers: Record<string, { amount_cents: number; stripe_account_id: string }> = {};
     for (const [sellerId, amount] of Object.entries(sellerAmounts)) {
+      const sellerDiscount = grossPreDiscount > 0 ? (amount / grossPreDiscount) * discount : 0;
+      const net = amount - sellerDiscount;
       sellerTransfers[sellerId] = {
-        amount_cents: Math.round(amount * 0.95 * 100),
+        amount_cents: Math.round(net * 0.95 * 100),
         stripe_account_id: sellerStripeMap[sellerId],
       };
     }
@@ -210,6 +213,17 @@ const handler = async (req: Request): Promise<Response> => {
         },
         quantity: 1,
       });
+    }
+
+    if (discount > 0) {
+      lineItems.push({
+        price_data: {
+          currency: "gbp",
+          product_data: { name: `Rabat (${appliedCouponCode})`, images: [] },
+          unit_amount: -Math.round(discount * 100),
+        },
+        quantity: 1,
+      } as any);
     }
 
     const origin = req.headers.get("origin") || "https://nook-swap.lovable.app";
