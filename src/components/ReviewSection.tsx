@@ -30,6 +30,8 @@ export const ReviewSection = ({ productId }: ReviewSectionProps) => {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [canReview, setCanReview] = useState(false);
+  const [alreadyReviewed, setAlreadyReviewed] = useState(false);
 
   useEffect(() => {
     fetchReviews();
@@ -38,7 +40,31 @@ export const ReviewSection = ({ productId }: ReviewSectionProps) => {
 
   const checkUser = async () => {
     const { data: { session } } = await supabase.auth.getSession();
-    setUser(session?.user || null);
+    const u = session?.user || null;
+    setUser(u);
+    if (!u) return;
+
+    // Already reviewed?
+    const { data: existing } = await supabase
+      .from("reviews")
+      .select("id")
+      .eq("product_id", productId)
+      .eq("reviewer_id", u.id)
+      .maybeSingle();
+    if (existing) {
+      setAlreadyReviewed(true);
+      return;
+    }
+
+    // Eligible to review? (delivered or completed order containing this product)
+    const { data: items } = await supabase
+      .from("order_items")
+      .select("order_id, orders!inner(buyer_id, status)")
+      .eq("product_id", productId)
+      .eq("orders.buyer_id", u.id)
+      .in("orders.status", ["delivered", "completed"])
+      .limit(1);
+    setCanReview((items?.length ?? 0) > 0);
   };
 
   const fetchReviews = async () => {
@@ -147,7 +173,17 @@ export const ReviewSection = ({ productId }: ReviewSectionProps) => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {user && (
+          {user && alreadyReviewed && (
+            <div className="mb-6 p-4 rounded-lg bg-muted/50 text-sm text-muted-foreground">
+              You have already reviewed this product. Thank you!
+            </div>
+          )}
+          {user && !alreadyReviewed && !canReview && (
+            <div className="mb-6 p-4 rounded-lg bg-muted/50 text-sm text-muted-foreground">
+              Only buyers who received this product can leave a review.
+            </div>
+          )}
+          {user && canReview && !alreadyReviewed && (
             <div className="mb-8 p-6 rounded-xl bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/20">
               <h3 className="font-semibold text-lg mb-4">Leave a Review</h3>
               <div className="space-y-4">
