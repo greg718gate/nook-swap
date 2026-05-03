@@ -58,3 +58,5 @@ createRoot(document.getElementById("root")!).render(
     <App />
   </RootErrorBoundary>,
 );
+
+document.getElementById("static-fallback")?.remove();
