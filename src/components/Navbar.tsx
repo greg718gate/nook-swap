@@ -136,6 +136,7 @@ export const Navbar = () => {
 
         {/* Mobile: cart + hamburger */}
         <div className="flex md:hidden items-center gap-1">
+          {user && <NotificationBell userId={user.id} />}
           {user && (
             <Button variant="ghost" size="icon" onClick={() => navigate("/cart")} className="relative h-10 w-10">
               <ShoppingCart className="h-5 w-5" />
