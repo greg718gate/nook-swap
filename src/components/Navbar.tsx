@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { Input } from "@/components/ui/input";
 import { useMessages } from "@/hooks/useMessages";
+import { NotificationBell } from "@/components/NotificationBell";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 export const Navbar = () => {
@@ -112,6 +113,7 @@ export const Navbar = () => {
                   </span>
                 )}
               </Button>
+              <NotificationBell userId={user.id} />
               <Button variant="ghost" size="icon" onClick={() => navigate("/cart")} className="relative">
                 <ShoppingCart className="h-5 w-5" />
                 {cartCount > 0 && (
@@ -134,6 +136,7 @@ export const Navbar = () => {
 
         {/* Mobile: cart + hamburger */}
         <div className="flex md:hidden items-center gap-1">
+          {user && <NotificationBell userId={user.id} />}
           {user && (
             <Button variant="ghost" size="icon" onClick={() => navigate("/cart")} className="relative h-10 w-10">
               <ShoppingCart className="h-5 w-5" />
