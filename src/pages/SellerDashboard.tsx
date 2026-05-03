@@ -304,6 +304,10 @@ const SellerDashboard = () => {
                 </CardContent>
               </Card>
             </TabsContent>
+
+            <TabsContent value="coupons">
+              {userId && <CouponsManager sellerId={userId} />}
+            </TabsContent>
           </Tabs>
 
           <div className="mt-8 text-center animate-fade-in" style={{ animationDelay: '0.3s' }}>
