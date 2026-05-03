@@ -215,15 +215,15 @@ const handler = async (req: Request): Promise<Response> => {
       });
     }
 
+    let stripeDiscounts: any[] | undefined;
     if (discount > 0) {
-      lineItems.push({
-        price_data: {
-          currency: "gbp",
-          product_data: { name: `Rabat (${appliedCouponCode})`, images: [] },
-          unit_amount: -Math.round(discount * 100),
-        },
-        quantity: 1,
-      } as any);
+      const stripeCoupon = await stripe.coupons.create({
+        amount_off: Math.round(discount * 100),
+        currency: "gbp",
+        duration: "once",
+        name: `Rabat ${appliedCouponCode}`,
+      });
+      stripeDiscounts = [{ coupon: stripeCoupon.id }];
     }
 
     const origin = req.headers.get("origin") || "https://nook-swap.lovable.app";
@@ -231,6 +231,7 @@ const handler = async (req: Request): Promise<Response> => {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: lineItems,
+      discounts: stripeDiscounts,
       mode: "payment",
       success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/cart`,
