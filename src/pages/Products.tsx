@@ -49,6 +49,9 @@ const Products = () => {
   const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(0);
+  const [priceMin, setPriceMin] = useState<string>("");
+  const [priceMax, setPriceMax] = useState<string>("");
+  const [conditionFilter, setConditionFilter] = useState<string>("all");
 
   useEffect(() => {
     fetchCategories();
@@ -60,7 +63,7 @@ const Products = () => {
     setPage(0);
     setHasMore(true);
     fetchProducts(0, true);
-  }, [searchParams, sortBy]);
+  }, [searchParams, sortBy, /* filters */ priceMin, priceMax, conditionFilter]);
 
   const fetchCategories = async () => {
     const { data } = await supabase.from("categories").select("*");
@@ -78,8 +81,14 @@ const Products = () => {
       const category = searchParams.get("category");
 
       if (search) {
-        query = query.ilike("title", `%${search}%`);
+        query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
       }
+
+      const minP = parseFloat(priceMin);
+      const maxP = parseFloat(priceMax);
+      if (!isNaN(minP)) query = query.gte("price", minP);
+      if (!isNaN(maxP)) query = query.lte("price", maxP);
+      if (conditionFilter !== "all") query = query.eq("condition", conditionFilter);
 
       // Sort
       if (sortBy === "price_asc") {
@@ -94,7 +103,7 @@ const Products = () => {
 
       return { query, category };
     },
-    [searchParams, sortBy]
+    [searchParams, sortBy, priceMin, priceMax, conditionFilter]
   );
 
   const fetchProducts = async (pageNum: number, reset: boolean) => {
