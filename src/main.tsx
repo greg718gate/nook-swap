@@ -1,4 +1,5 @@
 import { createRoot } from "react-dom/client";
+import { useEffect } from "react";
 import App from "./App.tsx";
 import "./index.css";
 
@@ -20,18 +21,26 @@ const showStaticFallback = () => {
   document.getElementById("static-fallback")?.removeAttribute("hidden");
 };
 
+const hideStaticFallback = () => {
+  document.documentElement.dataset.appLoaded = "true";
+  document.getElementById("static-fallback")?.setAttribute("hidden", "");
+};
+
+const AppBoot = () => {
+  useEffect(() => {
+    hideStaticFallback();
+  }, []);
+
+  return <App />;
+};
+
 window.addEventListener("error", showStaticFallback);
 window.addEventListener("unhandledrejection", showStaticFallback);
 
 const rootElement = document.getElementById("root");
 
 if (rootElement) {
-  createRoot(rootElement).render(<App />);
-
-  requestAnimationFrame(() => {
-    document.documentElement.dataset.appLoaded = "true";
-    document.getElementById("static-fallback")?.remove();
-  });
+  createRoot(rootElement).render(<AppBoot />);
 } else {
   showStaticFallback();
 }
