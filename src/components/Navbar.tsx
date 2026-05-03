@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { Input } from "@/components/ui/input";
 import { useMessages } from "@/hooks/useMessages";
+import { NotificationBell } from "@/components/NotificationBell";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 export const Navbar = () => {
