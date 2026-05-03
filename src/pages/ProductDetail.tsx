@@ -142,6 +142,9 @@ const ProductDetail = () => {
   const seoTitle = `${product.title} - £${Number(product.price).toFixed(2)} | VelvetBazzar`;
   const seoDesc = (product.description || product.title).slice(0, 160);
   const productImage = product.images?.[0];
+  const sellerName = product.profiles?.username || "Sprzedawca";
+  const sellerRating = Number(product.profiles?.rating) || 0;
+  const sellerReviews = Number(product.profiles?.total_reviews) || 0;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -236,7 +239,7 @@ const ProductDetail = () => {
               </div>
 
               <div className="text-4xl font-bold text-primary">
-                £{product.price.toFixed(2)}
+                £{Number(product.price).toFixed(2)}
               </div>
 
               {product.condition && (
@@ -252,14 +255,14 @@ const ProductDetail = () => {
                     <User className="h-6 w-6" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-semibold">{product.profiles.username}</p>
+                    <p className="font-semibold">{sellerName}</p>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Star className="h-3 w-3 fill-accent text-accent" />
-                        <span>{product.profiles.rating.toFixed(1)}</span>
+                        <span>{sellerRating.toFixed(1)}</span>
                       </div>
                       <span>•</span>
-                      <span>{product.profiles.total_reviews} reviews</span>
+                      <span>{sellerReviews} reviews</span>
                     </div>
                   </div>
                   <Button variant="outline" size="sm">
