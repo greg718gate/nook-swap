@@ -17,6 +17,7 @@ interface CheckoutRequest {
   items: CartItemRequest[];
   shipping_method: string;
   shipping_address?: string;
+  coupon_code?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -42,7 +43,7 @@ const handler = async (req: Request): Promise<Response> => {
     if (userError || !userData.user) throw new Error("Invalid user token");
 
     const body: CheckoutRequest = await req.json();
-    const { items: clientItems, shipping_method, shipping_address } = body;
+    const { items: clientItems, shipping_method, shipping_address, coupon_code } = body;
 
     // Validate input
     if (!Array.isArray(clientItems) || clientItems.length === 0) {
@@ -128,7 +129,30 @@ const handler = async (req: Request): Promise<Response> => {
       (sum, item) => sum + (item.product_type === "physical" ? item.shipping_cost : 0),
       0
     );
-    const total = subtotal + shippingCost;
+
+    // Validate and apply coupon (server-side)
+    let discount = 0;
+    let appliedCouponCode: string | null = null;
+    if (coupon_code && typeof coupon_code === "string") {
+      const sellerSet = new Set(items.map((i) => i.seller_id));
+      if (sellerSet.size === 1) {
+        const sellerId = [...sellerSet][0];
+        const { data: cdata } = await supabase.rpc("validate_coupon", {
+          _code: coupon_code.trim().toUpperCase(),
+          _seller_id: sellerId,
+          _subtotal: subtotal,
+        });
+        if (cdata && cdata[0]?.coupon_id) {
+          discount = Number(cdata[0].discount) || 0;
+          appliedCouponCode = coupon_code.trim().toUpperCase();
+          // Increment uses_count
+          await supabase.rpc as unknown;
+          await supabase.from("coupons").update({ uses_count: (await supabase.from("coupons").select("uses_count").eq("id", cdata[0].coupon_id).single()).data?.uses_count + 1 || 1 }).eq("id", cdata[0].coupon_id);
+        }
+      }
+    }
+
+    const total = Math.max(0, subtotal + shippingCost - discount);
     const platformFee = Math.round(total * 0.05 * 100); // 5% in cents
     const sellerPayout = Math.round(total * 0.95 * 100); // 95% in cents
 
