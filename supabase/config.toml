@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.stripe-connect-status]
 verify_jwt = false
+
+[functions.refund-order]
+verify_jwt = false

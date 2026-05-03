@@ -11,6 +11,7 @@ import { Star, ShoppingCart, User, MessageCircle, ChevronLeft, ChevronRight } fr
 import { toast } from "sonner";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { useMessages } from "@/hooks/useMessages";
+import { ReportButton } from "@/components/ReportButton";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -258,6 +259,12 @@ const ProductDetail = () => {
                   {contactingLoading ? "Łączenie..." : "Napisz do sprzedawcy"}
                 </Button>
               </div>
+
+              {user && product.seller_id !== user.id && (
+                <div className="pt-2">
+                  <ReportButton targetType="product" targetId={product.id} variant="ghost" size="sm" />
+                </div>
+              )}
 
               {product.status === "sold" && (
                 <div className="rounded-lg bg-destructive/10 p-4 text-center text-destructive">

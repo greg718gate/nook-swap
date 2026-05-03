@@ -117,6 +117,22 @@ export const Navbar = () => {
               <Button
                 variant="ghost"
                 size="sm"
+                onClick={() => navigate("/my-orders")}
+                className="hover:bg-primary/10 hover:text-primary transition-all"
+              >
+                Zakupy
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/sales")}
+                className="hover:bg-primary/10 hover:text-primary transition-all"
+              >
+                Sprzedaż
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => navigate("/dashboard")}
                 className="gap-2 hover:bg-accent/10 hover:text-accent transition-all"
               >

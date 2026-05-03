@@ -13,6 +13,9 @@ import Profile from "./pages/Profile";
 import Sell from "./pages/Sell";
 import EditProduct from "./pages/EditProduct";
 import SellerDashboard from "./pages/SellerDashboard";
+import MyOrders from "./pages/MyOrders";
+import SellerOrders from "./pages/SellerOrders";
+import Admin from "./pages/Admin";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Terms from "./pages/Terms";
 import Shipping from "./pages/Shipping";
@@ -40,6 +43,9 @@ const App = () => (
           <Route path="/sell" element={<Sell />} />
           <Route path="/edit-product/:id" element={<EditProduct />} />
           <Route path="/dashboard" element={<SellerDashboard />} />
+          <Route path="/my-orders" element={<MyOrders />} />
+          <Route path="/sales" element={<SellerOrders />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/shipping" element={<Shipping />} />
