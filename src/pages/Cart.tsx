@@ -276,7 +276,7 @@ const Cart = () => {
                         </div>
                         <div className="flex items-center justify-between">
                           <p className="text-xl font-bold text-primary">
-                            £{item.products.price.toFixed(2)}
+                            £{Number(item.products.price ?? 0).toFixed(2)}
                           </p>
                           <Button
                             variant="ghost"
@@ -316,7 +316,7 @@ const Cart = () => {
                           <span className="font-medium">
                             £{cartItems
                               .filter((i) => i.products.product_type === "physical")
-                              .reduce((sum, i) => sum + i.products.shipping_evri, 0)
+                              .reduce((sum, i) => sum + Number(i.products.shipping_evri ?? 0), 0)
                               .toFixed(2)}
                           </span>
                         </label>
@@ -335,7 +335,7 @@ const Cart = () => {
                           <span className="font-medium">
                             £{cartItems
                               .filter((i) => i.products.product_type === "physical")
-                              .reduce((sum, i) => sum + i.products.shipping_royal_mail, 0)
+                              .reduce((sum, i) => sum + Number(i.products.shipping_royal_mail ?? 0), 0)
                               .toFixed(2)}
                           </span>
                         </label>
@@ -354,7 +354,7 @@ const Cart = () => {
                           <span className="font-medium">
                             £{cartItems
                               .filter((i) => i.products.product_type === "physical")
-                              .reduce((sum, i) => sum + i.products.shipping_inpost, 0)
+                              .reduce((sum, i) => sum + Number(i.products.shipping_inpost ?? 0), 0)
                               .toFixed(2)}
                           </span>
                         </label>
