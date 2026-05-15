@@ -256,7 +256,7 @@ const Profile = () => {
                           </Badge>
                         </div>
                         <p className="mb-3 text-xl font-bold text-primary">
-                          £{product.price.toFixed(2)}
+                          £{Number(product.price ?? 0).toFixed(2)}
                         </p>
                         <div className="flex flex-wrap gap-2">
                           <Button
@@ -330,7 +330,7 @@ const Profile = () => {
                         </div>
                         <div className="text-right">
                           <p className="text-xl font-bold">
-                            £{order.total_amount.toFixed(2)}
+                            £{Number(order.total_amount ?? 0).toFixed(2)}
                           </p>
                           <Badge>{order.status}</Badge>
                         </div>
