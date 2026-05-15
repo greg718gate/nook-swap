@@ -38,26 +38,55 @@ const Profile = () => {
   const defaultTab = searchParams.get('tab') || 'listings';
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      const currentUser = session?.user ?? null;
+    let cancelled = false;
+
+    const loadFor = async (currentUser: SupabaseUser | null) => {
+      if (cancelled) return;
       setUser(currentUser);
       if (!currentUser) {
         navigate("/auth");
-      } else {
-        fetchProfile(currentUser.id);
-        fetchProducts(currentUser.id);
-        fetchOrders(currentUser.id);
+        return;
       }
+      try {
+        await Promise.all([
+          fetchProfile(currentUser.id),
+          fetchProducts(currentUser.id),
+          fetchOrders(currentUser.id),
+        ]);
+      } catch (err) {
+        console.error("Profile load error:", err);
+        // ensure we never get stuck on a blank screen
+        setProfile((prev) => prev ?? { id: currentUser.id, username: null, rating: 0, total_reviews: 0 });
+      }
+    };
+
+    // Set up listener FIRST, then check session
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      loadFor(session?.user ?? null);
     });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      loadFor(session?.user ?? null);
+    });
+
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
   }, [navigate]);
 
   const fetchProfile = async (userId: string) => {
-    const { data } = await supabase
-      .from("profiles")
-      .select("id, username, full_name, avatar_url, bio, location, rating, total_reviews, stripe_onboarded, created_at, updated_at")
-      .eq("id", userId)
-      .maybeSingle();
-    setProfile(data ?? { id: userId, username: null, rating: 0, total_reviews: 0 });
+    try {
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, username, full_name, avatar_url, bio, location, rating, total_reviews, stripe_onboarded, created_at, updated_at")
+        .eq("id", userId)
+        .maybeSingle();
+      setProfile(data ?? { id: userId, username: null, rating: 0, total_reviews: 0 });
+    } catch (err) {
+      console.error("fetchProfile error:", err);
+      setProfile({ id: userId, username: null, rating: 0, total_reviews: 0 });
+    }
   };
 
   const fetchProducts = async (userId: string) => {
@@ -227,7 +256,7 @@ const Profile = () => {
                           </Badge>
                         </div>
                         <p className="mb-3 text-xl font-bold text-primary">
-                          £{product.price.toFixed(2)}
+                          £{Number(product.price ?? 0).toFixed(2)}
                         </p>
                         <div className="flex flex-wrap gap-2">
                           <Button
@@ -301,7 +330,7 @@ const Profile = () => {
                         </div>
                         <div className="text-right">
                           <p className="text-xl font-bold">
-                            £{order.total_amount.toFixed(2)}
+                            £{Number(order.total_amount ?? 0).toFixed(2)}
                           </p>
                           <Badge>{order.status}</Badge>
                         </div>
