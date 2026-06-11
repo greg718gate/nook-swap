@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ConversationList } from "./ConversationList";
 import { ChatDialog } from "./ChatDialog";
-import { useMessages, Conversation } from "@/hooks/useMessages";
+import { useMessages } from "@/hooks/useMessages";
 
 interface MessagesSectionProps {
   userId: string;
+  initialConversationId?: string | null;
 }
 
-export const MessagesSection = ({ userId }: MessagesSectionProps) => {
+export const MessagesSection = ({ userId, initialConversationId }: MessagesSectionProps) => {
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
+  const appliedInitialRef = useRef(false);
   
   const { 
     conversations, 
@@ -16,6 +18,14 @@ export const MessagesSection = ({ userId }: MessagesSectionProps) => {
     sendMessage, 
     markAsRead 
   } = useMessages(userId);
+
+  useEffect(() => {
+    if (appliedInitialRef.current || !initialConversationId || loading) return;
+    if (conversations.some((c) => c.id === initialConversationId)) {
+      setSelectedConversationId(initialConversationId);
+      appliedInitialRef.current = true;
+    }
+  }, [initialConversationId, loading, conversations]);
 
   const selectedConversation = conversations.find(c => c.id === selectedConversationId) || null;
 

@@ -36,6 +36,7 @@ const Profile = () => {
   const { unreadCount } = useMessages(user?.id);
   
   const defaultTab = searchParams.get('tab') || 'listings';
+  const initialConversationId = searchParams.get('conversation');
 
   useEffect(() => {
     let cancelled = false;
@@ -354,7 +355,7 @@ const Profile = () => {
 
             <TabsContent value="messages">
               <h2 className="mb-6 text-2xl font-bold">Wiadomości</h2>
-              <MessagesSection userId={user.id} />
+              <MessagesSection userId={user.id} initialConversationId={initialConversationId} />
             </TabsContent>
           </Tabs>
         </div>
