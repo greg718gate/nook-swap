@@ -12,7 +12,7 @@ interface Review {
   rating: number;
   comment: string;
   created_at: string;
-  profiles: {
+  public_profiles: {
     username: string;
     avatar_url: string;
   };
@@ -76,7 +76,7 @@ export const ReviewSection = ({ productId }: ReviewSectionProps) => {
           rating,
           comment,
           created_at,
-          profiles(username, avatar_url)
+          public_profiles(username, avatar_url)
         `)
         .eq("product_id", productId)
         .order("created_at", { ascending: false });
@@ -244,15 +244,15 @@ export const ReviewSection = ({ productId }: ReviewSectionProps) => {
                   <CardContent className="pt-6">
                     <div className="flex items-start gap-4">
                       <Avatar className="h-12 w-12 border-2 border-primary/20">
-                        <AvatarImage src={review.profiles.avatar_url} />
+                        <AvatarImage src={review.public_profiles.avatar_url} />
                         <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white">
-                          {review.profiles.username[0].toUpperCase()}
+                          {review.public_profiles.username[0].toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-2">
                           <div>
-                            <p className="font-semibold">{review.profiles.username}</p>
+                            <p className="font-semibold">{review.public_profiles.username}</p>
                             <p className="text-xs text-muted-foreground">
                               {new Date(review.created_at).toLocaleDateString('en-GB', {
                                 year: 'numeric',

@@ -23,7 +23,7 @@ const Wishlist = () => {
       }
       const { data } = await supabase
         .from("wishlist_items")
-        .select("product_id, products(id, title, price, images, condition, status, profiles:seller_id(username, rating))")
+        .select("product_id, products(id, title, price, images, condition, status, public_profiles:seller_id(username, rating))")
         .eq("user_id", session.session.user.id);
       setProducts((data ?? []).map((r: any) => r.products).filter(Boolean));
       setLoading(false);
@@ -56,7 +56,7 @@ const Wishlist = () => {
                   price={p.price}
                   image={p.images?.[0]}
                   condition={p.condition}
-                  seller={{ username: p.profiles?.username ?? "—", rating: p.profiles?.rating ?? 0 }}
+                  seller={{ username: p.public_profiles?.username ?? "—", rating: p.public_profiles?.rating ?? 0 }}
                 />
               ))}
             </div>

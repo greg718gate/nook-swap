@@ -50,7 +50,7 @@ const ProductDetail = () => {
       .from("products")
       .select(`
         *,
-        profiles:seller_id (username, rating, total_reviews),
+        public_profiles:seller_id (username, rating, total_reviews),
         categories (name)
       `)
       .eq("id", id)
@@ -142,9 +142,9 @@ const ProductDetail = () => {
   const seoTitle = `${product.title} - £${Number(product.price).toFixed(2)} | VelvetBazzar`;
   const seoDesc = (product.description || product.title).slice(0, 160);
   const productImage = product.images?.[0];
-  const sellerName = product.profiles?.username || "Sprzedawca";
-  const sellerRating = Number(product.profiles?.rating) || 0;
-  const sellerReviews = Number(product.profiles?.total_reviews) || 0;
+  const sellerName = product.public_profiles?.username || "Sprzedawca";
+  const sellerRating = Number(product.public_profiles?.rating) || 0;
+  const sellerReviews = Number(product.public_profiles?.total_reviews) || 0;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -167,11 +167,11 @@ const ProductDetail = () => {
                 ? "https://schema.org/InStock"
                 : "https://schema.org/OutOfStock",
           },
-          aggregateRating: product.profiles?.total_reviews
+          aggregateRating: product.public_profiles?.total_reviews
             ? {
                 "@type": "AggregateRating",
-                ratingValue: Number(product.profiles.rating).toFixed(1),
-                reviewCount: product.profiles.total_reviews,
+                ratingValue: Number(product.public_profiles.rating).toFixed(1),
+                reviewCount: product.public_profiles.total_reviews,
               }
             : undefined,
         }}

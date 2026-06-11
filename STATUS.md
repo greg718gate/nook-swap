@@ -1,15 +1,13 @@
-AKTUALNE ZADANIE: Produkcja — auth URL + publish
-STATUS: w trakcie
+AKTUALNE ZADANIE: Publish — migracja bezpieczeństwa + auth URL
+STATUS: czeka na Lovable (migracja w GitHubie)
 
 GOTOWE:
-- Wiadomości (Edge Functions, wdrożone)
-- Stripe (przetestowany)
-- Storage — buckety product-images + digital-products działają (upload/download OK)
-- Koszyk, zamówienia, sprzedaż, recenzje, powiadomienia
+- Wiadomości, Stripe, Storage
+- Migracja: supabase/migrations/20260612120000_security_publish_fixes.sql
+- Frontend: public_profiles zamiast profiles (bezpieczne publiczne dane)
 
-KOLEJNE KROKI:
-1. Auth URL — dodać velvetbazzar.co.uk w Lovable (Authentication → URL Configuration)
-2. Publish — opublikować aplikację w Lovable pod domeną produkcyjną
-3. Testy E2E z drugą osobą (wiadomości + zakup)
+DO ZROBIENIA:
+1. Lovable: zastosuj migrację + publish (wiadomość poniżej)
+2. Ty ręcznie: Auth URL w Lovable Backend (Site URL + Redirect URLs)
 
 BAZA: Lovable (nmgiyvauguilbwtqlexj)

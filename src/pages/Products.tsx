@@ -24,7 +24,7 @@ interface Product {
   price: number;
   images: string[];
   condition: string;
-  profiles: {
+  public_profiles: {
     username?: string | null;
     rating?: number | null;
   } | null;
@@ -76,7 +76,7 @@ const Products = () => {
     (offset: number) => {
       let query = supabase
         .from("products")
-        .select("id, title, price, images, condition, profiles(username, rating)")
+        .select("id, title, price, images, condition, public_profiles:seller_id(username, rating)")
         .eq("status", "active");
 
       const search = searchParams.get("search");
@@ -275,8 +275,8 @@ const Products = () => {
                     image={product.images?.[0]}
                     condition={product.condition}
                     seller={{
-                      username: product.profiles?.username,
-                      rating: product.profiles?.rating,
+                      username: product.public_profiles?.username,
+                      rating: product.public_profiles?.rating,
                     }}
                   />
                 ))}
