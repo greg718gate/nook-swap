@@ -1,14 +1,57 @@
+-- Fix infinite recursion in conversation_participants SELECT policy
+CREATE OR REPLACE FUNCTION public.is_conversation_participant(conv_id uuid)
+RETURNS boolean
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.conversation_participants
+    WHERE conversation_id = conv_id AND user_id = auth.uid()
+  );
+$$;
+
+REVOKE ALL ON FUNCTION public.is_conversation_participant(uuid) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.is_conversation_participant(uuid) TO authenticated;
+
+DROP POLICY IF EXISTS "Users can view participants in their conversations" ON public.conversation_participants;
+
+CREATE POLICY "Users can view participants in their conversations"
+ON public.conversation_participants
+FOR SELECT
+USING (public.is_conversation_participant(conversation_id));
+
+-- Tighten conversation_participants INSERT (idempotent if already applied)
+DROP POLICY IF EXISTS "Users can add participants to conversations" ON public.conversation_participants;
+
+CREATE POLICY "Users can add participants to conversations"
+ON public.conversation_participants
+FOR INSERT
+WITH CHECK (
+  (
+    user_id = auth.uid()
+    AND NOT EXISTS (
+      SELECT 1 FROM public.conversation_participants cp
+      WHERE cp.conversation_id = conversation_participants.conversation_id
+    )
+  )
+  OR EXISTS (
+    SELECT 1 FROM public.conversation_participants cp
+    WHERE cp.conversation_id = conversation_participants.conversation_id
+      AND cp.user_id = auth.uid()
+  )
+);
+
 -- Allow conversation participants to mark received messages as read
+DROP POLICY IF EXISTS "Recipients can mark messages as read" ON public.messages;
+
 CREATE POLICY "Recipients can mark messages as read"
 ON public.messages
 FOR UPDATE
 USING (
   sender_id <> auth.uid()
-  AND EXISTS (
-    SELECT 1 FROM public.conversation_participants cp
-    WHERE cp.conversation_id = messages.conversation_id
-      AND cp.user_id = auth.uid()
-  )
+  AND public.is_conversation_participant(conversation_id)
 );
 
 -- Point message notifications to the specific conversation
