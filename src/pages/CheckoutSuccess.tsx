@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CheckCircle, Package, Download, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface Purchase {
   id: string;
@@ -69,6 +70,7 @@ const CheckoutSuccess = () => {
 
     if (rpcError || !rpcData || rpcData.length === 0) {
       console.error("Download error:", rpcError);
+      toast.error("Nie udało się pobrać pliku. Sprawdź limit pobrań lub skontaktuj się ze sprzedawcą.");
       return;
     }
 
@@ -80,6 +82,7 @@ const CheckoutSuccess = () => {
 
     if (error) {
       console.error("Download error:", error);
+      toast.error("Nie udało się pobrać pliku.");
       return;
     }
 

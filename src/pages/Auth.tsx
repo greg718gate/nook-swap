@@ -41,7 +41,7 @@ const Auth = () => {
 
       if (error) throw error;
 
-      toast.success("Account created! Please check your email to verify.");
+      toast.success("Konto utworzone! Sprawdź e-mail, aby potwierdzić rejestrację.");
       setEmail("");
       setPassword("");
       setUsername("");
@@ -64,7 +64,7 @@ const Auth = () => {
 
       if (error) throw error;
 
-      toast.success("Welcome back!");
+      toast.success("Zalogowano pomyślnie!");
       navigate("/");
     } catch (error: any) {
       toast.error(error.message);

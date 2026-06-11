@@ -82,7 +82,7 @@ export const Navbar = () => {
           <div className="relative w-full max-w-xl">
             <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Search products..."
+              placeholder="Szukaj produktów..."
               className="pl-12 h-12 rounded-xl bg-muted/50 border-border/50"
               onKeyDown={(e) => {
                 if (e.key === "Enter") navigate(`/products?search=${e.currentTarget.value}`);
@@ -93,17 +93,17 @@ export const Navbar = () => {
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center space-x-3">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/")}>Home</Button>
-          <Button variant="ghost" size="sm" onClick={() => navigate("/products")}>Browse</Button>
+          <Button variant="ghost" size="sm" onClick={() => navigate("/")}>Strona główna</Button>
+          <Button variant="ghost" size="sm" onClick={() => navigate("/products")}>Przeglądaj</Button>
           <Button variant="ghost" size="sm" onClick={() => navigate("/sell")} className="gap-2">
-            <Plus className="h-4 w-4" /> Sell
+            <Plus className="h-4 w-4" /> Sprzedaj
           </Button>
           {user ? (
             <>
               <Button variant="ghost" size="sm" onClick={() => navigate("/my-orders")}>Zakupy</Button>
               <Button variant="ghost" size="sm" onClick={() => navigate("/sales")}>Sprzedaż</Button>
               <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="gap-2">
-                <BarChart3 className="h-4 w-4" /> Dashboard
+                <BarChart3 className="h-4 w-4" /> Panel
               </Button>
               <Button variant="ghost" size="icon" onClick={() => navigate("/profile?tab=messages")} className="relative">
                 <MessageCircle className="h-5 w-5" />
