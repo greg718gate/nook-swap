@@ -191,15 +191,18 @@ export const useMessages = (userId: string | undefined) => {
 
       if (convError) throw convError;
 
-      // Add participants
-      const { error: participantError } = await supabase
+      // Add participants sequentially (RLS requires creator to join before adding the other user)
+      const { error: selfParticipantError } = await supabase
         .from('conversation_participants')
-        .insert([
-          { conversation_id: newConv.id, user_id: userId },
-          { conversation_id: newConv.id, user_id: otherUserId }
-        ]);
+        .insert({ conversation_id: newConv.id, user_id: userId });
 
-      if (participantError) throw participantError;
+      if (selfParticipantError) throw selfParticipantError;
+
+      const { error: otherParticipantError } = await supabase
+        .from('conversation_participants')
+        .insert({ conversation_id: newConv.id, user_id: otherUserId });
+
+      if (otherParticipantError) throw otherParticipantError;
 
       await fetchConversations();
       return newConv.id;
@@ -281,11 +284,14 @@ export const useMessages = (userId: string | undefined) => {
           fetchConversations();
           
           // Show toast notification for new messages from others
-          if (payload.new && (payload.new as any).sender_id !== userId) {
+          if (payload.new && (payload.new as Message).sender_id !== userId) {
+            const conversationId = (payload.new as Message).conversation_id;
             toast.info('Masz nową wiadomość!', {
               action: {
                 label: 'Zobacz',
-                onClick: () => window.location.href = '/profile?tab=messages'
+                onClick: () => {
+                  window.location.href = `/profile?tab=messages&conversation=${conversationId}`;
+                }
               }
             });
           }

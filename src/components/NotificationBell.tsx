@@ -37,6 +37,10 @@ export const NotificationBell = ({ userId }: Props) => {
   const handleClick = async (n: Notification) => {
     if (!n.is_read) await markAsRead(n.id);
     setOpen(false);
+    if (n.type === 'message' && n.related_id) {
+      navigate(`/profile?tab=messages&conversation=${n.related_id}`);
+      return;
+    }
     if (n.link) navigate(n.link);
   };
 

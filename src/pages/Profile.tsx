@@ -35,8 +35,22 @@ const Profile = () => {
   const [orders, setOrders] = useState<any[]>([]);
   const { unreadCount } = useMessages(user?.id);
   
-  const defaultTab = searchParams.get('tab') || 'listings';
+  const activeTab = searchParams.get('tab') || 'listings';
   const initialConversationId = searchParams.get('conversation');
+
+  const handleTabChange = (tab: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (tab === 'listings') {
+      params.delete('tab');
+    } else {
+      params.set('tab', tab);
+    }
+    if (tab !== 'messages') {
+      params.delete('conversation');
+    }
+    const query = params.toString();
+    navigate(query ? `/profile?${query}` : '/profile', { replace: true });
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -193,7 +207,7 @@ const Profile = () => {
             </div>
           </Card>
 
-          <Tabs defaultValue={defaultTab}>
+          <Tabs value={activeTab} onValueChange={handleTabChange}>
             <TabsList className="mb-6">
               <TabsTrigger value="listings">Moje Ogłoszenia</TabsTrigger>
               <TabsTrigger value="orders">Moje Zamówienia</TabsTrigger>

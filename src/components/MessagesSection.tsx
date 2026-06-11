@@ -20,6 +20,10 @@ export const MessagesSection = ({ userId, initialConversationId }: MessagesSecti
   } = useMessages(userId);
 
   useEffect(() => {
+    appliedInitialRef.current = false;
+  }, [initialConversationId]);
+
+  useEffect(() => {
     if (appliedInitialRef.current || !initialConversationId || loading) return;
     if (conversations.some((c) => c.id === initialConversationId)) {
       setSelectedConversationId(initialConversationId);
