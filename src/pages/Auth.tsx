@@ -28,25 +28,25 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            username,
-          },
-          emailRedirectTo: `${window.location.origin}/`,
-        },
+      const { data, error } = await supabase.functions.invoke("auth-signup", {
+        body: { email, password, username },
       });
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
-      toast.success("Konto utworzone! Sprawdź e-mail, aby potwierdzić rejestrację.");
-      setEmail("");
-      setPassword("");
-      setUsername("");
-    } catch (error: any) {
-      toast.error(error.message);
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) throw signInError;
+
+      toast.success("Konto utworzone! Zalogowano pomyślnie.");
+      navigate("/");
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Błąd rejestracji";
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -66,8 +66,9 @@ const Auth = () => {
 
       toast.success("Zalogowano pomyślnie!");
       navigate("/");
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Błąd logowania";
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -78,14 +79,14 @@ const Auth = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 h-12 w-12 rounded-lg bg-gradient-hero" />
-          <CardTitle className="text-2xl">Welcome to VelvetBazzar.co.uk</CardTitle>
-          <CardDescription>Sign in to start buying and selling</CardDescription>
+          <CardTitle className="text-2xl">VelvetBazzar</CardTitle>
+          <CardDescription>Zaloguj się, aby kupować i sprzedawać</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsTrigger value="signin">Logowanie</TabsTrigger>
+              <TabsTrigger value="signup">Rejestracja</TabsTrigger>
             </TabsList>
             
             <TabsContent value="signin">
@@ -95,14 +96,14 @@ const Auth = () => {
                   <Input
                     id="signin-email"
                     type="email"
-                    placeholder="you@example.com"
+                    placeholder="ty@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signin-password">Password</Label>
+                  <Label htmlFor="signin-password">Hasło</Label>
                   <Input
                     id="signin-password"
                     type="password"
@@ -112,7 +113,7 @@ const Auth = () => {
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Signing in..." : "Sign In"}
+                  {loading ? "Logowanie..." : "Zaloguj się"}
                 </Button>
               </form>
             </TabsContent>
@@ -120,11 +121,11 @@ const Auth = () => {
             <TabsContent value="signup">
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-username">Username</Label>
+                  <Label htmlFor="signup-username">Nazwa użytkownika</Label>
                   <Input
                     id="signup-username"
                     type="text"
-                    placeholder="johndoe"
+                    placeholder="janek"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
@@ -135,14 +136,14 @@ const Auth = () => {
                   <Input
                     id="signup-email"
                     type="email"
-                    placeholder="you@example.com"
+                    placeholder="ty@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
+                  <Label htmlFor="signup-password">Hasło</Label>
                   <Input
                     id="signup-password"
                     type="password"
@@ -153,7 +154,7 @@ const Auth = () => {
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Creating account..." : "Sign Up"}
+                  {loading ? "Tworzenie konta..." : "Załóż konto"}
                 </Button>
               </form>
             </TabsContent>

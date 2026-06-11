@@ -1,5 +1,9 @@
 project_id = "nmgiyvauguilbwtqlexj"
 
+[auth]
+site_url = "https://velvetbazzar.co.uk"
+additional_redirect_urls = ["https://velvetbazzar.co.uk/**", "http://localhost:8080/**", "http://localhost:5173/**"]
+
 [functions.auto-tag-product]
 verify_jwt = false
 
@@ -25,4 +29,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.messaging-api]
+verify_jwt = false
+
+[functions.auth-signup]
 verify_jwt = false

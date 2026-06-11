@@ -1,16 +1,12 @@
-AKTUALNE ZADANIE: Testy produkcyjne
-STATUS: opublikowano na https://velvetbazzar.co.uk
+AKTUALNE ZADANIE: Auth bez konta Supabase
+STATUS: kod gotowy — wymaga deploy auth-signup w Lovable
 
 GOTOWE:
-- Wiadomości (Edge Functions)
-- Stripe (przetestowany)
-- Storage (product-images + digital-products)
-- Migracja bezpieczeństwa (3 błędy skanera naprawione)
-- Publish na velvetbazzar.co.uk
+- Produkcja: https://velvetbazzar.co.uk
+- Logowanie hasłem — działa z kodu, bez panelu Supabase
+- Rejestracja — przez Edge Function auth-signup (auto-potwierdza email, bez linku w mailu)
 
-DO ZROBIENIA:
-1. Auth URL — upewnij się że Site URL + Redirect URLs ustawione w Lovable Backend
-2. Testy E2E z drugą osobą (wiadomości + zakup)
-3. Test logowania na żywej domenie
+LOVABLE (jedna wiadomość):
+"Wdróż edge function auth-signup z GitHuba"
 
-BAZA: Lovable (nmgiyvauguilbwtqlexj)
+NIE POTRZEBUJESZ konta na supabase.com — nigdy.
