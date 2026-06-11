@@ -129,11 +129,11 @@ export const Navbar = () => {
                 <User className="h-5 w-5" />
               </Button>
               <Button variant="ghost" size="sm" onClick={handleSignOut} className="hover:text-destructive">
-                Sign Out
+                Wyloguj
               </Button>
             </>
           ) : (
-            <Button onClick={() => navigate("/auth")} className="shadow-lg">Log In / Sign Up</Button>
+            <Button onClick={() => navigate("/auth")} className="shadow-lg">Zaloguj się</Button>
           )}
         </div>
 
@@ -199,7 +199,7 @@ export const Navbar = () => {
               <div className="flex-1 overflow-y-auto px-2 pb-4">
                 <div className="flex flex-col gap-1">
                   <Button variant="ghost" className="justify-start gap-3 h-12" onClick={() => go("/")}>
-                    <Home className="h-5 w-5" /> Home
+                    <Home className="h-5 w-5" /> Strona główna
                   </Button>
                   <Button variant="ghost" className="justify-start gap-3 h-12" onClick={() => go("/products")}>
                     <Search className="h-5 w-5" /> Przeglądaj
@@ -232,7 +232,7 @@ export const Navbar = () => {
                         <Package className="h-5 w-5" /> Moja sprzedaż
                       </Button>
                       <Button variant="ghost" className="justify-start gap-3 h-12" onClick={() => go("/dashboard")}>
-                        <BarChart3 className="h-5 w-5" /> Dashboard
+                        <BarChart3 className="h-5 w-5" /> Panel sprzedawcy
                       </Button>
                       <Button variant="ghost" className="justify-start gap-3 h-12" onClick={() => go("/cart")}>
                         <ShoppingCart className="h-5 w-5" /> Koszyk

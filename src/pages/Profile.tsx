@@ -166,7 +166,7 @@ const Profile = () => {
     return (
       <div className="flex min-h-screen flex-col">
         <Navbar />
-        <div className="flex flex-1 items-center justify-center">Loading...</div>
+        <div className="flex flex-1 items-center justify-center">Ładowanie...</div>
         <Footer />
       </div>
     );

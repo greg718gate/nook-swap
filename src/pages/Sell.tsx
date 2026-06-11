@@ -176,9 +176,9 @@ const Sell = () => {
         const fileExt = file.name.split('.').pop();
         const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-        const { error: uploadError, data } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
           .from('product-images')
-          .upload(fileName, file);
+          .upload(fileName, file, { contentType: file.type, upsert: false });
 
         if (uploadError) throw uploadError;
 
@@ -192,6 +192,7 @@ const Sell = () => {
       return uploadedUrls;
     } catch (error) {
       console.error('Error uploading images:', error);
+      toast.error('Nie udało się przesłać zdjęć. Spróbuj ponownie lub wybierz mniejsze pliki.');
       throw error;
     } finally {
       setUploadingImages(false);
@@ -220,7 +221,7 @@ const Sell = () => {
 
       const { error: uploadError } = await supabase.storage
         .from('digital-products')
-        .upload(fileName, digitalFile);
+        .upload(fileName, digitalFile, { contentType: digitalFile.type || 'application/octet-stream', upsert: false });
 
       if (uploadError) throw uploadError;
 
@@ -280,8 +281,9 @@ const Sell = () => {
 
       toast.success("Produkt został dodany pomyślnie!");
       navigate("/profile");
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Nie udało się dodać produktu';
+      toast.error(message);
     } finally {
       setLoading(false);
     }
