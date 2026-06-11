@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.76.1";
-import { Resend } from "https://esm.sh/resend@2.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -8,25 +7,16 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-type MessagingAction =
+type Action =
   | "list_conversations"
   | "get_messages"
   | "start_conversation"
   | "send_message"
   | "mark_read";
 
-function escapeHtml(str: string): string {
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#x27;");
-}
-
 async function getUserId(req: Request, admin: SupabaseClient): Promise<string> {
   const authHeader = req.headers.get("Authorization");
-  if (!authHeader?.startsWith("Bearer ")) throw new Error("Not authenticated");
+  if (!authHeader) throw new Error("Not authenticated");
 
   const token = authHeader.replace("Bearer ", "");
   const { data, error } = await admin.auth.getUser(token);
@@ -57,7 +47,10 @@ async function listConversations(admin: SupabaseClient, userId: string) {
     .eq("user_id", userId);
 
   if (participantError) throw participantError;
-  if (!participantData?.length) return { conversations: [], unreadCount: 0 };
+
+  if (!participantData?.length) {
+    return { conversations: [], unreadCount: 0 };
+  }
 
   const conversationIds = participantData.map((p) => p.conversation_id);
 
@@ -267,157 +260,62 @@ async function markRead(
   return { success: true };
 }
 
-async function handleMessagingApi(req: Request, body: Record<string, unknown>) {
-  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-  const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-  const admin = createClient(supabaseUrl, supabaseServiceKey);
-
-  const userId = await getUserId(req, admin);
-  const action = body.action as MessagingAction;
-
-  switch (action) {
-    case "list_conversations":
-      return listConversations(admin, userId);
-    case "get_messages":
-      return getMessages(admin, userId, body.conversationId as string);
-    case "start_conversation":
-      return startConversation(
-        admin,
-        userId,
-        body.otherUserId as string,
-        body.productId as string | null | undefined,
-      );
-    case "send_message":
-      return sendMessage(
-        admin,
-        userId,
-        body.conversationId as string,
-        body.content as string,
-      );
-    case "mark_read":
-      return markRead(admin, userId, body.conversationId as string);
-    default:
-      throw new Error("Unknown action");
-  }
-}
-
-async function sendEmailNotification(
-  req: Request,
-  conversationId: string,
-  messageContent: string,
-) {
-  const resendKey = Deno.env.get("RESEND_API_KEY");
-  if (!resendKey) {
-    return { skipped: true, reason: "no resend key" };
-  }
-
-  const authHeader = req.headers.get("Authorization");
-  if (!authHeader?.startsWith("Bearer ")) throw new Error("Unauthorized");
-
-  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-  const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-  const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-  const senderId = await getUserId(req, supabase);
-
-  const { data: participants } = await supabase
-    .from("conversation_participants")
-    .select("user_id")
-    .eq("conversation_id", conversationId)
-    .neq("user_id", senderId);
-
-  if (!participants?.length) {
-    return { skipped: true, reason: "no recipients" };
-  }
-
-  const { data: senderProfile } = await supabase
-    .from("profiles")
-    .select("username, full_name")
-    .eq("id", senderId)
-    .single();
-
-  const senderName = senderProfile?.full_name || senderProfile?.username || "Użytkownik";
-
-  const { data: conversation } = await supabase
-    .from("conversations")
-    .select("product_id")
-    .eq("id", conversationId)
-    .single();
-
-  let productTitle = "";
-  if (conversation?.product_id) {
-    const { data: product } = await supabase
-      .from("products")
-      .select("title")
-      .eq("id", conversation.product_id)
-      .single();
-    productTitle = product?.title || "";
-  }
-
-  const resend = new Resend(resendKey);
-
-  for (const participant of participants) {
-    const { data: authUser } = await supabase.auth.admin.getUserById(participant.user_id);
-    const recipientEmail = authUser?.user?.email;
-    if (!recipientEmail) continue;
-
-    const truncatedMessage = messageContent.length > 200
-      ? messageContent.substring(0, 200) + "..."
-      : messageContent;
-
-    await resend.emails.send({
-      from: "VelvetBazzar <noreply@resend.dev>",
-      to: [recipientEmail],
-      subject: `Nowa wiadomość od ${senderName} - VelvetBazzar`,
-      html: `
-          <h2>Masz nową wiadomość!</h2>
-          <p><strong>${escapeHtml(senderName)}</strong> wysłał(a) Ci wiadomość${productTitle ? ` w sprawie produktu <em>"${escapeHtml(productTitle)}"</em>` : ""}:</p>
-          <blockquote style="border-left: 3px solid #8B5CF6; padding: 12px 16px; margin: 16px 0; background: #f9f9f9; border-radius: 4px;">
-            ${escapeHtml(truncatedMessage)}
-          </blockquote>
-          <p><a href="https://velvetbazzar.co.uk/profile?tab=messages&conversation=${conversationId}" style="background: #8B5CF6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; display: inline-block;">Odpowiedz na wiadomość</a></p>
-          <p style="color: #666; font-size: 12px; margin-top: 24px;">Z pozdrowieniami,<br>Zespół VelvetBazzar</p>
-        `,
-    });
-  }
-
-  return { success: true };
-}
-
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const admin = createClient(supabaseUrl, supabaseServiceKey);
+
+    const userId = await getUserId(req, admin);
     const body = await req.json();
+    const action = body.action as Action;
 
-    if (body.action) {
-      const result = await handleMessagingApi(req, body);
-      return new Response(JSON.stringify(result), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    let result: unknown;
+
+    switch (action) {
+      case "list_conversations":
+        result = await listConversations(admin, userId);
+        break;
+      case "get_messages":
+        result = await getMessages(admin, userId, body.conversationId);
+        break;
+      case "start_conversation":
+        result = await startConversation(
+          admin,
+          userId,
+          body.otherUserId,
+          body.productId,
+        );
+        break;
+      case "send_message":
+        result = await sendMessage(
+          admin,
+          userId,
+          body.conversationId,
+          body.content,
+        );
+        break;
+      case "mark_read":
+        result = await markRead(admin, userId, body.conversationId);
+        break;
+      default:
+        return new Response(JSON.stringify({ error: "Unknown action" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
     }
 
-    const { conversationId, messageContent } = body;
-    if (!conversationId || !messageContent) {
-      return new Response(JSON.stringify({ error: "Missing fields" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const result = await sendEmailNotification(req, conversationId, messageContent);
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Unknown error";
-    const status = message === "Forbidden" ? 403
-      : message.includes("auth") || message === "Unauthorized" ? 401
-      : message === "Unknown action" ? 400
-      : 500;
-    console.error("notify-new-message error:", error);
+    const status = message === "Forbidden" ? 403 : message.includes("auth") ? 401 : 500;
+    console.error("messaging-api error:", error);
     return new Response(JSON.stringify({ error: message }), {
       status,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

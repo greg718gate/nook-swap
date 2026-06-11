@@ -1,11 +1,9 @@
 AKTUALNE ZADANIE: System wiadomości między kupującym a sprzedającym
-STATUS: kod gotowy — w bazie Lovable trzeba uruchomić 1 plik SQL (patrz niżej)
+STATUS: kod gotowy — wiadomości przez Edge Function (omija błąd RLS w bazie Lovable)
 
-BAZA: istniejąca Supabase z Lovable (project_id: nmgiyvauguilbwtqlexj)
-PANEL: https://supabase.com/dashboard/project/nmgiyvauguilbwtqlexj/sql/new
+BAZA: istniejąca Lovable (nmgiyvauguilbwtqlexj) — bez migracji SQL, bez konta Supabase
 
-DO ZROBIENIA W PANELU (5 min):
-1. Otwórz SQL Editor w Supabase (link powyżej)
-2. Skopiuj całą zawartość pliku: supabase/migrations/20260611120000_fix_messaging_read_policy.sql
-3. Wklej i kliknij Run
-4. Napisz w czacie: "sql odpalone"
+DEPLOY FUNKCJI (jednorazowo, 2 min w Lovable):
+1. Otwórz https://lovable.dev/projects/b3ed427c-8ab6-4e8f-9ef8-43662c14d723
+2. W czacie wpisz: "Wdróż edge functions notify-new-message i messaging-api z repozytorium GitHub"
+3. Napisz: "deploy zrobiony"
