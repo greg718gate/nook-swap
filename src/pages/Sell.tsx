@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Sparkles, Loader2, X, Upload, ImagePlus, FileUp } from "lucide-react";
-import type { User } from "@supabase/supabase-js";
+import { hasCompleteDispatchAddress } from "@/lib/profileSetup";
 
 const MAX_IMAGES = 5;
 const MIN_IMAGES = 1;
@@ -46,11 +46,23 @@ const Sell = () => {
   });
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       const currentUser = session?.user ?? null;
       setUser(currentUser);
       if (!currentUser) {
         navigate("/auth");
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("dispatch_line1, dispatch_city, dispatch_postcode")
+        .eq("id", currentUser.id)
+        .maybeSingle();
+
+      if (!hasCompleteDispatchAddress(profile)) {
+        toast.error("Add your UK address before selling");
+        navigate("/setup");
       }
     });
 

@@ -94,7 +94,7 @@ const Profile = () => {
     try {
       const { data } = await supabase
         .from("profiles")
-        .select("id, username, full_name, avatar_url, bio, location, rating, total_reviews, stripe_onboarded, created_at, updated_at")
+        .select("id, username, full_name, avatar_url, bio, location, rating, total_reviews, stripe_onboarded, created_at, updated_at, dispatch_name, dispatch_line1, dispatch_line2, dispatch_city, dispatch_postcode, dispatch_country")
         .eq("id", userId)
         .maybeSingle();
       setProfile(data ?? { id: userId, username: null, rating: 0, total_reviews: 0 });

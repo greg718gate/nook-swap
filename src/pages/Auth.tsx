@@ -9,6 +9,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Eye, EyeOff } from "lucide-react";
 import { getAuthErrorMessage, getFunctionErrorMessage } from "@/lib/functionError";
+import { getPostLoginPath } from "@/lib/profileSetup";
+import {
+  DispatchAddressFields,
+  validateDispatchAddress,
+  type DispatchAddressValues,
+} from "@/components/DispatchAddressFields";
+
+const emptyDispatch = (): DispatchAddressValues => ({
+  dispatch_name: "",
+  dispatch_line1: "",
+  dispatch_line2: "",
+  dispatch_city: "",
+  dispatch_postcode: "",
+});
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -17,14 +31,33 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
+  const [dispatch, setDispatch] = useState<DispatchAddressValues>(emptyDispatch);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session) {
-        navigate("/");
+        navigate(await getPostLoginPath());
       }
     });
   }, [navigate]);
+
+  const handleDispatchChange = (field: keyof DispatchAddressValues, value: string) => {
+    setDispatch((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const saveDispatchAddress = async (userId: string) => {
+    await supabase
+      .from("profiles")
+      .update({
+        dispatch_name: dispatch.dispatch_name.trim() || username.trim(),
+        dispatch_line1: dispatch.dispatch_line1.trim(),
+        dispatch_line2: dispatch.dispatch_line2.trim() || null,
+        dispatch_city: dispatch.dispatch_city.trim(),
+        dispatch_postcode: dispatch.dispatch_postcode.trim().toUpperCase(),
+        dispatch_country: "GB",
+      })
+      .eq("id", userId);
+  };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,6 +77,15 @@ const Auth = () => {
         return;
       }
 
+      const dispatchError = validateDispatchAddress({
+        ...dispatch,
+        dispatch_name: dispatch.dispatch_name || username,
+      });
+      if (dispatchError) {
+        toast.error(dispatchError);
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke("auth-signup", {
         body: { email: email.trim().toLowerCase(), password, username: trimmedUsername },
       });
@@ -58,8 +100,11 @@ const Auth = () => {
 
       if (signInError) throw signInError;
 
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) await saveDispatchAddress(session.user.id);
+
       toast.success("Konto utworzone! Zalogowano pomyślnie.");
-      navigate("/");
+      navigate(await getPostLoginPath());
     } catch (error: unknown) {
       toast.error(getAuthErrorMessage(error));
     } finally {
@@ -80,7 +125,7 @@ const Auth = () => {
       if (error) throw error;
 
       toast.success("Zalogowano pomyślnie!");
-      navigate("/");
+      navigate(await getPostLoginPath());
     } catch (error: unknown) {
       toast.error(getAuthErrorMessage(error));
     } finally {
@@ -90,7 +135,7 @@ const Auth = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-hero p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md lg:max-w-lg">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 h-12 w-12 rounded-lg bg-gradient-hero" />
           <CardTitle className="text-2xl">VelvetBazzar</CardTitle>
@@ -188,6 +233,17 @@ const Auth = () => {
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
+                </div>
+                <div className="rounded-lg border border-border/60 p-4 space-y-3">
+                  <p className="text-sm font-medium">Your UK address *</p>
+                  <p className="text-xs text-muted-foreground">
+                    Required for shipping when you buy or sell.
+                  </p>
+                  <DispatchAddressFields
+                    values={dispatch}
+                    onChange={handleDispatchChange}
+                    idPrefix="signup-dispatch"
+                  />
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? "Tworzenie konta..." : "Załóż konto"}
