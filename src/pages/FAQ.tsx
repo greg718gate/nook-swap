@@ -50,8 +50,8 @@ const FAQ = () => {
                 Jakie metody płatności są dostępne?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground leading-relaxed pt-2">
-                Akceptujemy karty kredytowe/debetowe (Visa, Mastercard), BLIK, przelewy bankowe oraz płatności przez 
-                PayPal. Wszystkie transakcje są bezpieczne i szyfrowane.
+                Akceptujemy karty debetowe i kredytowe (Visa, Mastercard, Amex) przez Stripe.
+                Wszystkie płatności są w funtach brytyjskich (£). Transakcje są szyfrowane i bezpieczne.
               </AccordionContent>
             </AccordionItem>
 
@@ -72,9 +72,8 @@ const FAQ = () => {
               <AccordionContent className="text-muted-foreground leading-relaxed pt-2">
                 Czas wysyłki zależy od wybranej metody dostawy i lokalizacji. Zazwyczaj:
                 <ul className="list-disc list-inside mt-2 space-y-1">
-                  <li>InPost Paczkomaty: 1-2 dni robocze</li>
-                  <li>Royal Mail: 1-3 dni robocze</li>
-                  <li>Evri: 2-4 dni robocze</li>
+                  <li>Royal Mail: 1–3 working days (UK)</li>
+                  <li>Evri: 2–4 working days (UK)</li>
                 </ul>
                 Sprzedający wysyła produkt w ciągu 3 dni roboczych od otrzymania płatności.
               </AccordionContent>

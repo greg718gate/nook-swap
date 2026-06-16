@@ -1,6 +1,15 @@
-STATUS: Deploy automatyczny — bez Lovable
+STATUS: LIVE na własnej domenie
 
-Strona (nowa wersja kodu): https://greg718gate.github.io/nook-swap/
-Stara domena (Lovable): https://velvetbazzar.co.uk
+Strona: https://velvetbazzar.co.uk ✅
+DNS Fasthosts: OK (4 rekordy A → GitHub)
+Auth: logowanie + wylogowanie działa
 
-Każdy push na main = automatyczny deploy. Nie musisz nic klikać.
+Deploy: push na main = auto update (bez Lovable)
+
+Uwaga: www.velvetbazzar.co.uk jeszcze wskazuje na stary serwer — opcjonalnie dodaj CNAME www → greg718gate.github.io
+
+Do przetestowania:
+- Rejestracja (unikalna nazwa)
+- Produkt ze zdjęciem
+- Wiadomości
+- Stripe checkout

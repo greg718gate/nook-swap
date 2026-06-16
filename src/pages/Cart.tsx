@@ -86,9 +86,7 @@ const Cart = () => {
       const shippingCost =
         shippingMethod === "evri"
           ? item.products.shipping_evri
-          : shippingMethod === "royal_mail"
-          ? item.products.shipping_royal_mail
-          : item.products.shipping_inpost;
+          : item.products.shipping_royal_mail;
       return sum + shippingCost;
     }, 0);
   };
@@ -339,25 +337,6 @@ const Cart = () => {
                               .toFixed(2)}
                           </span>
                         </label>
-                        <label className="flex cursor-pointer items-center justify-between rounded-lg border p-3 hover:bg-accent">
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="radio"
-                              name="shipping"
-                              value="inpost"
-                              checked={shippingMethod === "inpost"}
-                              onChange={(e) => setShippingMethod(e.target.value)}
-                              className="h-4 w-4"
-                            />
-                            <span>InPost</span>
-                          </div>
-                          <span className="font-medium">
-                            £{cartItems
-                              .filter((i) => i.products.product_type === "physical")
-                              .reduce((sum, i) => sum + Number(i.products.shipping_inpost ?? 0), 0)
-                              .toFixed(2)}
-                          </span>
-                        </label>
                       </div>
                     </div>
                   )}
@@ -416,7 +395,7 @@ const Cart = () => {
                     {hasPhysicalProducts && (
                       <div className="flex justify-between text-muted-foreground">
                         <span>
-                          Wysyłka ({shippingMethod === "evri" ? "Evri" : shippingMethod === "royal_mail" ? "Royal Mail" : "InPost"})
+                          Wysyłka ({shippingMethod === "evri" ? "Evri" : "Royal Mail"})
                         </span>
                         <span>£{shippingCost.toFixed(2)}</span>
                       </div>
