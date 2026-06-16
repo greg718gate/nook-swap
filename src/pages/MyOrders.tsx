@@ -24,6 +24,8 @@ interface Order {
   shipping_method: string | null;
   shipping_address: string | null;
   tracking_number: string | null;
+  tracking_url: string | null;
+  shipment_status: string | null;
   carrier: string | null;
   shipped_at: string | null;
   delivered_at: string | null;
@@ -178,14 +180,28 @@ const MyOrders = () => {
                       </div>
                     )}
                     {o.tracking_number && (
-                      <div className="rounded-md bg-muted p-3 text-sm">
+                      <div className="rounded-md bg-muted p-3 text-sm space-y-1">
                         <div className="flex items-center gap-2 font-medium">
-                          <Truck className="h-4 w-4" /> Nr przesyłki: {o.tracking_number}
-                          {o.carrier && <span className="text-muted-foreground">({o.carrier})</span>}
+                          <Truck className="h-4 w-4" /> {o.carrier || "Carrier"}: {o.tracking_number}
+                          {o.shipment_status && (
+                            <Badge variant="outline" className="text-xs ml-auto">
+                              {o.shipment_status.replace("_", " ")}
+                            </Badge>
+                          )}
                         </div>
+                        {o.tracking_url && (
+                          <a
+                            href={o.tracking_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary text-xs hover:underline inline-block"
+                          >
+                            Track your parcel →
+                          </a>
+                        )}
                         {o.shipped_at && (
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Wysłane {new Date(o.shipped_at).toLocaleDateString("pl-PL")}
+                          <p className="text-xs text-muted-foreground">
+                            Dispatched {new Date(o.shipped_at).toLocaleDateString("en-GB")}
                           </p>
                         )}
                       </div>

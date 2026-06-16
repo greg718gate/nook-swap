@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Truck } from "lucide-react";
+import { Loader2, Truck, Download, Package } from "lucide-react";
+import { createShippingLabel } from "@/lib/shippingApi";
 
 interface SaleItem {
   id: string;
@@ -25,6 +26,9 @@ interface SaleItem {
     shipping_method: string | null;
     shipping_address: string | null;
     tracking_number: string | null;
+    tracking_url: string | null;
+    shipping_label_url: string | null;
+    shipment_status: string | null;
     carrier: string | null;
     buyer_id: string;
   };
@@ -96,6 +100,31 @@ const SellerOrders = () => {
     }
   };
 
+  const generateLabel = async (orderId: string) => {
+    setActing(orderId);
+    try {
+      const result = await createShippingLabel(orderId);
+      if (result.error) {
+        if (result.code === "DISPATCH_ADDRESS_REQUIRED") {
+          toast.error("Add your dispatch address in Profile → Edit first");
+        } else if (result.code === "SHIPPO_NOT_CONFIGURED") {
+          toast.error("Auto labels coming soon — use manual tracking below");
+        } else {
+          toast.error(result.error);
+        }
+        return;
+      }
+      toast.success("Shipping label ready — tracking linked automatically");
+      if (result.label_url) window.open(result.label_url, "_blank");
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) await fetchSales(session.user.id);
+    } catch {
+      toast.error("Could not generate shipping label");
+    } finally {
+      setActing(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-screen flex-col">
@@ -154,12 +183,54 @@ const SellerOrders = () => {
                         </div>
                       )}
                       {order.tracking_number && (
-                        <div className="text-sm flex items-center gap-2">
-                          <Truck className="h-4 w-4" />
-                          {order.carrier} — {order.tracking_number}
+                        <div className="text-sm space-y-1">
+                          <div className="flex items-center gap-2">
+                            <Truck className="h-4 w-4" />
+                            {order.carrier} — {order.tracking_number}
+                            {order.shipment_status && (
+                              <Badge variant="outline" className="text-xs">
+                                {order.shipment_status.replace("_", " ")}
+                              </Badge>
+                            )}
+                          </div>
+                          {order.tracking_url && (
+                            <a
+                              href={order.tracking_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary text-xs hover:underline"
+                            >
+                              Track parcel →
+                            </a>
+                          )}
                         </div>
                       )}
+                      {order.shipping_label_url && (
+                        <Button variant="outline" size="sm" asChild>
+                          <a href={order.shipping_label_url} target="_blank" rel="noopener noreferrer">
+                            <Download className="mr-2 h-4 w-4" />
+                            Download label
+                          </a>
+                        </Button>
+                      )}
                       {showShipBox && (
+                        <div className="space-y-3 rounded-lg border border-dashed border-primary/30 p-4">
+                          <p className="text-sm text-muted-foreground">
+                            Generate a prepaid label — tracking updates automatically on VelvetBazzar.
+                          </p>
+                          <Button
+                            onClick={() => generateLabel(orderId)}
+                            disabled={acting === orderId}
+                            className="w-full sm:w-auto"
+                          >
+                            {acting === orderId ? (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                              <Package className="mr-2 h-4 w-4" />
+                            )}
+                            Generate shipping label
+                          </Button>
+                          <p className="text-xs text-muted-foreground">Or enter tracking manually:</p>
                         <div className="grid gap-2 sm:grid-cols-3 items-end">
                           <div>
                             <label className="text-xs text-muted-foreground">Kurier</label>
@@ -190,8 +261,9 @@ const SellerOrders = () => {
                             />
                           </div>
                           <Button onClick={() => markShipped(orderId)} disabled={acting === orderId}>
-                            Oznacz jako wysłane
+                            Mark as shipped
                           </Button>
+                        </div>
                         </div>
                       )}
                     </CardContent>

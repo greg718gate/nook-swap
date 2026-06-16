@@ -33,3 +33,9 @@ verify_jwt = false
 
 [functions.auth-signup]
 verify_jwt = false
+
+[functions.create-shipping-label]
+verify_jwt = false
+
+[functions.shipping-webhook]
+verify_jwt = false

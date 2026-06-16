@@ -17,6 +17,12 @@ interface ProfileEditFormProps {
     bio: string | null;
     location: string | null;
     avatar_url: string | null;
+    dispatch_name?: string | null;
+    dispatch_line1?: string | null;
+    dispatch_line2?: string | null;
+    dispatch_city?: string | null;
+    dispatch_postcode?: string | null;
+    dispatch_country?: string | null;
   };
   onSaved: () => void;
 }
@@ -26,6 +32,11 @@ export const ProfileEditForm = ({ profile, onSaved }: ProfileEditFormProps) => {
   const [location, setLocation] = useState(profile.location ?? "");
   const [fullName, setFullName] = useState(profile.full_name ?? "");
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url ?? "");
+  const [dispatchName, setDispatchName] = useState(profile.dispatch_name ?? "");
+  const [dispatchLine1, setDispatchLine1] = useState(profile.dispatch_line1 ?? "");
+  const [dispatchLine2, setDispatchLine2] = useState(profile.dispatch_line2 ?? "");
+  const [dispatchCity, setDispatchCity] = useState(profile.dispatch_city ?? "");
+  const [dispatchPostcode, setDispatchPostcode] = useState(profile.dispatch_postcode ?? "");
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -86,6 +97,12 @@ export const ProfileEditForm = ({ profile, onSaved }: ProfileEditFormProps) => {
         location: location.trim() || null,
         full_name: fullName.trim() || null,
         avatar_url: avatarUrl || null,
+        dispatch_name: dispatchName.trim() || null,
+        dispatch_line1: dispatchLine1.trim() || null,
+        dispatch_line2: dispatchLine2.trim() || null,
+        dispatch_city: dispatchCity.trim() || null,
+        dispatch_postcode: dispatchPostcode.trim() || null,
+        dispatch_country: "GB",
       })
       .eq("id", profile.id);
 
@@ -161,9 +178,65 @@ export const ProfileEditForm = ({ profile, onSaved }: ProfileEditFormProps) => {
           id="location"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
-          placeholder="np. Warszawa, Polska"
+          placeholder="e.g. London, UK"
           maxLength={100}
         />
+      </div>
+
+      <div className="space-y-4 rounded-lg border border-border/60 p-4">
+        <div>
+          <h3 className="font-semibold">Dispatch address (UK)</h3>
+          <p className="text-sm text-muted-foreground">
+            Required to generate shipping labels. Parcels are sent from this address.
+          </p>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="dispatchName">Sender name</Label>
+          <Input
+            id="dispatchName"
+            value={dispatchName}
+            onChange={(e) => setDispatchName(e.target.value)}
+            placeholder="Your name or shop name"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="dispatchLine1">Address line 1 *</Label>
+          <Input
+            id="dispatchLine1"
+            value={dispatchLine1}
+            onChange={(e) => setDispatchLine1(e.target.value)}
+            placeholder="123 High Street"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="dispatchLine2">Address line 2</Label>
+          <Input
+            id="dispatchLine2"
+            value={dispatchLine2}
+            onChange={(e) => setDispatchLine2(e.target.value)}
+            placeholder="Flat 2"
+          />
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="dispatchCity">City *</Label>
+            <Input
+              id="dispatchCity"
+              value={dispatchCity}
+              onChange={(e) => setDispatchCity(e.target.value)}
+              placeholder="London"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="dispatchPostcode">Postcode *</Label>
+            <Input
+              id="dispatchPostcode"
+              value={dispatchPostcode}
+              onChange={(e) => setDispatchPostcode(e.target.value)}
+              placeholder="SW1A 1AA"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Bio */}
