@@ -335,15 +335,19 @@ export type Database = {
           platform_fee: number | null
           refund_amount: number | null
           seller_payout: number | null
+          shipment_id: string | null
+          shipment_status: string | null
           shipped_at: string | null
           shipping_address: string | null
           shipping_cost: number | null
+          shipping_label_url: string | null
           shipping_method: string | null
           status: string | null
           stripe_payment_intent_id: string | null
           stripe_session_id: string | null
           total_amount: number
           tracking_number: string | null
+          tracking_url: string | null
           updated_at: string
         }
         Insert: {
@@ -357,15 +361,19 @@ export type Database = {
           platform_fee?: number | null
           refund_amount?: number | null
           seller_payout?: number | null
+          shipment_id?: string | null
+          shipment_status?: string | null
           shipped_at?: string | null
           shipping_address?: string | null
           shipping_cost?: number | null
+          shipping_label_url?: string | null
           shipping_method?: string | null
           status?: string | null
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
           total_amount: number
           tracking_number?: string | null
+          tracking_url?: string | null
           updated_at?: string
         }
         Update: {
@@ -379,15 +387,19 @@ export type Database = {
           platform_fee?: number | null
           refund_amount?: number | null
           seller_payout?: number | null
+          shipment_id?: string | null
+          shipment_status?: string | null
           shipped_at?: string | null
           shipping_address?: string | null
           shipping_cost?: number | null
+          shipping_label_url?: string | null
           shipping_method?: string | null
           status?: string | null
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
           total_amount?: number
           tracking_number?: string | null
+          tracking_url?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -406,6 +418,72 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      phase_shield_jitter_log: {
+        Row: {
+          client_key: string
+          created_at: string
+          delta_ms: number | null
+          drop_reason: string | null
+          dropped: boolean
+          endpoint: string
+          harmonic_lock: number | null
+          id: string
+          phase_rad: number | null
+          request_ns: number
+          zero_phase_residual: number | null
+        }
+        Insert: {
+          client_key: string
+          created_at?: string
+          delta_ms?: number | null
+          drop_reason?: string | null
+          dropped?: boolean
+          endpoint: string
+          harmonic_lock?: number | null
+          id?: string
+          phase_rad?: number | null
+          request_ns: number
+          zero_phase_residual?: number | null
+        }
+        Update: {
+          client_key?: string
+          created_at?: string
+          delta_ms?: number | null
+          drop_reason?: string | null
+          dropped?: boolean
+          endpoint?: string
+          harmonic_lock?: number | null
+          id?: string
+          phase_rad?: number | null
+          request_ns?: number
+          zero_phase_residual?: number | null
+        }
+        Relationships: []
+      }
+      phase_shield_state: {
+        Row: {
+          client_key: string
+          delta_history_ms: number[]
+          last_request_ns: number | null
+          request_count: number
+          updated_at: string
+        }
+        Insert: {
+          client_key: string
+          delta_history_ms?: number[]
+          last_request_ns?: number | null
+          request_count?: number
+          updated_at?: string
+        }
+        Update: {
+          client_key?: string
+          delta_history_ms?: number[]
+          last_request_ns?: number | null
+          request_count?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       products: {
         Row: {
@@ -497,45 +575,93 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           created_at: string | null
+          dispatch_city: string | null
+          dispatch_country: string | null
+          dispatch_line1: string | null
+          dispatch_line2: string | null
+          dispatch_name: string | null
+          dispatch_postcode: string | null
+          first_sale_rewarded: boolean
           full_name: string | null
           id: string
           location: string | null
           rating: number | null
+          referral_code: string | null
+          referred_by: string | null
           stripe_account_id: string | null
           stripe_onboarded: boolean | null
           total_reviews: number | null
           updated_at: string | null
           username: string
+          velvet_coins: number
+          velvet_coins_auto_apply: number
         }
         Insert: {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
+          dispatch_city?: string | null
+          dispatch_country?: string | null
+          dispatch_line1?: string | null
+          dispatch_line2?: string | null
+          dispatch_name?: string | null
+          dispatch_postcode?: string | null
+          first_sale_rewarded?: boolean
           full_name?: string | null
           id: string
           location?: string | null
           rating?: number | null
+          referral_code?: string | null
+          referred_by?: string | null
           stripe_account_id?: string | null
           stripe_onboarded?: boolean | null
           total_reviews?: number | null
           updated_at?: string | null
           username: string
+          velvet_coins?: number
+          velvet_coins_auto_apply?: number
         }
         Update: {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
+          dispatch_city?: string | null
+          dispatch_country?: string | null
+          dispatch_line1?: string | null
+          dispatch_line2?: string | null
+          dispatch_name?: string | null
+          dispatch_postcode?: string | null
+          first_sale_rewarded?: boolean
           full_name?: string | null
           id?: string
           location?: string | null
           rating?: number | null
+          referral_code?: string | null
+          referred_by?: string | null
           stripe_account_id?: string | null
           stripe_onboarded?: boolean | null
           total_reviews?: number | null
           updated_at?: string | null
           username?: string
+          velvet_coins?: number
+          velvet_coins_auto_apply?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_referred_by_fkey"
+            columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_referred_by_fkey"
+            columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       purchases: {
         Row: {
@@ -694,6 +820,51 @@ export type Database = {
         }
         Relationships: []
       }
+      velvet_coin_ledger: {
+        Row: {
+          amount: number
+          balance_after: number
+          created_at: string
+          id: string
+          reason: string
+          reference_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          created_at?: string
+          id?: string
+          reason: string
+          reference_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          created_at?: string
+          id?: string
+          reason?: string
+          reference_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "velvet_coin_ledger_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "velvet_coin_ledger_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wishlist_items: {
         Row: {
           created_at: string
@@ -755,6 +926,16 @@ export type Database = {
       }
     }
     Functions: {
+      generate_referral_code: { Args: never; Returns: string }
+      grant_velvet_coins: {
+        Args: {
+          p_amount: number
+          p_reason: string
+          p_reference_id?: string
+          p_user_id: string
+        }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
