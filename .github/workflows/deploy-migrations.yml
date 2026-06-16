@@ -27,8 +27,8 @@ jobs:
       - name: Push migrations
         run: |
           if [ -z "$SUPABASE_ACCESS_TOKEN" ]; then
-            echo "::warning::SUPABASE_ACCESS_TOKEN not set — skip deploy. See DEPLOY.md"
-            exit 0
+            echo "::error::SUPABASE_ACCESS_TOKEN not set — migrations NOT applied. Add token to GitHub secrets. Phase Shield auto-provisions via edge functions SUPABASE_DB_URL as fallback."
+            exit 1
           fi
           supabase link --project-ref "$PROJECT_ID" --yes
           supabase db push --yes

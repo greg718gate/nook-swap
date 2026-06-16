@@ -21,4 +21,4 @@ Do przetestowania:
 - Wiadomości
 - Stripe checkout
 
-Anti-Bot Phase Shield: docs/PHASE_SHIELD.md
+Anti-Bot Phase Shield: docs/PHASE_SHIELD.md — **AKTYWNY** (warmup 8 req, auto-provision tabel)

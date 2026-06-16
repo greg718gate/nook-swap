@@ -10,6 +10,7 @@ import {
 } from "./constants.ts";
 import { zeroPhaseResidualRad } from "./compensated-phase.ts";
 import { zeroPhaseFir } from "./fir-filter.ts";
+import { ensurePhaseShieldTables } from "./provision.ts";
 import { perfCounterNs } from "./token.ts";
 
 export type JitterVerdict = {
@@ -88,6 +89,20 @@ export async function verifyRequestJitter(
   req: Request,
   endpoint: string,
 ): Promise<JitterVerdict> {
+  const tablesReady = await ensurePhaseShieldTables();
+  if (!tablesReady) {
+    console.warn("[phase-shield] jitter logging unavailable — tables not provisioned");
+    return {
+      pass: true,
+      dropReason: null,
+      requestCount: 0,
+      deltaMs: null,
+      phaseRad: ZERO_PHASE_TARGET_RAD,
+      zeroPhaseResidual: 0,
+      harmonicLock: 0,
+    };
+  }
+
   const supabase = adminClient();
   const clientKey = clientKeyFromRequest(req);
   const requestNs = perfCounterNs();
@@ -116,7 +131,7 @@ export async function verifyRequestJitter(
   let pass = true;
   let dropReason: string | null = null;
 
-  if (requestCount > WARMUP_REQUESTS && history.length >= 4) {
+  if (requestCount > WARMUP_REQUESTS && history.length >= 6) {
     if (analysis.phaseViolation) {
       pass = false;
       dropReason = "nonlinear_phase_shift";

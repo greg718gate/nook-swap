@@ -48,10 +48,21 @@ Migration `20260617140000_phase_shield.sql`:
 ## Staging integrity tests
 
 1. Load site → handshake stores token in sessionStorage
-2. Register / checkout / message → responses include `X-Phase-Token`
-3. Replay stale token → expect HTTP 403
-4. Script rapid-fire requests with fixed interval → `harmonic_bot_signature` drop in logs
-5. Query `phase_shield_jitter_log` for dropped=true rows
+2. Handshake response includes `"tables_ready": true` after first call (auto-provisions DDL via `SUPABASE_DB_URL`)
+3. Register / checkout / message → responses include `X-Phase-Token`
+4. Replay stale token → expect HTTP 403 after **8 warmup requests** (request 9+)
+5. Script rapid-fire requests with fixed interval → `harmonic_bot_signature` drop in logs
+6. Query `phase_shield_jitter_log` for dropped=true rows
+
+## Warmup
+
+Jitter analysis and token enforcement begin after **8 requests** per client key (mobile packet-loss safe margin).
+
+## Production migration status
+
+GitHub Actions migration workflow requires `SUPABASE_ACCESS_TOKEN` (currently **not set** — SQL file was not pushed via CLI).
+
+**Fallback (active):** edge functions auto-run `20260617140000_phase_shield.sql` DDL on first protected request via built-in `SUPABASE_DB_URL`. Handshake returns `tables_ready: true` when verified.
 
 ## Optional env
 

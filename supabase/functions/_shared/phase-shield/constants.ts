@@ -6,7 +6,7 @@ export const ZERO_PHASE_TARGET_RAD = 0.0;
 export const PHASE_TOLERANCE_RAD = 0.38;
 
 export const DROP_HTTP_STATUS = 403;
-export const WARMUP_REQUESTS = 2;
+export const WARMUP_REQUESTS = 8;
 export const JITTER_HISTORY_LEN = 14;
 export const RIGID_LOOP_CV_THRESHOLD = 0.009;
 export const HARMONIC_LOCK_THRESHOLD = 0.9;
