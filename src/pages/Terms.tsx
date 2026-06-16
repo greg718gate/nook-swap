@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { FileText } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Terms = () => {
   return (
@@ -12,118 +13,195 @@ const Terms = () => {
             <FileText className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Regulamin
+            Terms of Service
           </h1>
         </div>
 
-        <div className="space-y-8 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/50 p-8 shadow-xl">
+        <div className="space-y-8 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/50 p-8 shadow-xl text-muted-foreground leading-relaxed">
+          <p className="text-sm">
+            These Terms of Service (&quot;Terms&quot;) govern your use of VelvetBazzar
+            (&quot;we&quot;, &quot;us&quot;, &quot;the Platform&quot;) at{" "}
+            <a href="https://velvetbazzar.co.uk" className="text-primary hover:underline">
+              velvetbazzar.co.uk
+            </a>
+            . By creating an account or using the Platform, you agree to these Terms.
+          </p>
+
           <section>
-            <h2 className="mb-4 text-2xl font-bold text-foreground">1. Postanowienia Ogólne</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              Niniejszy regulamin określa zasady korzystania z platformy VelvetBazzar.co.uk, warunki zawierania umów 
-              kupna-sprzedaży oraz prawa i obowiązki użytkowników.
+            <h2 className="mb-4 text-2xl font-bold text-foreground">1. Who we are</h2>
+            <p>
+              VelvetBazzar is a UK marketplace that connects buyers and sellers of
+              pre-owned and new items. We provide listing, messaging, checkout, and
+              payment tools. We are not the seller of items listed by users unless
+              explicitly stated.
+            </p>
+            <p className="mt-3">
+              Contact:{" "}
+              <a href="mailto:support@velvetbazzar.co.uk" className="text-primary hover:underline">
+                support@velvetbazzar.co.uk
+              </a>
             </p>
           </section>
 
           <section>
-            <h2 className="mb-4 text-2xl font-bold text-foreground">2. Definicje</h2>
-            <ul className="space-y-3 text-muted-foreground">
-              <li><strong className="text-foreground">Platforma</strong> - serwis internetowy VelvetBazzar.co.uk</li>
-              <li><strong className="text-foreground">Użytkownik</strong> - osoba korzystająca z platformy</li>
-              <li><strong className="text-foreground">Sprzedający</strong> - użytkownik wystawiający produkty na sprzedaż</li>
-              <li><strong className="text-foreground">Kupujący</strong> - użytkownik dokonujący zakupu</li>
-              <li><strong className="text-foreground">Produkt</strong> - przedmiot wystawiony na sprzedaż</li>
+            <h2 className="mb-4 text-2xl font-bold text-foreground">2. Eligibility &amp; accounts</h2>
+            <ul className="list-disc list-inside space-y-2 ml-2">
+              <li>You must be at least 18 years old (or have guardian consent).</li>
+              <li>You must provide accurate registration details and a valid UK dispatch address if you buy or sell physical items.</li>
+              <li>You are responsible for keeping your login credentials secure.</li>
+              <li>One person must not operate multiple accounts to abuse promotions or fees.</li>
+              <li>We may suspend or close accounts that breach these Terms or applicable law.</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="mb-4 text-2xl font-bold text-foreground">3. Rejestracja Konta</h2>
-            <p className="text-muted-foreground leading-relaxed mb-3">
-              Aby korzystać z pełnej funkcjonalności platformy, użytkownik musi:
+            <h2 className="mb-4 text-2xl font-bold text-foreground">3. Buying &amp; selling</h2>
+            <p className="mb-3">
+              A contract of sale is between the buyer and the seller. VelvetBazzar facilitates
+              the transaction but is not a party to that contract.
             </p>
-            <ul className="list-disc list-inside space-y-2 text-muted-foreground ml-4">
-              <li>Ukończyć 18 lat lub posiadać zgodę opiekuna prawnego</li>
-              <li>Podać prawdziwe dane podczas rejestracji</li>
-              <li>Zabezpieczyć swoje dane logowania</li>
-              <li>Nie udostępniać konta innym osobom</li>
+            <p className="font-medium text-foreground mb-2">Sellers agree to:</p>
+            <ul className="list-disc list-inside space-y-2 ml-2 mb-4">
+              <li>List only items they are entitled to sell, with honest photos and descriptions.</li>
+              <li>Dispatch physical items within 3 working days of payment (unless otherwise agreed in writing via Platform messages).</li>
+              <li>Comply with UK consumer law, including accurate descriptions and safe products.</li>
+              <li>Not list prohibited, illegal, counterfeit, or stolen goods.</li>
+            </ul>
+            <p className="font-medium text-foreground mb-2">Buyers agree to:</p>
+            <ul className="list-disc list-inside space-y-2 ml-2">
+              <li>Pay promptly through the Platform checkout.</li>
+              <li>Provide a correct UK delivery address.</li>
+              <li>Communicate in good faith if there is a problem with an order.</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="mb-4 text-2xl font-bold text-foreground">4. Wystawianie Produktów</h2>
-            <p className="text-muted-foreground leading-relaxed mb-3">
-              Sprzedający zobowiązuje się do:
-            </p>
-            <ul className="list-disc list-inside space-y-2 text-muted-foreground ml-4">
-              <li>Umieszczania prawdziwych zdjęć i opisów produktów</li>
-              <li>Podawania uczciwych informacji o stanie produktu</li>
-              <li>Przestrzegania przepisów prawa przy sprzedaży</li>
-              <li>Niewystawiania przedmiotów zabronionych lub nielegalnych</li>
-              <li>Wysyłki produktu w terminie do 3 dni roboczych po otrzymaniu płatności</li>
+            <h2 className="mb-4 text-2xl font-bold text-foreground">4. Fees &amp; payments</h2>
+            <ul className="list-disc list-inside space-y-2 ml-2">
+              <li>All prices on the Platform are shown in British pounds (GBP, £).</li>
+              <li>Payments are processed by Stripe. We do not store full card details.</li>
+              <li>
+                Sellers pay a <strong className="text-foreground">5% platform fee</strong> on
+                the sale value (including the buyer&apos;s share of shipping where applicable),
+                unless reduced through Velvet Coins (see section 5).
+              </li>
+              <li>Payouts to sellers are made via Stripe Connect to the seller&apos;s connected account after a successful payment.</li>
+              <li>Shipping costs are set by sellers and shown at checkout.</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="mb-4 text-2xl font-bold text-foreground">5. Zakupy</h2>
-            <p className="text-muted-foreground leading-relaxed mb-3">
-              Kupujący zobowiązuje się do:
+            <h2 className="mb-4 text-2xl font-bold text-foreground">5. Velvet Coins</h2>
+            <p className="mb-3">
+              Velvet Coins (&quot;VC&quot;) are a <strong className="text-foreground">platform-only reward currency</strong>.
+              They are not cryptocurrency, legal tender, or withdrawable cash.
             </p>
-            <ul className="list-disc list-inside space-y-2 text-muted-foreground ml-4">
-              <li>Dokonania płatności w ciągu 24 godzin od złożenia zamówienia</li>
-              <li>Podania prawidłowego adresu dostawy</li>
-              <li>Odebrania przesyłki w odpowiednim czasie</li>
-              <li>Kontaktu ze sprzedającym w przypadku problemów</li>
+            <p className="font-medium text-foreground mb-2">Earning VC</p>
+            <ul className="list-disc list-inside space-y-2 ml-2 mb-4">
+              <li>Welcome bonus when you create an account (currently 25 VC).</li>
+              <li>First completed sale as a seller (currently 100 VC).</li>
+              <li>Referral bonus when someone registers using your referral link (currently 50 VC).</li>
+              <li>Additional bonus when a referred user completes their first sale (currently 75 VC).</li>
+            </ul>
+            <p className="font-medium text-foreground mb-2">Using VC</p>
+            <ul className="list-disc list-inside space-y-2 ml-2 mb-4">
+              <li>Sellers may redeem VC to reduce the platform selling fee on a future sale.</li>
+              <li>100 VC reduces the fee by 1 percentage point (e.g. from 5% to 4%).</li>
+              <li>Maximum redemption per sale: 250 VC (lowering the fee to 2.5%).</li>
+              <li>VC are deducted when payment for that sale is successfully completed.</li>
+            </ul>
+            <p className="font-medium text-foreground mb-2">General rules</p>
+            <ul className="list-disc list-inside space-y-2 ml-2">
+              <li>VC cannot be transferred, sold, or exchanged for money outside the Platform.</li>
+              <li>We may adjust earn rates, redemption rules, or retire the programme with reasonable notice.</li>
+              <li>Abuse (fake accounts, self-referrals, manipulation) may result in forfeiture of VC and account closure.</li>
+              <li>Unused VC have no cash value if your account is closed.</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="mb-4 text-2xl font-bold text-foreground">6. Płatności</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              Wszystkie transakcje są przetwarzane bezpiecznie. VelvetBazzar.co.uk nie przechowuje danych kart płatniczych. 
-              Płatności są realizowane przez zaufanych partnerów płatniczych.
+            <h2 className="mb-4 text-2xl font-bold text-foreground">6. Shipping &amp; delivery</h2>
+            <p>
+              Sellers are responsible for packing and dispatch. Buyers should track parcels
+              and report non-delivery promptly. Our{" "}
+              <Link to="/shipping" className="text-primary hover:underline">Shipping</Link> page
+              describes available carriers (Evri, Royal Mail, InPost Lockers). Risk passes in
+              line with UK law and the carrier&apos;s terms once the item is handed to the carrier.
             </p>
           </section>
 
           <section>
-            <h2 className="mb-4 text-2xl font-bold text-foreground">7. Zwroty i Reklamacje</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              Kupujący ma prawo do zwrotu produktu w ciągu 14 dni od otrzymania, jeśli produkt jest niezgodny z opisem 
-              lub uszkodzony. Szczegóły w polityce zwrotów.
+            <h2 className="mb-4 text-2xl font-bold text-foreground">7. Returns, refunds &amp; UK consumer rights</h2>
+            <p className="mb-3">
+              If you buy as a consumer in the UK, you may have statutory rights under the
+              Consumer Rights Act 2015 and Consumer Contracts Regulations 2013, including
+              rights where goods are faulty, not as described, or not delivered.
+            </p>
+            <p>
+              See our{" "}
+              <Link to="/returns" className="text-primary hover:underline">Returns Policy</Link>{" "}
+              for practical steps. Refunds for eligible orders may be processed through Stripe
+              in line with our refund procedures. Private sales between individuals may have
+              different rights than business sellers — sellers who trade as businesses must
+              comply with all applicable consumer regulations.
             </p>
           </section>
 
           <section>
-            <h2 className="mb-4 text-2xl font-bold text-foreground">8. Zakazy</h2>
-            <p className="text-muted-foreground leading-relaxed mb-3">
-              Na platformie zabrania się:
-            </p>
-            <ul className="list-disc list-inside space-y-2 text-muted-foreground ml-4">
-              <li>Sprzedaży produktów nielegalnych lub podróbek</li>
-              <li>Wprowadzania w błąd innych użytkowników</li>
-              <li>Manipulowania opiniami i ocenami</li>
-              <li>Spamu i nieuzasadnionego kontaktu</li>
-              <li>Prowadzenia transakcji poza platformą</li>
+            <h2 className="mb-4 text-2xl font-bold text-foreground">8. Prohibited conduct</h2>
+            <ul className="list-disc list-inside space-y-2 ml-2">
+              <li>Fraud, chargeback abuse, or payment circumvention (e.g. asking buyers to pay off-platform).</li>
+              <li>Harassment, hate speech, spam, or fake reviews.</li>
+              <li>Automated scraping, bots, or attempts to disrupt the Platform.</li>
+              <li>Listing weapons, drugs, stolen goods, counterfeits, or other prohibited items.</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="mb-4 text-2xl font-bold text-foreground">9. Odpowiedzialność</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              VelvetBazzar.co.uk pełni rolę pośrednika między kupującym a sprzedającym. Nie ponosimy odpowiedzialności za jakość 
-              produktów, terminowość wysyłki czy spory między użytkownikami, chociaż staramy się wspierać w ich rozwiązaniu.
+            <h2 className="mb-4 text-2xl font-bold text-foreground">9. Content &amp; intellectual property</h2>
+            <p>
+              You retain ownership of photos and descriptions you upload. You grant us a
+              licence to display and process that content to operate the Platform. You must
+              not infringe third-party rights. We may remove content that violates these Terms
+              or receives valid legal complaints.
             </p>
           </section>
 
           <section>
-            <h2 className="mb-4 text-2xl font-bold text-foreground">10. Zmiany Regulaminu</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              Zastrzegamy sobie prawo do zmiany regulaminu. Użytkownicy zostaną poinformowani o zmianach z wyprzedzeniem 
-              14 dni.
+            <h2 className="mb-4 text-2xl font-bold text-foreground">10. Limitation of liability</h2>
+            <p>
+              To the fullest extent permitted by law, VelvetBazzar is not liable for the
+              quality, safety, or legality of items listed by users, actions of buyers or
+              sellers, or indirect losses. Nothing in these Terms limits liability for death
+              or personal injury caused by negligence, fraud, or any liability that cannot be
+              excluded under UK law.
             </p>
           </section>
 
-          <p className="text-sm text-muted-foreground mt-8 pt-4 border-t border-border/50">
-            Ostatnia aktualizacja: 01.01.2025
+          <section>
+            <h2 className="mb-4 text-2xl font-bold text-foreground">11. Privacy</h2>
+            <p>
+              We process personal data as described in our{" "}
+              <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="mb-4 text-2xl font-bold text-foreground">12. Changes &amp; governing law</h2>
+            <p className="mb-3">
+              We may update these Terms. Material changes will be notified on the Platform
+              or by email where appropriate. Continued use after changes take effect constitutes
+              acceptance.
+            </p>
+            <p>
+              These Terms are governed by the laws of England and Wales. Disputes are subject
+              to the exclusive jurisdiction of the courts of England and Wales, without prejudice
+              to your mandatory consumer rights in Scotland or Northern Ireland.
+            </p>
+          </section>
+
+          <p className="text-sm mt-8 pt-4 border-t border-border/50">
+            Last updated: 16 June 2026
           </p>
         </div>
       </main>

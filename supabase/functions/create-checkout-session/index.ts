@@ -13,6 +13,15 @@ interface CartItemRequest {
   quantity: number;
 }
 
+const COINS_PER_PERCENT = 100;
+const MAX_REDEEM_PER_SALE = 250;
+const PLATFORM_FEE_RATE = 0.05;
+
+function sellerFeeRate(coinsUsed: number): number {
+  const reduction = (Math.min(Math.max(coinsUsed, 0), MAX_REDEEM_PER_SALE) / COINS_PER_PERCENT) * 0.01;
+  return Math.max(PLATFORM_FEE_RATE - reduction, 0.025);
+}
+
 interface CheckoutRequest {
   items: CartItemRequest[];
   shipping_method: string;
@@ -102,7 +111,7 @@ const handler = async (req: Request): Promise<Response> => {
     const sellerIds = [...new Set(items.map((i) => i.seller_id))];
     const { data: sellerProfiles, error: sellerError } = await supabase
       .from("profiles")
-      .select("id, stripe_account_id, stripe_onboarded")
+      .select("id, stripe_account_id, stripe_onboarded, velvet_coins, velvet_coins_auto_apply")
       .in("id", sellerIds);
 
     if (sellerError) throw new Error("Failed to fetch seller profiles");
@@ -160,8 +169,16 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const total = Math.max(0, subtotal + shippingCost - discount);
-    const platformFee = Math.round(total * 0.05 * 100); // 5% in cents
-    const sellerPayout = Math.round(total * 0.95 * 100); // 95% in cents
+
+    const velvetRedemptions: Record<string, number> = {};
+    sellerProfiles?.forEach((s) => {
+      const coinsToUse = Math.min(
+        s.velvet_coins ?? 0,
+        s.velvet_coins_auto_apply ?? 0,
+        MAX_REDEEM_PER_SALE,
+      );
+      if (coinsToUse > 0) velvetRedemptions[s.id] = coinsToUse;
+    });
 
     // Calculate per-seller amounts for transfers (stored in metadata)
     const sellerAmounts: Record<string, number> = {};
@@ -176,17 +193,30 @@ const handler = async (req: Request): Promise<Response> => {
         sellerAmounts[sellerId] += shippingCost * proportion;
       }
     }
-    // Apply discount proportionally, then 95% to each seller
+    // Apply discount proportionally, then seller share after platform fee (Velvet Coin may reduce fee)
     const grossPreDiscount = subtotal + shippingCost;
-    const sellerTransfers: Record<string, { amount_cents: number; stripe_account_id: string }> = {};
+    const sellerTransfers: Record<string, { amount_cents: number; stripe_account_id: string; velvet_coins_used: number }> = {};
+    let platformFeeCents = 0;
+    let sellerPayoutCents = 0;
     for (const [sellerId, amount] of Object.entries(sellerAmounts)) {
       const sellerDiscount = grossPreDiscount > 0 ? (amount / grossPreDiscount) * discount : 0;
       const net = amount - sellerDiscount;
+      const coinsUsed = velvetRedemptions[sellerId] ?? 0;
+      const feeRate = sellerFeeRate(coinsUsed);
+      const sellerShare = 1 - feeRate;
+      const sellerCents = Math.round(net * sellerShare * 100);
+      const feeCents = Math.round(net * feeRate * 100);
+      platformFeeCents += feeCents;
+      sellerPayoutCents += sellerCents;
       sellerTransfers[sellerId] = {
-        amount_cents: Math.round(net * 0.95 * 100),
+        amount_cents: sellerCents,
         stripe_account_id: sellerStripeMap[sellerId],
+        velvet_coins_used: coinsUsed,
       };
     }
+
+    const platformFee = platformFeeCents;
+    const sellerPayout = sellerPayoutCents;
 
     // Create line items for Stripe (using server-fetched prices/titles)
     const lineItems = items.map((item) => ({
@@ -245,6 +275,7 @@ const handler = async (req: Request): Promise<Response> => {
         coupon_code: appliedCouponCode || "",
         discount_amount: discount.toFixed(2),
         seller_transfers: JSON.stringify(sellerTransfers),
+        velvet_redemptions: JSON.stringify(velvetRedemptions),
         items_json: JSON.stringify(
           items.map((i) => ({
             product_id: i.product_id,

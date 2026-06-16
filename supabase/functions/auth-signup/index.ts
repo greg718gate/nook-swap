@@ -22,7 +22,7 @@ serve(async (req) => {
   }
 
   try {
-    const { email, password, username } = await req.json();
+    const { email, password, username, referral_code } = await req.json();
 
     if (!email || typeof email !== "string" || !email.includes("@")) {
       return new Response(JSON.stringify({ error: "Nieprawidłowy email" }), {
@@ -82,6 +82,41 @@ serve(async (req) => {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    const newUserId = data.user?.id;
+    if (newUserId) {
+      let referrerId: string | null = null;
+      if (referral_code && typeof referral_code === "string") {
+        const code = referral_code.trim().toUpperCase();
+        const { data: referrer } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("referral_code", code)
+          .maybeSingle();
+        if (referrer?.id && referrer.id !== newUserId) {
+          referrerId = referrer.id;
+          await supabase
+            .from("profiles")
+            .update({ referred_by: referrerId })
+            .eq("id", newUserId);
+        }
+      }
+
+      await supabase.rpc("grant_velvet_coins", {
+        p_user_id: newUserId,
+        p_amount: 25,
+        p_reason: "signup_bonus",
+      });
+
+      if (referrerId) {
+        await supabase.rpc("grant_velvet_coins", {
+          p_user_id: referrerId,
+          p_amount: 50,
+          p_reason: "referral_signup",
+          p_reference_id: newUserId,
+        });
+      }
     }
 
     return new Response(JSON.stringify({ success: true, userId: data.user?.id }), {

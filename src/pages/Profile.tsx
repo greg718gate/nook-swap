@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Star, User, Edit, Eye, Trash2, MessageCircle } from "lucide-react";
+import { Star, User, Edit, Eye, Trash2, MessageCircle, Coins } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,6 +25,7 @@ import { MessagesSection } from "@/components/MessagesSection";
 import { useMessages } from "@/hooks/useMessages";
 import { ProfileEditForm } from "@/components/ProfileEditForm";
 import { StripeConnectSection } from "@/components/StripeConnectSection";
+import { VelvetCoinSection } from "@/components/VelvetCoinSection";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -211,6 +212,10 @@ const Profile = () => {
             <TabsList className="mb-6">
               <TabsTrigger value="listings">Moje Ogłoszenia</TabsTrigger>
               <TabsTrigger value="orders">Moje Zamówienia</TabsTrigger>
+              <TabsTrigger value="coins" className="gap-1">
+                <Coins className="h-4 w-4" />
+                Velvet Coins
+              </TabsTrigger>
               <TabsTrigger value="edit">Edytuj Profil</TabsTrigger>
               <TabsTrigger value="messages" className="relative">
                 <MessageCircle className="h-4 w-4 mr-2" />
@@ -354,6 +359,10 @@ const Profile = () => {
                   ))}
                 </div>
               )}
+            </TabsContent>
+
+            <TabsContent value="coins">
+              <VelvetCoinSection />
             </TabsContent>
 
             <TabsContent value="edit" className="space-y-6">

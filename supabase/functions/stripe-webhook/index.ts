@@ -151,6 +151,57 @@ serve(async (req: Request) => {
         }
       }
 
+      // ====== VELVET COIN REWARDS & REDEMPTIONS ======
+      const velvetRedemptions = metadata.velvet_redemptions
+        ? JSON.parse(metadata.velvet_redemptions)
+        : {};
+
+      const sellerIds = [...new Set(items.map((i: { seller_id: string }) => i.seller_id))];
+
+      for (const sellerId of sellerIds) {
+        const coinsUsed = Number(velvetRedemptions[sellerId] || 0);
+        if (coinsUsed > 0) {
+          await supabase.rpc("grant_velvet_coins", {
+            p_user_id: sellerId,
+            p_amount: -coinsUsed,
+            p_reason: "fee_reduction",
+            p_reference_id: order.id,
+          });
+          await supabase
+            .from("profiles")
+            .update({ velvet_coins_auto_apply: 0 })
+            .eq("id", sellerId);
+        }
+
+        const { data: sellerProfile } = await supabase
+          .from("profiles")
+          .select("first_sale_rewarded, referred_by")
+          .eq("id", sellerId)
+          .single();
+
+        if (sellerProfile && !sellerProfile.first_sale_rewarded) {
+          await supabase.rpc("grant_velvet_coins", {
+            p_user_id: sellerId,
+            p_amount: 100,
+            p_reason: "first_sale",
+            p_reference_id: order.id,
+          });
+          await supabase
+            .from("profiles")
+            .update({ first_sale_rewarded: true })
+            .eq("id", sellerId);
+
+          if (sellerProfile.referred_by) {
+            await supabase.rpc("grant_velvet_coins", {
+              p_user_id: sellerProfile.referred_by,
+              p_amount: 75,
+              p_reason: "referral_first_sale",
+              p_reference_id: sellerId,
+            });
+          }
+        }
+      }
+
       // ====== EMAIL NOTIFICATIONS ======
       const { data: buyerProfile } = await supabase
         .from("profiles")
@@ -179,7 +230,6 @@ serve(async (req: Request) => {
           });
         }
 
-        const sellerIds = [...new Set(items.map((i: any) => i.seller_id))];
         for (const sellerId of sellerIds) {
           const { data: sellerAuth } = await supabase.auth.admin.getUserById(
             sellerId as string

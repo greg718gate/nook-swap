@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,7 @@ import {
   validateDispatchAddress,
   type DispatchAddressValues,
 } from "@/components/DispatchAddressFields";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const emptyDispatch = (): DispatchAddressValues => ({
   dispatch_name: "",
@@ -26,12 +27,15 @@ const emptyDispatch = (): DispatchAddressValues => ({
 
 const Auth = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [dispatch, setDispatch] = useState<DispatchAddressValues>(emptyDispatch);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const referralCode = searchParams.get("ref")?.trim().toUpperCase() || "";
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
@@ -86,8 +90,18 @@ const Auth = () => {
         return;
       }
 
+      if (!acceptedTerms) {
+        toast.error("You must accept the Terms of Service");
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke("auth-signup", {
-        body: { email: email.trim().toLowerCase(), password, username: trimmedUsername },
+        body: {
+          email: email.trim().toLowerCase(),
+          password,
+          username: trimmedUsername,
+          referral_code: referralCode || undefined,
+        },
       });
 
       if (error) throw new Error(await getFunctionErrorMessage(error));
@@ -245,7 +259,29 @@ const Auth = () => {
                     idPrefix="signup-dispatch"
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                {referralCode && (
+                  <p className="text-xs text-muted-foreground rounded-md bg-muted/50 p-2">
+                    Referral code applied: <strong>{referralCode}</strong>
+                  </p>
+                )}
+                <div className="flex items-start gap-3">
+                  <Checkbox
+                    id="accept-terms"
+                    checked={acceptedTerms}
+                    onCheckedChange={(v) => setAcceptedTerms(v === true)}
+                  />
+                  <Label htmlFor="accept-terms" className="text-sm leading-snug font-normal">
+                    I agree to the{" "}
+                    <Link to="/terms" className="text-primary hover:underline" target="_blank">
+                      Terms of Service
+                    </Link>{" "}
+                    and{" "}
+                    <Link to="/privacy" className="text-primary hover:underline" target="_blank">
+                      Privacy Policy
+                    </Link>
+                  </Label>
+                </div>
+                <Button type="submit" className="w-full" disabled={loading || !acceptedTerms}>
                   {loading ? "Tworzenie konta..." : "Załóż konto"}
                 </Button>
               </form>
