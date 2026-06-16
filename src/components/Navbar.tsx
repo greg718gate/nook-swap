@@ -82,7 +82,7 @@ export const Navbar = () => {
           <div className="relative w-full max-w-xl">
             <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Szukaj produktów..."
+              placeholder="Search products..."
               className="pl-12 h-12 rounded-xl bg-muted/50 border-border/50"
               onKeyDown={(e) => {
                 if (e.key === "Enter") navigate(`/products?search=${e.currentTarget.value}`);
@@ -93,17 +93,17 @@ export const Navbar = () => {
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center space-x-3">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/")}>Strona główna</Button>
-          <Button variant="ghost" size="sm" onClick={() => navigate("/products")}>Przeglądaj</Button>
+          <Button variant="ghost" size="sm" onClick={() => navigate("/")}>Home</Button>
+          <Button variant="ghost" size="sm" onClick={() => navigate("/products")}>Browse</Button>
           <Button variant="ghost" size="sm" onClick={() => navigate("/sell")} className="gap-2">
-            <Plus className="h-4 w-4" /> Sprzedaj
+            <Plus className="h-4 w-4" /> Sell
           </Button>
           {user ? (
             <>
-              <Button variant="ghost" size="sm" onClick={() => navigate("/my-orders")}>Zakupy</Button>
-              <Button variant="ghost" size="sm" onClick={() => navigate("/sales")}>Sprzedaż</Button>
+              <Button variant="ghost" size="sm" onClick={() => navigate("/my-orders")}>Orders</Button>
+              <Button variant="ghost" size="sm" onClick={() => navigate("/sales")}>Sales</Button>
               <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="gap-2">
-                <BarChart3 className="h-4 w-4" /> Panel
+                <BarChart3 className="h-4 w-4" /> Dashboard
               </Button>
               <Button variant="ghost" size="icon" onClick={() => navigate("/profile?tab=messages")} className="relative">
                 <MessageCircle className="h-5 w-5" />
@@ -113,7 +113,7 @@ export const Navbar = () => {
                   </span>
                 )}
               </Button>
-              <Button variant="ghost" size="icon" onClick={() => navigate("/wishlist")} aria-label="Ulubione">
+              <Button variant="ghost" size="icon" onClick={() => navigate("/wishlist")} aria-label="Wishlist">
                 <Heart className="h-5 w-5" />
               </Button>
               <NotificationBell userId={user.id} />
@@ -129,11 +129,11 @@ export const Navbar = () => {
                 <User className="h-5 w-5" />
               </Button>
               <Button variant="ghost" size="sm" onClick={handleSignOut} className="hover:text-destructive">
-                Wyloguj
+                Sign out
               </Button>
             </>
           ) : (
-            <Button onClick={() => navigate("/auth")} className="shadow-lg">Zaloguj się</Button>
+            <Button onClick={() => navigate("/auth")} className="shadow-lg">Sign in</Button>
           )}
         </div>
 
@@ -170,7 +170,7 @@ export const Navbar = () => {
                 <SheetTitle className="text-left">
                   {user ? (
                     <div className="flex flex-col gap-0.5">
-                      <span className="text-sm text-muted-foreground">Zalogowany jako</span>
+                      <span className="text-sm text-muted-foreground">Signed in as</span>
                       <span className="text-base font-semibold truncate">{user.email}</span>
                     </div>
                   ) : (
@@ -183,7 +183,7 @@ export const Navbar = () => {
                 <div className="relative mb-3">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
-                    placeholder="Szukaj produktów..."
+                    placeholder="Search products..."
                     className="pl-9 h-11 rounded-lg"
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
@@ -199,23 +199,23 @@ export const Navbar = () => {
               <div className="flex-1 overflow-y-auto px-2 pb-4">
                 <div className="flex flex-col gap-1">
                   <Button variant="ghost" className="justify-start gap-3 h-12" onClick={() => go("/")}>
-                    <Home className="h-5 w-5" /> Strona główna
+                    <Home className="h-5 w-5" /> Home
                   </Button>
                   <Button variant="ghost" className="justify-start gap-3 h-12" onClick={() => go("/products")}>
-                    <Search className="h-5 w-5" /> Przeglądaj
+                    <Search className="h-5 w-5" /> Browse
                   </Button>
                   <Button variant="ghost" className="justify-start gap-3 h-12" onClick={() => go("/sell")}>
-                    <Plus className="h-5 w-5" /> Wystaw przedmiot
+                    <Plus className="h-5 w-5" /> Sell an item
                   </Button>
 
                   {user ? (
                     <>
                       <div className="h-px bg-border my-2" />
                       <Button variant="ghost" className="justify-start gap-3 h-12" onClick={() => go("/profile")}>
-                        <User className="h-5 w-5" /> Mój profil
+                        <User className="h-5 w-5" /> My profile
                       </Button>
                       <Button variant="ghost" className="justify-start gap-3 h-12 relative" onClick={() => go("/profile?tab=messages")}>
-                        <MessageCircle className="h-5 w-5" /> Wiadomości
+                        <MessageCircle className="h-5 w-5" /> Messages
                         {unreadCount > 0 && (
                           <span className="ml-auto flex h-5 min-w-5 px-1.5 items-center justify-center rounded-full bg-accent-orange text-xs font-bold text-white">
                             {unreadCount > 9 ? "9+" : unreadCount}
@@ -223,19 +223,19 @@ export const Navbar = () => {
                         )}
                       </Button>
                       <Button variant="ghost" className="justify-start gap-3 h-12" onClick={() => go("/my-orders")}>
-                        <ShoppingBag className="h-5 w-5" /> Moje zakupy
+                        <ShoppingBag className="h-5 w-5" /> My orders
                       </Button>
                       <Button variant="ghost" className="justify-start gap-3 h-12" onClick={() => go("/wishlist")}>
-                        <Heart className="h-5 w-5" /> Ulubione
+                        <Heart className="h-5 w-5" /> Wishlist
                       </Button>
                       <Button variant="ghost" className="justify-start gap-3 h-12" onClick={() => go("/sales")}>
-                        <Package className="h-5 w-5" /> Moja sprzedaż
+                        <Package className="h-5 w-5" /> My sales
                       </Button>
                       <Button variant="ghost" className="justify-start gap-3 h-12" onClick={() => go("/dashboard")}>
-                        <BarChart3 className="h-5 w-5" /> Panel sprzedawcy
+                        <BarChart3 className="h-5 w-5" /> Seller dashboard
                       </Button>
                       <Button variant="ghost" className="justify-start gap-3 h-12" onClick={() => go("/cart")}>
-                        <ShoppingCart className="h-5 w-5" /> Koszyk
+                        <ShoppingCart className="h-5 w-5" /> Cart
                         {cartCount > 0 && (
                           <span className="ml-auto flex h-5 min-w-5 px-1.5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
                             {cartCount}
@@ -244,14 +244,14 @@ export const Navbar = () => {
                       </Button>
                       <div className="h-px bg-border my-2" />
                       <Button variant="ghost" className="justify-start gap-3 h-12 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={handleSignOut}>
-                        <LogOut className="h-5 w-5" /> Wyloguj się
+                        <LogOut className="h-5 w-5" /> Sign out
                       </Button>
                     </>
                   ) : (
                     <>
                       <div className="h-px bg-border my-2" />
                       <Button className="h-12 mt-2" onClick={() => go("/auth")}>
-                        Zaloguj / Zarejestruj
+                        Sign in / Register
                       </Button>
                     </>
                   )}

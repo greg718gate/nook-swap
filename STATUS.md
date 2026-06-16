@@ -1,24 +1,24 @@
-STATUS: LIVE na własnej domenie
+STATUS: LIVE — frontend + backend zsynchronizowane (16.06.2026)
 
 Strona: https://velvetbazzar.co.uk ✅
+Backend: https://nmgiyvauguilbwtqlexj.supabase.co ✅
 DNS Fasthosts: OK (4 rekordy A → GitHub)
 Auth: logowanie + wylogowanie działa
 
-Deploy: push na main = auto update (bez Lovable)
+Deploy:
+- Frontend: push na `main` → GitHub Pages (auto)
+- Backend: wdrożony przez Lovable (migracje + 12 edge functions)
 
-Nowe (16.06.2026):
-- Velvet Coin — wewnętrzna waluta (profil → zakładka Velvet Coins)
-- Regulamin UK po angielsku (/terms) + checkbox przy rejestracji
-- Rabat na opłatę 5% przez VC przy sprzedaży (100 VC = -1%, max 250 VC)
-
-Uwaga: www.velvetbazzar.co.uk jeszcze wskazuje na stary serwer — opcjonalnie dodaj CNAME www → greg718gate.github.io
+Wdrożone na produkcji:
+- Velvet Coin (profil → Velvet Coins)
+- Regulamin UK (/terms) + checkbox przy rejestracji
+- Anti-Bot Phase Shield — handshake `tables_ready: true`, warmup 8 req
+- UK dispatch address, shipping labels (Shippo — wymaga API key)
 
 Do przetestowania:
-- Rejestracja (unikalna nazwa + akceptacja regulaminu)
-- Velvet Coins w profilu (saldo, referral link, auto-apply)
-- Phase Shield handshake (Network → X-Phase-Token w odpowiedziach API)
-- Produkt ze zdjęciem
-- Wiadomości
-- Stripe checkout
+- Rejestracja + Velvet Coins w profilu
+- Phase Shield (DevTools → Network → X-Phase-Token)
+- Wystawienie produktu (/sell)
+- Wiadomości + Stripe checkout
 
-Anti-Bot Phase Shield: docs/PHASE_SHIELD.md — **AKTYWNY** (warmup 8 req, auto-provision tabel)
+Uwaga: www.velvetbazzar.co.uk jeszcze wskazuje na stary serwer — opcjonalnie CNAME www → greg718gate.github.io

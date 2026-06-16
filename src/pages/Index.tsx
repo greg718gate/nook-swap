@@ -6,6 +6,7 @@ import { Hero } from "@/components/Hero";
 import { ProductCard } from "@/components/ProductCard";
 import { CategoryGrid } from "@/components/CategoryGrid";
 import { ChatAssistant } from "@/components/ChatAssistant";
+import { VelvetCoinPromo } from "@/components/VelvetCoinPromo";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Package } from "lucide-react";
@@ -34,11 +35,21 @@ const Index = () => {
   const navigate = useNavigate();
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [listingCount, setListingCount] = useState(0);
 
   useEffect(() => {
     fetchFeaturedProducts();
     fetchCategories();
+    fetchListingCount();
   }, []);
+
+  const fetchListingCount = async () => {
+    const { count } = await supabase
+      .from("products")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "active");
+    setListingCount(count ?? 0);
+  };
 
   const fetchCategories = async () => {
     const { data } = await supabase.from("categories").select("*");
@@ -59,9 +70,10 @@ const Index = () => {
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
-      <Hero />
+      <Hero listingCount={listingCount} />
       <main className="flex-1">
         <CategoryGrid categories={categories} />
+        <VelvetCoinPromo />
         
         <section className="container py-20">
           <div className="mb-16 text-center animate-fade-in">
@@ -145,10 +157,10 @@ const Index = () => {
                   ⭐
                 </div>
                 <h3 className="mb-3 text-2xl font-bold group-hover:text-accent transition-colors duration-300">
-                  Trusted Community
+                  Built for the UK
                 </h3>
                 <p className="text-muted-foreground text-lg leading-relaxed">
-                  Join thousands of verified buyers and sellers worldwide
+                  UK addresses, GBP pricing, and carriers you already know — Evri, Royal Mail & InPost
                 </p>
               </div>
             </div>
