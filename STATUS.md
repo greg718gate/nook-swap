@@ -1,19 +1,15 @@
-AKTUALNE ZADANIE: Naprawa auth — czeka na republish Lovable
-STATUS: fix w GitHub — wymaga publish + redeploy auth-signup
+AKTUALNE ZADANIE: Odcięcie od Lovable — jednorazowy setup deploy
+STATUS: CI/CD gotowe w repo — wymaga konfiguracji Vercel + GitHub Secret
 
-PROBLEM (zdiagnozowany):
-- API auth DZIAŁA (signup + login OK z serwera)
-- Frontend pokazywał "non-2xx" zamiast prawdziwego błędu
-- Zajęta nazwa użytkownika = "Database error" przy rejestracji
-- Logowanie: złe hasło / konto nie istnieje = "Invalid login credentials"
+GOTOWE:
+- Produkcja: https://velvetbazzar.co.uk (obecnie Lovable — do przeniesienia)
+- Auth, messaging, Stripe — działają
+- GitHub Actions: frontend, edge functions, migracje (DEPLOY.md)
 
-FIX (w GitHub main):
-- Auth.tsx: czytelne błędy PL + sprawdzanie zajętej nazwy
-- auth-signup: walidacja username przed utworzeniem konta
+NASTĘPNY KROK (15 min, 0 zł):
+1. Vercel.com → import GitHub repo → env vars z .env → deploy
+2. Domena velvetbazzar.co.uk → DNS na Vercel (zamiast Lovable)
+3. GitHub Secret: SUPABASE_ACCESS_TOKEN (darmowe konto supabase.com, jednorazowo)
+4. Koniec z Lovable — push na main = auto deploy
 
-LOVABLE (1 wiadomość):
-"Zsynchronizuj z GitHub main, wdróż auth-signup, opublikuj frontend"
-
-TEST PO DEPLOY:
-- Rejestracja: unikalna nazwa użytkownika + nowy email
-- Logowanie: to samo konto
+Szczegóły: DEPLOY.md

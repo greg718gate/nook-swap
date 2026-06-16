@@ -1,15 +1,14 @@
-name: Deploy Supabase Edge Functions
+name: Deploy Supabase Migrations
 
 on:
   push:
     branches: [main]
     paths:
-      - 'supabase/functions/**'
-      - 'supabase/config.toml'
+      - 'supabase/migrations/**'
   workflow_dispatch:
 
 concurrency:
-  group: deploy-supabase-functions
+  group: deploy-supabase-migrations
   cancel-in-progress: true
 
 jobs:
@@ -25,14 +24,11 @@ jobs:
         with:
           version: latest
 
-      - name: Deploy all edge functions
+      - name: Push migrations
         run: |
           if [ -z "$SUPABASE_ACCESS_TOKEN" ]; then
             echo "::warning::SUPABASE_ACCESS_TOKEN not set — skip deploy. See DEPLOY.md"
             exit 0
           fi
-          for dir in supabase/functions/*/; do
-            name=$(basename "$dir")
-            echo "Deploying $name..."
-            supabase functions deploy "$name" --project-ref "$PROJECT_ID"
-          done
+          supabase link --project-ref "$PROJECT_ID" --yes
+          supabase db push --yes
