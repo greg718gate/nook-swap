@@ -79,6 +79,7 @@ const handler = async (req: Request): Promise<Response> => {
       const p = dbProducts.find((dp) => dp.id === ci.product_id)!;
       if (p.status !== "active") throw new Error(`Product unavailable: ${p.title}`);
       const shippingCostMap: Record<string, number> = {
+        inpost: Number(p.shipping_inpost) || 0,
         royal_mail: Number(p.shipping_royal_mail) || 0,
         evri: Number(p.shipping_evri) || 0,
       };

@@ -531,7 +531,7 @@ const Sell = () => {
                       Set shipping prices in pounds for UK carriers. Buyers pay the cost at checkout.
                     </p>
                     
-                    <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="grid gap-4 sm:grid-cols-3">
                       <div className="space-y-2">
                         <Label htmlFor="shipping_evri">Evri</Label>
                         <Input
@@ -557,6 +557,21 @@ const Sell = () => {
                           value={formData.shipping_royal_mail}
                           onChange={(e) =>
                             setFormData({ ...formData, shipping_royal_mail: e.target.value })
+                          }
+                          placeholder="0.00"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="shipping_inpost">InPost Lockers</Label>
+                        <Input
+                          id="shipping_inpost"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={formData.shipping_inpost}
+                          onChange={(e) =>
+                            setFormData({ ...formData, shipping_inpost: e.target.value })
                           }
                           placeholder="0.00"
                         />

@@ -69,6 +69,27 @@ const Shipping = () => {
                   </p>
                 </div>
               </div>
+
+              <div className="rounded-xl bg-gradient-to-br from-primary/5 to-muted/5 border border-primary/20 p-6">
+                <h3 className="text-xl font-bold text-foreground mb-4">InPost Lockers</h3>
+                <div className="space-y-2 text-muted-foreground">
+                  <div className="flex justify-between">
+                    <span>Small parcel (locker):</span>
+                    <span className="font-semibold text-foreground">from £2.99</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Medium parcel (locker):</span>
+                    <span className="font-semibold text-foreground">from £3.99</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Large parcel (locker):</span>
+                    <span className="font-semibold text-foreground">from £5.49</span>
+                  </div>
+                  <p className="text-sm mt-4 pt-4 border-t border-border/30">
+                    Delivery: 1–2 working days | Collect 24/7 from InPost lockers across the UK
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 

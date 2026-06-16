@@ -72,6 +72,7 @@ const FAQ = () => {
               <AccordionContent className="text-muted-foreground leading-relaxed pt-2">
                 Czas wysyłki zależy od wybranej metody dostawy i lokalizacji. Zazwyczaj:
                 <ul className="list-disc list-inside mt-2 space-y-1">
+                  <li>InPost Lockers: 1–2 working days (UK)</li>
                   <li>Royal Mail: 1–3 working days (UK)</li>
                   <li>Evri: 2–4 working days (UK)</li>
                 </ul>

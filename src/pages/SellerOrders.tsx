@@ -173,6 +173,7 @@ const SellerOrders = () => {
                               <SelectContent>
                                 <SelectItem value="Royal Mail">Royal Mail</SelectItem>
                                 <SelectItem value="Evri">Evri</SelectItem>
+                                <SelectItem value="InPost">InPost Lockers</SelectItem>
                                 <SelectItem value="DPD">DPD</SelectItem>
                                 <SelectItem value="Other">Other</SelectItem>
                               </SelectContent>
