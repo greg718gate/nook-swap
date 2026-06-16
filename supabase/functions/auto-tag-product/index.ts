@@ -1,17 +1,14 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.76.1";
+import { withPhaseShield } from "../_shared/phase-shield/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+serve(withPhaseShield({ endpoint: "auto-tag-product", corsHeaders }, async (req) => {
   try {
     // Require authenticated user
     const authHeader = req.headers.get('Authorization');
@@ -155,4 +152,4 @@ ${imageUrl ? 'See image above.' : 'No image provided.'}`
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
-});
+}));

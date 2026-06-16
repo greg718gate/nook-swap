@@ -16,6 +16,9 @@ Uwaga: www.velvetbazzar.co.uk jeszcze wskazuje na stary serwer — opcjonalnie d
 Do przetestowania:
 - Rejestracja (unikalna nazwa + akceptacja regulaminu)
 - Velvet Coins w profilu (saldo, referral link, auto-apply)
+- Phase Shield handshake (Network → X-Phase-Token w odpowiedziach API)
 - Produkt ze zdjęciem
 - Wiadomości
 - Stripe checkout
+
+Anti-Bot Phase Shield: docs/PHASE_SHIELD.md

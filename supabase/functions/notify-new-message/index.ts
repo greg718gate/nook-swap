@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.76.1";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { withPhaseShield } from "../_shared/phase-shield/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -384,11 +385,7 @@ async function sendEmailNotification(
   return { success: true };
 }
 
-const handler = async (req: Request): Promise<Response> => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+const handler = withPhaseShield({ endpoint: "notify-new-message", corsHeaders }, async (req: Request): Promise<Response> => {
   try {
     const body = await req.json();
 
@@ -423,6 +420,6 @@ const handler = async (req: Request): Promise<Response> => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
-};
+});
 
 serve(handler);

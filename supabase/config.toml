@@ -42,3 +42,6 @@ verify_jwt = false
 
 [functions.velvet-coin-api]
 verify_jwt = false
+
+[functions.phase-shield-handshake]
+verify_jwt = false

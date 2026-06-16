@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.76.1";
+import { withPhaseShield } from "../_shared/phase-shield/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -16,11 +17,7 @@ function normalizeUsername(raw: string, email: string): string {
   return base.length >= 3 ? base : `user${Date.now().toString(36).slice(-6)}`;
 }
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+serve(withPhaseShield({ endpoint: "auth-signup", corsHeaders }, async (req) => {
   try {
     const { email, password, username, referral_code } = await req.json();
 
@@ -130,4 +127,4 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
-});
+}));

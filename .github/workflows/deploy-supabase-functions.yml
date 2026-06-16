@@ -33,6 +33,10 @@ jobs:
           fi
           for dir in supabase/functions/*/; do
             name=$(basename "$dir")
+            if [ "$name" = "_shared" ]; then
+              echo "Skipping shared module $name"
+              continue
+            fi
             echo "Deploying $name..."
             supabase functions deploy "$name" --project-ref "$PROJECT_ID"
           done

@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.76.1";
+import { withPhaseShield } from "../_shared/phase-shield/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -53,11 +54,7 @@ async function shippoRequest(apiKey: string, path: string, body?: unknown) {
   return data;
 }
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+serve(withPhaseShield({ endpoint: "create-shipping-label", corsHeaders }, async (req) => {
   try {
     const shippoKey = Deno.env.get("SHIPPO_API_KEY");
     if (!shippoKey) {
@@ -266,4 +263,4 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
-});
+}));
