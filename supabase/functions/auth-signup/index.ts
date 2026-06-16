@@ -7,6 +7,15 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+function normalizeUsername(raw: string, email: string): string {
+  const base = (raw?.trim() || email.split("@")[0])
+    .toLowerCase()
+    .replace(/[^a-z0-9_]/g, "")
+    .slice(0, 24);
+
+  return base.length >= 3 ? base : `user${Date.now().toString(36).slice(-6)}`;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -34,19 +43,41 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanUsername = normalizeUsername(username, cleanEmail);
+
+    const { data: existingProfile } = await supabase
+      .from("profiles")
+      .select("id")
+      .ilike("username", cleanUsername)
+      .maybeSingle();
+
+    if (existingProfile) {
+      return new Response(
+        JSON.stringify({ error: "Nazwa użytkownika jest już zajęta — wybierz inną" }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
+    }
+
     const { data, error } = await supabase.auth.admin.createUser({
-      email: email.trim().toLowerCase(),
+      email: cleanEmail,
       password,
       email_confirm: true,
       user_metadata: {
-        username: username?.trim() || email.split("@")[0],
+        username: cleanUsername,
       },
     });
 
     if (error) {
-      const msg = error.message.includes("already")
-        ? "Konto z tym emailem już istnieje"
-        : error.message;
+      let msg = error.message;
+      if (error.message.includes("already") || error.message.includes("registered")) {
+        msg = "Konto z tym emailem już istnieje — zaloguj się";
+      } else if (error.message.includes("Database error")) {
+        msg = "Nie udało się utworzyć konta — sprawdź czy nazwa użytkownika i email są wolne";
+      }
       return new Response(JSON.stringify({ error: msg }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

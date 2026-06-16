@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { getAuthErrorMessage, getFunctionErrorMessage } from "@/lib/functionError";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -28,15 +29,28 @@ const Auth = () => {
     setLoading(true);
 
     try {
+      const trimmedUsername = username.trim();
+
+      const { data: taken } = await supabase
+        .from("public_profiles")
+        .select("id")
+        .ilike("username", trimmedUsername)
+        .maybeSingle();
+
+      if (taken) {
+        toast.error("Nazwa użytkownika jest zajęta — wybierz inną");
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke("auth-signup", {
-        body: { email, password, username },
+        body: { email: email.trim().toLowerCase(), password, username: trimmedUsername },
       });
 
-      if (error) throw error;
+      if (error) throw new Error(await getFunctionErrorMessage(error));
       if (data?.error) throw new Error(data.error);
 
       const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
+        email: email.trim().toLowerCase(),
         password,
       });
 
@@ -45,8 +59,7 @@ const Auth = () => {
       toast.success("Konto utworzone! Zalogowano pomyślnie.");
       navigate("/");
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : "Błąd rejestracji";
-      toast.error(message);
+      toast.error(getAuthErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -58,7 +71,7 @@ const Auth = () => {
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
-        email,
+        email: email.trim().toLowerCase(),
         password,
       });
 
@@ -67,8 +80,7 @@ const Auth = () => {
       toast.success("Zalogowano pomyślnie!");
       navigate("/");
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : "Błąd logowania";
-      toast.error(message);
+      toast.error(getAuthErrorMessage(error));
     } finally {
       setLoading(false);
     }

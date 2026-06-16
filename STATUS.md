@@ -1,12 +1,19 @@
-AKTUALNE ZADANIE: Auth bez konta Supabase
-STATUS: kod gotowy — wymaga deploy auth-signup w Lovable
+AKTUALNE ZADANIE: Naprawa auth — czeka na republish Lovable
+STATUS: fix w GitHub — wymaga publish + redeploy auth-signup
 
-GOTOWE:
-- Produkcja: https://velvetbazzar.co.uk
-- Logowanie hasłem — działa z kodu, bez panelu Supabase
-- Rejestracja — przez Edge Function auth-signup (auto-potwierdza email, bez linku w mailu)
+PROBLEM (zdiagnozowany):
+- API auth DZIAŁA (signup + login OK z serwera)
+- Frontend pokazywał "non-2xx" zamiast prawdziwego błędu
+- Zajęta nazwa użytkownika = "Database error" przy rejestracji
+- Logowanie: złe hasło / konto nie istnieje = "Invalid login credentials"
 
-LOVABLE (jedna wiadomość):
-"Wdróż edge function auth-signup z GitHuba"
+FIX (w GitHub main):
+- Auth.tsx: czytelne błędy PL + sprawdzanie zajętej nazwy
+- auth-signup: walidacja username przed utworzeniem konta
 
-NIE POTRZEBUJESZ konta na supabase.com — nigdy.
+LOVABLE (1 wiadomość):
+"Zsynchronizuj z GitHub main, wdróż auth-signup, opublikuj frontend"
+
+TEST PO DEPLOY:
+- Rejestracja: unikalna nazwa użytkownika + nowy email
+- Logowanie: to samo konto
