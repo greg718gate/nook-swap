@@ -35,12 +35,12 @@ interface SaleItem {
 }
 
 const statusLabel: Record<string, string> = {
-  paid: "Opłacone",
-  shipped: "Wysłane",
-  delivered: "Dostarczone",
-  completed: "Zakończone",
-  cancelled: "Anulowane",
-  refunded: "Zwrócone",
+  paid: "Paid",
+  shipped: "Shipped",
+  delivered: "Delivered",
+  completed: "Completed",
+  cancelled: "Cancelled",
+  refunded: "Refunded",
 };
 
 const SellerOrders = () => {
@@ -70,7 +70,7 @@ const SellerOrders = () => {
       .select("*, orders(*)")
       .eq("seller_id", uid)
       .order("created_at", { ascending: false });
-    if (error) toast.error("Nie udało się pobrać sprzedaży");
+    if (error) toast.error("Could not load sales");
     else setSales((data as SaleItem[]) || []);
     setLoading(false);
   };
@@ -78,7 +78,7 @@ const SellerOrders = () => {
   const markShipped = async (orderId: string) => {
     const t = tracking[orderId];
     if (!t?.num || !t?.carrier) {
-      toast.error("Podaj nr przesyłki i kuriera");
+      toast.error("Enter tracking number and carrier");
       return;
     }
     setActing(orderId);
@@ -92,9 +92,9 @@ const SellerOrders = () => {
       })
       .eq("id", orderId);
     setActing(null);
-    if (error) toast.error("Nie udało się zaktualizować zamówienia");
+    if (error) toast.error("Could not update order");
     else {
-      toast.success("Oznaczono jako wysłane");
+      toast.success("Marked as shipped");
       const { data: { session } } = await supabase.auth.getSession();
       if (session) await fetchSales(session.user.id);
     }
@@ -148,11 +148,11 @@ const SellerOrders = () => {
       <Navbar />
       <main className="flex-1 bg-muted/20">
         <div className="container py-10">
-          <h1 className="text-3xl font-bold mb-6">Sprzedaż</h1>
+          <h1 className="text-3xl font-bold mb-6">Sales</h1>
           {Object.keys(byOrder).length === 0 ? (
             <Card>
               <CardContent className="py-16 text-center text-muted-foreground">
-                Brak sprzedanych przedmiotów.
+                No sold items yet.
               </CardContent>
             </Card>
           ) : (
@@ -167,7 +167,7 @@ const SellerOrders = () => {
                       <div>
                         <CardTitle className="text-base font-mono">#{orderId.slice(0, 8)}</CardTitle>
                         <p className="text-sm text-muted-foreground mt-1">
-                          {items.length} pozycji · £{sellerTotal.toFixed(2)}
+                          {items.length} items · £{sellerTotal.toFixed(2)}
                         </p>
                       </div>
                       <Badge>{statusLabel[order.status] || order.status}</Badge>
@@ -175,10 +175,10 @@ const SellerOrders = () => {
                     <CardContent className="space-y-3">
                       {order.shipping_address && (
                         <div className="rounded-md bg-muted p-3 text-sm">
-                          <div className="font-medium mb-1">Adres dostawy</div>
+                          <div className="font-medium mb-1">Delivery address</div>
                           <div className="text-muted-foreground whitespace-pre-line">{order.shipping_address}</div>
                           {order.shipping_method && (
-                            <div className="text-xs text-muted-foreground mt-1">Metoda: {order.shipping_method}</div>
+                            <div className="text-xs text-muted-foreground mt-1">Method: {order.shipping_method}</div>
                           )}
                         </div>
                       )}
@@ -233,14 +233,14 @@ const SellerOrders = () => {
                           <p className="text-xs text-muted-foreground">Or enter tracking manually:</p>
                         <div className="grid gap-2 sm:grid-cols-3 items-end">
                           <div>
-                            <label className="text-xs text-muted-foreground">Kurier</label>
+                            <label className="text-xs text-muted-foreground">Carrier</label>
                             <Select
                               value={tracking[orderId]?.carrier || ""}
                               onValueChange={(v) =>
                                 setTracking((p) => ({ ...p, [orderId]: { ...(p[orderId] || { num: "" }), carrier: v } }))
                               }
                             >
-                              <SelectTrigger><SelectValue placeholder="Wybierz" /></SelectTrigger>
+                              <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="Royal Mail">Royal Mail</SelectItem>
                                 <SelectItem value="Evri">Evri</SelectItem>
@@ -251,7 +251,7 @@ const SellerOrders = () => {
                             </Select>
                           </div>
                           <div>
-                            <label className="text-xs text-muted-foreground">Nr przesyłki</label>
+                            <label className="text-xs text-muted-foreground">Tracking number</label>
                             <Input
                               value={tracking[orderId]?.num || ""}
                               onChange={(e) =>

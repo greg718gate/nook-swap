@@ -77,7 +77,7 @@ const Auth = () => {
         .maybeSingle();
 
       if (taken) {
-        toast.error("Nazwa użytkownika jest zajęta — wybierz inną");
+        toast.error("Username is taken — please choose another");
         return;
       }
 
@@ -117,7 +117,7 @@ const Auth = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) await saveDispatchAddress(session.user.id);
 
-      toast.success("Konto utworzone! Zalogowano pomyślnie.");
+      toast.success("Account created! You're signed in.");
       navigate(await getPostLoginPath());
     } catch (error: unknown) {
       toast.error(getAuthErrorMessage(error));
@@ -138,7 +138,7 @@ const Auth = () => {
 
       if (error) throw error;
 
-      toast.success("Zalogowano pomyślnie!");
+      toast.success("Signed in successfully!");
       navigate(await getPostLoginPath());
     } catch (error: unknown) {
       toast.error(getAuthErrorMessage(error));
@@ -153,13 +153,13 @@ const Auth = () => {
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 h-12 w-12 rounded-lg bg-gradient-hero" />
           <CardTitle className="text-2xl">VelvetBazzar</CardTitle>
-          <CardDescription>Zaloguj się, aby kupować i sprzedawać</CardDescription>
+          <CardDescription>Sign in to buy and sell</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Logowanie</TabsTrigger>
-              <TabsTrigger value="signup">Rejestracja</TabsTrigger>
+              <TabsTrigger value="signin">Sign in</TabsTrigger>
+              <TabsTrigger value="signup">Sign up</TabsTrigger>
             </TabsList>
             
             <TabsContent value="signin">
@@ -176,7 +176,7 @@ const Auth = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signin-password">Hasło</Label>
+                  <Label htmlFor="signin-password">Password</Label>
                   <div className="relative">
                     <Input
                       id="signin-password"
@@ -190,14 +190,14 @@ const Auth = () => {
                       type="button"
                       onClick={() => setShowPassword((prev) => !prev)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                      aria-label={showPassword ? "Ukryj hasło" : "Pokaż hasło"}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Logowanie..." : "Zaloguj się"}
+                  {loading ? "Signing in..." : "Sign in"}
                 </Button>
               </form>
             </TabsContent>
@@ -205,11 +205,11 @@ const Auth = () => {
             <TabsContent value="signup">
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-username">Nazwa użytkownika</Label>
+                  <Label htmlFor="signup-username">Username</Label>
                   <Input
                     id="signup-username"
                     type="text"
-                    placeholder="janek"
+                    placeholder="johndoe"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
@@ -227,7 +227,7 @@ const Auth = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Hasło</Label>
+                  <Label htmlFor="signup-password">Password</Label>
                   <div className="relative">
                     <Input
                       id="signup-password"
@@ -242,7 +242,7 @@ const Auth = () => {
                       type="button"
                       onClick={() => setShowPassword((prev) => !prev)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                      aria-label={showPassword ? "Ukryj hasło" : "Pokaż hasło"}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -282,7 +282,7 @@ const Auth = () => {
                   </Label>
                 </div>
                 <Button type="submit" className="w-full" disabled={loading || !acceptedTerms}>
-                  {loading ? "Tworzenie konta..." : "Załóż konto"}
+                  {loading ? "Creating account..." : "Create account"}
                 </Button>
               </form>
             </TabsContent>

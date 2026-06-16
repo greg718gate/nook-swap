@@ -77,7 +77,7 @@ const Sell = () => {
 
   const handleAIAnalysis = async () => {
     if (!formData.title && !formData.description && imagePreviews.length === 0) {
-      toast.error("Dodaj przynajmniej tytuł, opis lub zdjęcie produktu");
+      toast.error("Add at least a title, description, or product photo");
       return;
     }
 
@@ -129,14 +129,14 @@ const Sell = () => {
         setFormData(prev => ({ ...prev, condition: mappedCondition }));
       }
 
-      toast.success(`AI Analysis: ${result.insights || "Analiza zakończona!"}`);
+      toast.success(`AI Analysis: ${result.insights || "Analysis complete!"}`);
       
       if (result.tags && result.tags.length > 0) {
-        toast.info(`Sugerowane tagi: ${result.tags.join(", ")}`);
+        toast.info(`Suggested tags: ${result.tags.join(", ")}`);
       }
     } catch (error) {
       console.error("AI analysis error:", error);
-      toast.error(error instanceof Error ? error.message : "Nie udało się przeanalizować produktu");
+      toast.error(error instanceof Error ? error.message : "Could not analyse product");
     } finally {
       setAiAnalyzing(false);
     }
@@ -146,17 +146,17 @@ const Sell = () => {
     const files = Array.from(e.target.files || []);
     
     if (images.length + files.length > MAX_IMAGES) {
-      toast.error(`Możesz dodać maksymalnie ${MAX_IMAGES} zdjęć`);
+      toast.error(`You can add up to ${MAX_IMAGES} photos`);
       return;
     }
 
     const validFiles = files.filter(file => {
       if (!file.type.startsWith('image/')) {
-        toast.error(`${file.name} nie jest obrazem`);
+        toast.error(`${file.name} is not an image`);
         return false;
       }
       if (file.size > 5 * 1024 * 1024) {
-        toast.error(`${file.name} jest zbyt duży (max 5MB)`);
+        toast.error(`${file.name} is too large (max 5MB)`);
         return false;
       }
       return true;
@@ -205,7 +205,7 @@ const Sell = () => {
       return uploadedUrls;
     } catch (error) {
       console.error('Error uploading images:', error);
-      toast.error('Nie udało się przesłać zdjęć. Spróbuj ponownie lub wybierz mniejsze pliki.');
+      toast.error('Could not upload photos. Try again or choose smaller files.');
       throw error;
     } finally {
       setUploadingImages(false);
@@ -217,7 +217,7 @@ const Sell = () => {
     if (!file) return;
 
     if (file.size > 100 * 1024 * 1024) {
-      toast.error("Plik jest zbyt duży (max 100MB)");
+      toast.error("File is too large (max 100MB)");
       return;
     }
 
@@ -252,12 +252,12 @@ const Sell = () => {
     if (!user) return;
 
     if (images.length < MIN_IMAGES) {
-      toast.error(`Dodaj przynajmniej ${MIN_IMAGES} zdjęcie produktu`);
+      toast.error(`Add at least ${MIN_IMAGES} product photo`);
       return;
     }
 
     if (formData.product_type === "digital" && !digitalFile) {
-      toast.error("Dodaj plik do pobrania dla produktu cyfrowego");
+      toast.error("Add a download file for digital products");
       return;
     }
 
@@ -292,10 +292,10 @@ const Sell = () => {
 
       if (error) throw error;
 
-      toast.success("Produkt został dodany pomyślnie!");
+      toast.success("Product listed successfully!");
       navigate("/profile");
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Nie udało się dodać produktu';
+      const message = error instanceof Error ? error.message : 'Could not add product';
       toast.error(message);
     } finally {
       setLoading(false);
@@ -308,14 +308,14 @@ const Sell = () => {
       <main className="flex-1 bg-gradient-to-br from-background via-muted/20 to-background">
         <div className="container py-8">
           <div className="mx-auto max-w-2xl">
-            <h1 className="mb-8 text-3xl font-bold">Wystaw Przedmiot</h1>
+            <h1 className="mb-8 text-3xl font-bold">List an Item</h1>
 
             <Card className="p-6">
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* AI Analysis Section */}
                 <div className="space-y-4 p-4 rounded-lg bg-gradient-to-r from-primary/5 to-accent/5 border border-primary/20">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-semibold">Automatyczne Tagowanie AI</h2>
+                    <h2 className="text-lg font-semibold">AI Auto-Tagging</h2>
                     <Button
                       type="button"
                       variant="outline"
@@ -326,25 +326,25 @@ const Sell = () => {
                       {aiAnalyzing ? (
                         <>
                           <Loader2 className="h-4 w-4 animate-spin" />
-                          Analizuję...
+                          Analysing...
                         </>
                       ) : (
                         <>
                           <Sparkles className="h-4 w-4" />
-                          Analizuj z AI
+                          Analyse with AI
                         </>
                       )}
                     </Button>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    AI przeanalizuje Twój produkt i automatycznie wypełni kategorię, tagi i stan.
+                    AI will analyse your product and suggest category, tags, and condition.
                   </p>
                 </div>
 
                 {/* Multi-Image Upload */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <Label>Zdjęcia Produktu *</Label>
+                    <Label>Product Photos *</Label>
                     <span className="text-sm text-muted-foreground">
                       {images.length}/{MAX_IMAGES} (min. {MIN_IMAGES})
                     </span>
@@ -367,7 +367,7 @@ const Sell = () => {
                         </button>
                         {index === 0 && (
                           <span className="absolute bottom-2 left-2 text-xs bg-primary text-primary-foreground px-2 py-1 rounded">
-                            Główne
+                            Main
                           </span>
                         )}
                       </div>
@@ -376,7 +376,7 @@ const Sell = () => {
                     {images.length < MAX_IMAGES && (
                       <label className="aspect-square flex flex-col items-center justify-center border-2 border-dashed border-muted-foreground/30 rounded-lg cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-all">
                         <ImagePlus className="h-8 w-8 text-muted-foreground mb-2" />
-                        <span className="text-sm text-muted-foreground">Dodaj zdjęcie</span>
+                        <span className="text-sm text-muted-foreground">Add photo</span>
                         <input
                           type="file"
                           accept="image/*"
@@ -388,20 +388,20 @@ const Sell = () => {
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Pierwsze zdjęcie będzie głównym zdjęciem produktu. Maksymalny rozmiar: 5MB na zdjęcie.
+                    The first photo will be the main product image. Maximum size: 5MB per photo.
                   </p>
                 </div>
 
                 {/* Title */}
                 <div className="space-y-2">
-                  <Label htmlFor="title">Tytuł *</Label>
+                  <Label htmlFor="title">Title *</Label>
                   <Input
                     id="title"
                     value={formData.title}
                     onChange={(e) =>
                       setFormData({ ...formData, title: e.target.value })
                     }
-                    placeholder="np. iPhone 13 Pro Max 256GB"
+                    placeholder="e.g. iPhone 13 Pro Max 256GB"
                     required
                     maxLength={100}
                   />
@@ -409,14 +409,14 @@ const Sell = () => {
 
                 {/* Description */}
                 <div className="space-y-2">
-                  <Label htmlFor="description">Opis *</Label>
+                  <Label htmlFor="description">Description *</Label>
                   <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
                     }
-                    placeholder="Opisz szczegółowo swój przedmiot - stan, parametry, wady/zalety..."
+                    placeholder="Describe your item in detail — condition, specs, flaws..."
                     rows={5}
                     required
                     maxLength={2000}
@@ -428,7 +428,7 @@ const Sell = () => {
 
                 {/* Product Type */}
                 <div className="space-y-2">
-                  <Label>Typ produktu *</Label>
+                  <Label>Product type *</Label>
                   <Select
                     value={formData.product_type}
                     onValueChange={(value) =>
@@ -439,8 +439,8 @@ const Sell = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="physical">Fizyczny (do wysyłki)</SelectItem>
-                      <SelectItem value="digital">Cyfrowy (do pobrania)</SelectItem>
+                      <SelectItem value="physical">Physical (shipped)</SelectItem>
+                      <SelectItem value="digital">Digital (download)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -449,7 +449,7 @@ const Sell = () => {
                 {formData.product_type === "digital" && (
                   <div className="space-y-4 p-4 rounded-lg border border-primary/20 bg-primary/5">
                     <div className="flex items-center justify-between">
-                      <Label>Plik do pobrania *</Label>
+                      <Label>Download file *</Label>
                       {digitalFile && (
                         <span className="text-sm text-muted-foreground">
                           {digitalFile.name} ({(digitalFile.size / 1024 / 1024).toFixed(2)} MB)
@@ -459,7 +459,7 @@ const Sell = () => {
                     <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-muted-foreground/30 rounded-lg cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-all">
                       <FileUp className="h-10 w-10 text-muted-foreground mb-2" />
                       <span className="text-sm text-muted-foreground">
-                        {digitalFile ? "Zmień plik" : "Wybierz plik do pobrania"}
+                        {digitalFile ? "Change file" : "Choose download file"}
                       </span>
                       <span className="text-xs text-muted-foreground mt-1">
                         Max 100MB
@@ -476,7 +476,7 @@ const Sell = () => {
                 {/* Price and Condition */}
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="price">Cena (£) *</Label>
+                    <Label htmlFor="price">Price (£) *</Label>
                     <Input
                       id="price"
                       type="number"
@@ -493,7 +493,7 @@ const Sell = () => {
 
                   {formData.product_type === "physical" && (
                     <div className="space-y-2">
-                      <Label htmlFor="condition">Stan *</Label>
+                      <Label htmlFor="condition">Condition *</Label>
                       <Select
                         value={formData.condition}
                         onValueChange={(value) =>
@@ -504,10 +504,10 @@ const Sell = () => {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="new">Nowy</SelectItem>
-                          <SelectItem value="like-new">Jak nowy</SelectItem>
-                          <SelectItem value="good">Dobry</SelectItem>
-                          <SelectItem value="fair">Używany</SelectItem>
+                          <SelectItem value="new">New</SelectItem>
+                          <SelectItem value="like-new">Like new</SelectItem>
+                          <SelectItem value="good">Good</SelectItem>
+                          <SelectItem value="fair">Fair</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -516,7 +516,7 @@ const Sell = () => {
 
                 {/* Category */}
                 <div className="space-y-2">
-                  <Label htmlFor="category">Kategoria *</Label>
+                  <Label htmlFor="category">Category *</Label>
                   <Select
                     value={formData.category_id}
                     onValueChange={(value) =>
@@ -524,7 +524,7 @@ const Sell = () => {
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Wybierz kategorię" />
+                      <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
                       {categories.map((category) => (
@@ -603,10 +603,10 @@ const Sell = () => {
                     {loading || uploadingImages ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        {uploadingImages ? "Przesyłanie zdjęć..." : "Dodawanie..."}
+                        {uploadingImages ? "Uploading photos..." : "Listing..."}
                       </>
                     ) : (
-                      "Wystaw Przedmiot"
+                      "List Item"
                     )}
                   </Button>
                   <Button
@@ -614,7 +614,7 @@ const Sell = () => {
                     variant="outline"
                     onClick={() => navigate("/")}
                   >
-                    Anuluj
+                    Cancel
                   </Button>
                 </div>
               </form>

@@ -119,7 +119,7 @@ const handler = withPhaseShield({ endpoint: "create-checkout-session", corsHeade
 
     if (sellersWithoutStripe && sellersWithoutStripe.length > 0) {
       throw new Error(
-        "Niektórzy sprzedawcy nie mają jeszcze skonfigurowanego konta Stripe. Nie można dokończyć zamówienia."
+        "Some sellers have not finished Stripe setup. Checkout cannot be completed."
       );
     }
 
@@ -233,7 +233,7 @@ const handler = withPhaseShield({ endpoint: "create-checkout-session", corsHeade
         price_data: {
           currency: "gbp",
           product_data: {
-            name: `Wysyłka (${shipping_method})`,
+            name: `Shipping (${shipping_method})`,
             images: [],
           },
           unit_amount: Math.round(shippingCost * 100),

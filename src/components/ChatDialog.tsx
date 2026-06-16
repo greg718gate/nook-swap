@@ -6,7 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, User, Package } from "lucide-react";
 import { Message, Conversation, useConversationMessages } from "@/hooks/useMessages";
 import { formatDistanceToNow } from "date-fns";
-import { pl } from "date-fns/locale";
+import { enGB } from "date-fns/locale";
 
 interface ChatDialogProps {
   conversation: Conversation | null;
@@ -69,7 +69,7 @@ export const ChatDialog = ({
       <Card className="h-full flex items-center justify-center p-8">
         <div className="text-center text-muted-foreground">
           <User className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p>Wybierz rozmowę, aby zobaczyć wiadomości</p>
+          <p>Select a conversation to view messages</p>
         </div>
       </Card>
     );
@@ -83,7 +83,7 @@ export const ChatDialog = ({
           <User className="h-5 w-5 text-white" />
         </div>
         <div className="flex-1">
-          <p className="font-semibold">{otherUser?.username || 'Użytkownik'}</p>
+          <p className="font-semibold">{otherUser?.username || 'User'}</p>
           {conversation.product && (
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <Package className="h-3 w-3" />
@@ -106,8 +106,8 @@ export const ChatDialog = ({
           </div>
         ) : messages.length === 0 ? (
           <div className="text-center text-muted-foreground py-8">
-            <p>Brak wiadomości</p>
-            <p className="text-sm">Rozpocznij rozmowę!</p>
+            <p>No messages</p>
+            <p className="text-sm">Start the conversation!</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -138,7 +138,7 @@ export const ChatDialog = ({
                     <p className="text-xs text-muted-foreground mt-1">
                       {formatDistanceToNow(new Date(message.created_at), {
                         addSuffix: true,
-                        locale: pl
+                        locale: enGB
                       })}
                     </p>
                   </div>
@@ -159,7 +159,7 @@ export const ChatDialog = ({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Napisz wiadomość..."
+            placeholder="Write a message..."
             disabled={sending}
             className="flex-1"
           />

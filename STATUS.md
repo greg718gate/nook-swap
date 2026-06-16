@@ -1,24 +1,16 @@
-STATUS: LIVE — frontend + backend zsynchronizowane (16.06.2026)
+STATUS: LIVE — UK marketplace (June 2026)
 
-Strona: https://velvetbazzar.co.uk ✅
-Backend: https://nmgiyvauguilbwtqlexj.supabase.co ✅
-DNS Fasthosts: OK (4 rekordy A → GitHub)
-Auth: logowanie + wylogowanie działa
+Frontend: https://velvetbazzar.co.uk (GitHub Pages, auto deploy on push)
+Backend: Supabase nmgiyvauguilbwtqlexj (Lovable Publish)
 
-Deploy:
-- Frontend: push na `main` → GitHub Pages (auto)
-- Backend: wdrożony przez Lovable (migracje + 12 edge functions)
+## Done
+- Auth, UK dispatch address, sell/buy flow
+- Stripe Connect + checkout (GBP)
+- Velvet Coin, Phase Shield, AI Guide
+- Full UK English UI (pages, toasts, emails)
+- Terms, Privacy, FAQ, Shipping, Returns
 
-Wdrożone na produkcji:
-- Velvet Coin (profil → Velvet Coins)
-- Regulamin UK (/terms) + checkbox przy rejestracji
-- Anti-Bot Phase Shield — handshake `tables_ready: true`, warmup 8 req
-- UK dispatch address, shipping labels (Shippo — wymaga API key)
-
-Do przetestowania:
-- Rejestracja + Velvet Coins w profilu
-- Phase Shield (DevTools → Network → X-Phase-Token)
-- Wystawienie produktu (/sell)
-- Wiadomości + Stripe checkout
-
-Uwaga: www.velvetbazzar.co.uk jeszcze wskazuje na stary serwer — opcjonalnie CNAME www → greg718gate.github.io
+## Optional / user setup
+- Shippo API key (auto labels)
+- SUPABASE_ACCESS_TOKEN in GitHub (deploy without Lovable)
+- www CNAME, support@ email, real listings

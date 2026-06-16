@@ -23,7 +23,7 @@ export const useWishlist = (userId?: string) => {
 
   const toggle = async (productId: string) => {
     if (!userId) {
-      toast.error("Zaloguj się, aby dodać do ulubionych");
+      toast.error("Sign in to add to wishlist");
       return;
     }
     if (ids.has(productId)) {
@@ -33,14 +33,14 @@ export const useWishlist = (userId?: string) => {
         n.delete(productId);
         return n;
       });
-      toast.success("Usunięto z ulubionych");
+      toast.success("Removed from wishlist");
     } else {
       const { error } = await supabase
         .from("wishlist_items")
         .insert({ user_id: userId, product_id: productId });
       if (!error) {
         setIds((prev) => new Set(prev).add(productId));
-        toast.success("Dodano do ulubionych");
+        toast.success("Added to wishlist");
       }
     }
   };

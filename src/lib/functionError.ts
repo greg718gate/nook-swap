@@ -14,25 +14,25 @@ export async function getFunctionErrorMessage(error: unknown): Promise<string> {
 
   if (error instanceof Error) {
     if (error.message.includes('non-2xx')) {
-      return 'Operacja nie powiodła się — sprawdź dane i spróbuj ponownie';
+      return 'Operation failed — check your details and try again';
     }
     return error.message;
   }
 
-  return 'Nieznany błąd';
+  return 'Unknown error';
 }
 
 export function getAuthErrorMessage(error: unknown): string {
-  const message = error instanceof Error ? error.message : 'Błąd logowania';
+  const message = error instanceof Error ? error.message : 'Sign-in error';
 
   if (message.includes('Invalid login credentials')) {
-    return 'Nieprawidłowy email lub hasło';
+    return 'Invalid email or password';
   }
   if (message.includes('Email not confirmed')) {
-    return 'Email nie został potwierdzony — użyj innego adresu lub załóż konto ponownie';
+    return 'Email not confirmed — use a different address or create a new account';
   }
   if (message.includes('weak') || message.includes('easy to guess')) {
-    return 'Hasło jest zbyt słabe — użyj min. 8 znaków, liter i cyfr';
+    return 'Password is too weak — use at least 8 characters with letters and numbers';
   }
 
   return message;

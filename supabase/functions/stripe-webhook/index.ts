@@ -218,14 +218,14 @@ serve(async (req: Request) => {
           await resend.emails.send({
             from: "VelvetBazzar <noreply@resend.dev>",
             to: [buyerEmail],
-            subject: "Potwierdzenie zamówienia - VelvetBazzar",
+            subject: "Order confirmation - VelvetBazzar",
             html: `
-              <h1>Dziękujemy za zamówienie!</h1>
-              <p>Cześć ${buyerProfile?.full_name || buyerProfile?.username || "Kupujący"},</p>
-              <p>Twoje zamówienie #${order.id.slice(0, 8)} zostało potwierdzone.</p>
-              <p><strong>Kwota:</strong> £${((session.amount_total || 0) / 100).toFixed(2)}</p>
-              <p>Sprzedawca został powiadomiony i wkrótce nada przesyłkę.</p>
-              <p>Z pozdrowieniami,<br>Zespół VelvetBazzar</p>
+              <h1>Thank you for your order!</h1>
+              <p>Hi ${buyerProfile?.full_name || buyerProfile?.username || "there"},</p>
+              <p>Your order #${order.id.slice(0, 8)} has been confirmed.</p>
+              <p><strong>Total:</strong> £${((session.amount_total || 0) / 100).toFixed(2)}</p>
+              <p>The seller has been notified and will dispatch your parcel soon.</p>
+              <p>Kind regards,<br>The VelvetBazzar Team</p>
             `,
           });
         }
@@ -249,18 +249,18 @@ serve(async (req: Request) => {
             await resend.emails.send({
               from: "VelvetBazzar <noreply@resend.dev>",
               to: [sellerEmail],
-              subject: "Nowe zamówienie - VelvetBazzar",
+              subject: "New order - VelvetBazzar",
               html: `
-                <h1>Masz nowe zamówienie!</h1>
-                <p>Kupujący: ${buyerProfile?.username || "Kupujący"}</p>
-                <p><strong>Produkty:</strong></p>
+                <h1>You have a new order!</h1>
+                <p>Buyer: ${buyerProfile?.username || "Buyer"}</p>
+                <p><strong>Items:</strong></p>
                 <ul>
                   ${sellerItems.map((i: any) => `<li>${i.quantity}x - £${i.price}</li>`).join("")}
                 </ul>
-                <p><strong>Wypłata (95%):</strong> £${sellerTransferAmount.toFixed(2)}</p>
-                <p>💰 Pieniądze zostały automatycznie przelane na Twoje konto Stripe.</p>
-                <p>Proszę przygotować i nadać przesyłkę.</p>
-                <p>Z pozdrowieniami,<br>Zespół VelvetBazzar</p>
+                <p><strong>Payout (95%):</strong> £${sellerTransferAmount.toFixed(2)}</p>
+                <p>Funds have been transferred to your Stripe account automatically.</p>
+                <p>Please prepare and dispatch the parcel.</p>
+                <p>Kind regards,<br>The VelvetBazzar Team</p>
               `,
             });
           }

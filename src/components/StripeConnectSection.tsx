@@ -49,7 +49,7 @@ export const StripeConnectSection = ({ userId, stripeOnboarded }: StripeConnectS
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        toast.error("Musisz być zalogowany");
+        toast.error("You must be signed in");
         return;
       }
 
@@ -60,7 +60,7 @@ export const StripeConnectSection = ({ userId, stripeOnboarded }: StripeConnectS
       if (error) throw error;
 
       if (data.already_onboarded) {
-        toast.success("Twoje konto Stripe jest już połączone!");
+        toast.success("Your Stripe account is already connected!");
         await checkStatus();
         return;
       }
@@ -69,7 +69,7 @@ export const StripeConnectSection = ({ userId, stripeOnboarded }: StripeConnectS
         window.location.href = data.url;
       }
     } catch (err: any) {
-      toast.error("Nie udało się połączyć z kontem Stripe");
+      toast.error("Could not connect Stripe account");
       console.error(err);
     } finally {
       setLoading(false);
@@ -81,7 +81,7 @@ export const StripeConnectSection = ({ userId, stripeOnboarded }: StripeConnectS
       <Card className="p-6">
         <div className="flex items-center gap-3">
           <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-          <span className="text-muted-foreground">Sprawdzanie statusu Stripe...</span>
+          <span className="text-muted-foreground">Checking Stripe status...</span>
         </div>
       </Card>
     );
@@ -93,25 +93,25 @@ export const StripeConnectSection = ({ userId, stripeOnboarded }: StripeConnectS
     <Card className="p-6 space-y-4">
       <div className="flex items-center gap-3">
         <CreditCard className="h-6 w-6 text-primary" />
-        <h3 className="text-xl font-bold">Konto Stripe Connect</h3>
+        <h3 className="text-xl font-bold">Stripe Connect account</h3>
       </div>
 
       <p className="text-muted-foreground">
-        Połącz swoje konto Stripe, aby automatycznie otrzymywać wypłaty ze sprzedaży na platformie.
-        Platforma pobiera 5% prowizji, reszta trafia bezpośrednio na Twoje konto.
+        Connect your Stripe account to receive payouts from sales on the platform automatically.
+        We charge a 5% platform fee; the rest goes directly to your account.
       </p>
 
       {isFullyOnboarded ? (
         <div className="flex items-center gap-3 p-4 rounded-lg bg-green-500/10 border border-green-500/20">
           <CheckCircle2 className="h-5 w-5 text-green-600" />
           <div>
-            <p className="font-semibold text-green-700 dark:text-green-400">Konto połączone</p>
+            <p className="font-semibold text-green-700 dark:text-green-400">Account connected</p>
             <p className="text-sm text-muted-foreground">
-              Płatności i wypłaty są aktywne. Pieniądze ze sprzedaży będą automatycznie przelewane na Twoje konto.
+              Payments and payouts are active. Sale proceeds will be transferred to your account automatically.
             </p>
           </div>
           <Badge variant="outline" className="ml-auto border-green-500 text-green-600">
-            Aktywne
+            Active
           </Badge>
         </div>
       ) : status?.connected ? (
@@ -120,10 +120,10 @@ export const StripeConnectSection = ({ userId, stripeOnboarded }: StripeConnectS
             <AlertCircle className="h-5 w-5 text-amber-600" />
             <div>
               <p className="font-semibold text-amber-700 dark:text-amber-400">
-                Onboarding niekompletny
+                Onboarding incomplete
               </p>
               <p className="text-sm text-muted-foreground">
-                Twoje konto wymaga dokończenia konfiguracji, aby móc przyjmować płatności.
+                Your account needs further setup before you can accept payments.
               </p>
             </div>
           </div>
@@ -131,12 +131,12 @@ export const StripeConnectSection = ({ userId, stripeOnboarded }: StripeConnectS
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Ładowanie...
+                Loading...
               </>
             ) : (
               <>
                 <ExternalLink className="mr-2 h-4 w-4" />
-                Dokończ konfigurację Stripe
+                Complete Stripe setup
               </>
             )}
           </Button>
@@ -146,12 +146,12 @@ export const StripeConnectSection = ({ userId, stripeOnboarded }: StripeConnectS
           {loading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Łączenie...
+              Connecting...
             </>
           ) : (
             <>
               <CreditCard className="mr-2 h-4 w-4" />
-              Połącz konto Stripe
+              Connect Stripe account
             </>
           )}
         </Button>

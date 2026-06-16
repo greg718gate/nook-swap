@@ -56,7 +56,7 @@ export const useMessages = (userId: string | undefined) => {
         result.unreadCount > previousUnreadRef.current &&
         previousUnreadRef.current > 0
       ) {
-        toast.info('Masz nową wiadomość!', {
+        toast.info('New message!', {
           action: {
             label: 'Zobacz',
             onClick: () => {
@@ -90,7 +90,7 @@ export const useMessages = (userId: string | undefined) => {
       return result.conversationId;
     } catch (error) {
       console.error('Error starting conversation:', error);
-      toast.error('Nie udało się rozpocząć rozmowy');
+      toast.error('Could not start conversation');
       return null;
     }
   }, [userId, fetchConversations]);
@@ -113,7 +113,7 @@ export const useMessages = (userId: string | undefined) => {
       return true;
     } catch (error) {
       console.error('Error sending message:', error);
-      toast.error('Nie udało się wysłać wiadomości');
+      toast.error('Could not send message');
       return false;
     }
   }, [userId, fetchConversations]);

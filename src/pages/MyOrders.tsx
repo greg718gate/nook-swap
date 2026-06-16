@@ -46,13 +46,13 @@ const statusColor: Record<string, string> = {
 };
 
 const statusLabel: Record<string, string> = {
-  paid: "Opłacone",
-  shipped: "Wysłane",
-  delivered: "Dostarczone",
-  completed: "Zakończone",
-  cancelled: "Anulowane",
-  refunded: "Zwrócone",
-  pending: "Oczekuje",
+  paid: "Paid",
+  shipped: "Shipped",
+  delivered: "Delivered",
+  completed: "Completed",
+  cancelled: "Cancelled",
+  refunded: "Refunded",
+  pending: "Pending",
 };
 
 const MyOrders = () => {
@@ -82,7 +82,7 @@ const MyOrders = () => {
       .eq("buyer_id", uid)
       .order("created_at", { ascending: false });
     if (error) {
-      toast.error("Nie udało się pobrać zamówień");
+      toast.error("Could not load orders");
     } else {
       setOrders((data as Order[]) || []);
     }
@@ -97,16 +97,16 @@ const MyOrders = () => {
       .eq("id", orderId);
     setActioning(null);
     if (error) {
-      toast.error("Nie udało się potwierdzić odbioru");
+      toast.error("Could not confirm delivery");
     } else {
-      toast.success("Dziękujemy za potwierdzenie odbioru!");
+      toast.success("Thank you for confirming delivery!");
       const { data: { session } } = await supabase.auth.getSession();
       if (session) await fetchOrders(session.user.id);
     }
   };
 
   const handleRequestRefund = async (orderId: string) => {
-    const reason = prompt("Powód zwrotu:");
+    const reason = prompt("Reason for refund:");
     if (!reason) return;
     setActioning(orderId);
     const { data: { session } } = await supabase.auth.getSession();
@@ -117,9 +117,9 @@ const MyOrders = () => {
     });
     setActioning(null);
     if (error || (data as any)?.error) {
-      toast.error((data as any)?.error || "Nie udało się wykonać zwrotu");
+      toast.error((data as any)?.error || "Could not process refund");
     } else {
-      toast.success("Zwrot wykonany pomyślnie");
+      toast.success("Refund processed successfully");
       await fetchOrders(session.user.id);
     }
   };
@@ -141,12 +141,12 @@ const MyOrders = () => {
       <Navbar />
       <main className="flex-1 bg-muted/20">
         <div className="container py-10">
-          <h1 className="text-3xl font-bold mb-6">Moje zakupy</h1>
+          <h1 className="text-3xl font-bold mb-6">My purchases</h1>
           {orders.length === 0 ? (
             <Card>
               <CardContent className="py-16 text-center text-muted-foreground">
                 <Package className="mx-auto h-12 w-12 mb-3 opacity-40" />
-                Brak zamówień. <Button variant="link" onClick={() => navigate("/products")}>Przeglądaj produkty</Button>
+                No orders yet. <Button variant="link" onClick={() => navigate("/products")}>Browse products</Button>
               </CardContent>
             </Card>
           ) : (
@@ -157,7 +157,7 @@ const MyOrders = () => {
                     <div>
                       <CardTitle className="text-base font-mono">#{o.id.slice(0, 8)}</CardTitle>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {new Date(o.created_at).toLocaleString("pl-PL")}
+                        {new Date(o.created_at).toLocaleString("en-GB")}
                       </p>
                     </div>
                     <Badge className={`${statusColor[o.status] || "bg-gray-400"} text-white`}>
@@ -166,16 +166,16 @@ const MyOrders = () => {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Pozycji:</span>
+                      <span className="text-muted-foreground">Items:</span>
                       <span>{o.order_items?.length ?? 0}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Kwota:</span>
+                      <span className="text-muted-foreground">Total:</span>
                       <span className="font-semibold">£{Number(o.total_amount).toFixed(2)}</span>
                     </div>
                     {o.shipping_method && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Wysyłka:</span>
+                        <span className="text-muted-foreground">Shipping:</span>
                         <span>{o.shipping_method}</span>
                       </div>
                     )}
@@ -208,7 +208,7 @@ const MyOrders = () => {
                     )}
                     {o.refund_amount && Number(o.refund_amount) > 0 && (
                       <div className="text-sm text-red-600">
-                        Zwrócono: £{Number(o.refund_amount).toFixed(2)}
+                        Refunded: £{Number(o.refund_amount).toFixed(2)}
                       </div>
                     )}
                     <div className="flex flex-wrap gap-2 pt-2">
@@ -219,7 +219,7 @@ const MyOrders = () => {
                           disabled={actioning === o.id}
                         >
                           <CheckCircle2 className="mr-2 h-4 w-4" />
-                          Potwierdź odbiór
+                          Confirm delivery
                         </Button>
                       )}
                       {(o.status === "paid" || o.status === "shipped") && (
@@ -230,7 +230,7 @@ const MyOrders = () => {
                           disabled={actioning === o.id}
                         >
                           <XCircle className="mr-2 h-4 w-4" />
-                          Zażądaj zwrotu
+                          Request refund
                         </Button>
                       )}
                       {(o.status === "delivered" || o.status === "completed") &&
@@ -242,7 +242,7 @@ const MyOrders = () => {
                             onClick={() => navigate(`/product/${it.product_id}#reviews`)}
                           >
                             <Star className="mr-2 h-4 w-4" />
-                            Wystaw opinię
+                            Leave a review
                           </Button>
                         ))}
                     </div>

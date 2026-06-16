@@ -337,7 +337,7 @@ async function sendEmailNotification(
     .eq("id", senderId)
     .single();
 
-  const senderName = senderProfile?.full_name || senderProfile?.username || "Użytkownik";
+  const senderName = senderProfile?.full_name || senderProfile?.username || "User";
 
   const { data: conversation } = await supabase
     .from("conversations")
@@ -369,15 +369,15 @@ async function sendEmailNotification(
     await resend.emails.send({
       from: "VelvetBazzar <noreply@resend.dev>",
       to: [recipientEmail],
-      subject: `Nowa wiadomość od ${senderName} - VelvetBazzar`,
+      subject: `New message from ${senderName} - VelvetBazzar`,
       html: `
-          <h2>Masz nową wiadomość!</h2>
-          <p><strong>${escapeHtml(senderName)}</strong> wysłał(a) Ci wiadomość${productTitle ? ` w sprawie produktu <em>"${escapeHtml(productTitle)}"</em>` : ""}:</p>
+          <h2>You have a new message!</h2>
+          <p><strong>${escapeHtml(senderName)}</strong> sent you a message${productTitle ? ` about <em>"${escapeHtml(productTitle)}"</em>` : ""}:</p>
           <blockquote style="border-left: 3px solid #8B5CF6; padding: 12px 16px; margin: 16px 0; background: #f9f9f9; border-radius: 4px;">
             ${escapeHtml(truncatedMessage)}
           </blockquote>
-          <p><a href="https://velvetbazzar.co.uk/profile?tab=messages&conversation=${conversationId}" style="background: #8B5CF6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; display: inline-block;">Odpowiedz na wiadomość</a></p>
-          <p style="color: #666; font-size: 12px; margin-top: 24px;">Z pozdrowieniami,<br>Zespół VelvetBazzar</p>
+          <p><a href="https://velvetbazzar.co.uk/profile?tab=messages&conversation=${conversationId}" style="background: #8B5CF6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; display: inline-block;">Reply to message</a></p>
+          <p style="color: #666; font-size: 12px; margin-top: 24px;">Kind regards,<br>The VelvetBazzar Team</p>
         `,
     });
   }

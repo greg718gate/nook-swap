@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { User, Package } from "lucide-react";
 import { Conversation } from "@/hooks/useMessages";
 import { formatDistanceToNow } from "date-fns";
-import { pl } from "date-fns/locale";
+import { enGB } from "date-fns/locale";
 
 interface ConversationListProps {
   conversations: Conversation[];
@@ -39,9 +39,9 @@ export const ConversationList = ({
   if (conversations.length === 0) {
     return (
       <Card className="p-8 text-center">
-        <p className="text-muted-foreground">Brak wiadomości</p>
+        <p className="text-muted-foreground">No messages</p>
         <p className="text-sm text-muted-foreground mt-2">
-          Rozpocznij rozmowę kontaktując się ze sprzedawcą
+          Start a conversation by contacting a seller
         </p>
       </Card>
     );
@@ -78,13 +78,13 @@ export const ConversationList = ({
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
                   <p className={`font-semibold truncate ${conv.unread_count > 0 ? 'text-foreground' : ''}`}>
-                    {otherUser?.username || 'Użytkownik'}
+                    {otherUser?.username || 'User'}
                   </p>
                   {conv.last_message && (
                     <span className="text-xs text-muted-foreground whitespace-nowrap">
                       {formatDistanceToNow(new Date(conv.last_message.created_at), { 
                         addSuffix: true, 
-                        locale: pl 
+                        locale: enGB 
                       })}
                     </span>
                   )}

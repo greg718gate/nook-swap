@@ -131,9 +131,9 @@ const Profile = () => {
 
     if (!error) {
       setProducts(products.filter((p) => p.id !== productId));
-      toast.success("Produkt został usunięty");
+      toast.success("Product deleted");
     } else {
-      toast.error("Nie udało się usunąć produktu");
+      toast.error("Could not delete product");
     }
   };
 
@@ -148,17 +148,17 @@ const Profile = () => {
       setProducts(products.map((p) => 
         p.id === productId ? { ...p, status: newStatus } : p
       ));
-      toast.success(newStatus === "active" ? "Produkt aktywowany" : "Produkt dezaktywowany");
+      toast.success(newStatus === "active" ? "Product activated" : "Product deactivated");
     } else {
-      toast.error("Nie udało się zmienić statusu");
+      toast.error("Could not update status");
     }
   };
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case "active": return "Aktywny";
-      case "inactive": return "Nieaktywny";
-      case "sold": return "Sprzedany";
+      case "active": return "Active";
+      case "inactive": return "Inactive";
+      case "sold": return "Sold";
       default: return status;
     }
   };
@@ -167,7 +167,7 @@ const Profile = () => {
     return (
       <div className="flex min-h-screen flex-col">
         <Navbar />
-        <div className="flex flex-1 items-center justify-center">Ładowanie...</div>
+        <div className="flex flex-1 items-center justify-center">Loading...</div>
         <Footer />
       </div>
     );
@@ -188,7 +188,7 @@ const Profile = () => {
                 </div>
               )}
               <div className="flex-1">
-                <h1 className="mb-2 text-3xl font-bold">{profile.username || "Użytkownik"}</h1>
+                <h1 className="mb-2 text-3xl font-bold">{profile.username || "User"}</h1>
                 <div className="mb-4 flex items-center gap-4 text-muted-foreground">
                   <div className="flex items-center gap-1">
                     <Star className="h-4 w-4 fill-accent text-accent" />
@@ -210,16 +210,16 @@ const Profile = () => {
 
           <Tabs value={activeTab} onValueChange={handleTabChange}>
             <TabsList className="mb-6">
-              <TabsTrigger value="listings">Moje Ogłoszenia</TabsTrigger>
-              <TabsTrigger value="orders">Moje Zamówienia</TabsTrigger>
+              <TabsTrigger value="listings">My Listings</TabsTrigger>
+              <TabsTrigger value="orders">My Orders</TabsTrigger>
               <TabsTrigger value="coins" className="gap-1">
                 <Coins className="h-4 w-4" />
                 Velvet Coins
               </TabsTrigger>
-              <TabsTrigger value="edit">Edytuj Profil</TabsTrigger>
+              <TabsTrigger value="edit">Edit Profile</TabsTrigger>
               <TabsTrigger value="messages" className="relative">
                 <MessageCircle className="h-4 w-4 mr-2" />
-                Wiadomości
+                Messages
                 {unreadCount > 0 && (
                   <Badge className="ml-2 h-5 w-5 p-0 flex items-center justify-center bg-accent-orange text-white">
                     {unreadCount > 9 ? '9+' : unreadCount}
@@ -230,16 +230,16 @@ const Profile = () => {
 
             <TabsContent value="listings" className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold">Moje Ogłoszenia</h2>
-                <Button onClick={() => navigate("/sell")}>Dodaj Nowe</Button>
+                <h2 className="text-2xl font-bold">My Listings</h2>
+                <Button onClick={() => navigate("/sell")}>Add New</Button>
               </div>
 
               {products.length === 0 ? (
                 <Card className="p-12 text-center">
                   <p className="mb-4 text-muted-foreground">
-                    Nie masz jeszcze żadnych ogłoszeń
+                    You do not have any listings yet
                   </p>
-                  <Button onClick={() => navigate("/sell")}>Wystaw Pierwszy Przedmiot</Button>
+                  <Button onClick={() => navigate("/sell")}>List Your First Item</Button>
                 </Card>
               ) : (
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -254,7 +254,7 @@ const Profile = () => {
                           />
                         ) : (
                           <div className="flex h-full w-full items-center justify-center text-muted-foreground">
-                            Brak zdjęcia
+                            No image
                           </div>
                         )}
                         {product.status !== "active" && (
@@ -299,7 +299,7 @@ const Profile = () => {
                               size="sm"
                               onClick={() => toggleProductStatus(product.id, product.status)}
                             >
-                              {product.status === "active" ? "Dezaktywuj" : "Aktywuj"}
+                              {product.status === "active" ? "Deactivate" : "Activate"}
                             </Button>
                           )}
                           <AlertDialog>
@@ -310,15 +310,15 @@ const Profile = () => {
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Usuń produkt?</AlertDialogTitle>
+                                <AlertDialogTitle>Delete product?</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Ta akcja jest nieodwracalna. Produkt zostanie trwale usunięty.
+                                  This action cannot be undone. The product will be permanently removed.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
-                                <AlertDialogCancel>Anuluj</AlertDialogCancel>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
                                 <AlertDialogAction onClick={() => deleteProduct(product.id)}>
-                                  Usuń
+                                  Delete
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
@@ -332,10 +332,10 @@ const Profile = () => {
             </TabsContent>
 
             <TabsContent value="orders">
-              <h2 className="mb-6 text-2xl font-bold">Moje Zamówienia</h2>
+              <h2 className="mb-6 text-2xl font-bold">My Orders</h2>
               {orders.length === 0 ? (
                 <Card className="p-12 text-center">
-                  <p className="text-muted-foreground">Brak zamówień</p>
+                  <p className="text-muted-foreground">No orders yet</p>
                 </Card>
               ) : (
                 <div className="space-y-4">
@@ -343,9 +343,9 @@ const Profile = () => {
                     <Card key={order.id} className="p-6">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-semibold">Zamówienie #{order.id.slice(0, 8)}</p>
+                          <p className="font-semibold">Order #{order.id.slice(0, 8)}</p>
                           <p className="text-sm text-muted-foreground">
-                            {new Date(order.created_at).toLocaleDateString("pl-PL")}
+                            {new Date(order.created_at).toLocaleDateString("en-GB")}
                           </p>
                         </div>
                         <div className="text-right">
@@ -377,7 +377,7 @@ const Profile = () => {
             </TabsContent>
 
             <TabsContent value="messages">
-              <h2 className="mb-6 text-2xl font-bold">Wiadomości</h2>
+              <h2 className="mb-6 text-2xl font-bold">Messages</h2>
               <MessagesSection userId={user.id} initialConversationId={initialConversationId} />
             </TabsContent>
           </Tabs>

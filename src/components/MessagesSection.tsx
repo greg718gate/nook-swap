@@ -58,7 +58,7 @@ export const MessagesSection = ({ userId, initialConversationId }: MessagesSecti
             onClick={() => setSelectedConversationId(null)}
             className="mb-4 text-sm text-primary hover:underline"
           >
-            ← Powrót do listy
+            ← Back to list
           </button>
           <div className="h-[calc(100vh-80px)]">
             <ChatDialog

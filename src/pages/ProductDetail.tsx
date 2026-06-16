@@ -93,13 +93,13 @@ const ProductDetail = () => {
 
   const handleContactSeller = async () => {
     if (!user) {
-      toast.error("Zaloguj się, aby skontaktować się ze sprzedawcą");
+      toast.error("Sign in to contact the seller");
       navigate("/auth");
       return;
     }
 
     if (user.id === product.seller_id) {
-      toast.error("Nie możesz napisać do siebie");
+      toast.error("You cannot message yourself");
       return;
     }
 
@@ -108,7 +108,7 @@ const ProductDetail = () => {
       const conversationId = await startConversation(product.seller_id, id);
       if (conversationId) {
         navigate(`/profile?tab=messages&conversation=${conversationId}`);
-        toast.success("Rozmowa rozpoczęta!");
+        toast.success("Conversation started!");
       }
     } finally {
       setContactingLoading(false);
@@ -142,7 +142,7 @@ const ProductDetail = () => {
   const seoTitle = `${product.title} - £${Number(product.price).toFixed(2)} | VelvetBazzar`;
   const seoDesc = (product.description || product.title).slice(0, 160);
   const productImage = product.images?.[0];
-  const sellerName = product.public_profiles?.username || "Sprzedawca";
+  const sellerName = product.public_profiles?.username || "Seller";
   const sellerRating = Number(product.public_profiles?.rating) || 0;
   const sellerReviews = Number(product.public_profiles?.total_reviews) || 0;
 
@@ -294,7 +294,7 @@ const ProductDetail = () => {
                   disabled={contactingLoading || product.seller_id === user?.id}
                 >
                   <MessageCircle className="h-5 w-5" />
-                  {contactingLoading ? "Łączenie..." : "Napisz do sprzedawcy"}
+                  {contactingLoading ? "Connecting..." : "Message seller"}
                 </Button>
               </div>
 

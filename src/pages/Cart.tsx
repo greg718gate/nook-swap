@@ -71,9 +71,9 @@ const Cart = () => {
     const { error } = await supabase.from("cart_items").delete().eq("id", itemId);
 
     if (error) {
-      toast.error("Nie udało się usunąć produktu");
+      toast.error("Could not remove item");
     } else {
-      toast.success("Produkt usunięty z koszyka");
+      toast.success("Item removed from cart");
       fetchCart();
     }
   };
@@ -117,7 +117,7 @@ const Cart = () => {
     // Coupons are per-seller; require single-seller cart
     const sellers = new Set(cartItems.map((i) => i.products.seller_id));
     if (sellers.size > 1) {
-      toast.error("Kupon można zastosować tylko gdy w koszyku są produkty od jednego sprzedawcy");
+      toast.error("Coupons apply only when all items are from one seller");
       return;
     }
     setCouponLoading(true);
@@ -129,16 +129,16 @@ const Cart = () => {
     });
     setCouponLoading(false);
     if (error || !data || data.length === 0) {
-      toast.error("Błąd walidacji kuponu");
+      toast.error("Coupon validation error");
       return;
     }
     const r = data[0] as any;
     if (!r.coupon_id) {
-      toast.error(r.message || "Nieprawidłowy kod");
+      toast.error(r.message || "Invalid code");
       return;
     }
     setAppliedCoupon({ code: couponCode.trim().toUpperCase(), discount: Number(r.discount) });
-    toast.success(`Zastosowano rabat -£${Number(r.discount).toFixed(2)}`);
+    toast.success(`Discount applied — £${Number(r.discount).toFixed(2)} off`);
   };
 
   const handleCheckout = async () => {
@@ -148,14 +148,14 @@ const Cart = () => {
     }
 
     if (hasPhysicalProducts && !shippingAddress.trim()) {
-      toast.error("Podaj adres dostawy dla produktów fizycznych");
+      toast.error("Enter a delivery address for physical items");
       return;
     }
 
     // Check for sold items
     const soldItems = cartItems.filter((item) => item.products.status === "sold");
     if (soldItems.length > 0) {
-      toast.error("Niektóre produkty są już niedostępne. Usuń je z koszyka.");
+      toast.error("Some items are no longer available. Remove them from your cart.");
       return;
     }
 
@@ -164,7 +164,7 @@ const Cart = () => {
     try {
       const { data: session } = await supabase.auth.getSession();
       if (!session.session) {
-        throw new Error("Musisz być zalogowany");
+        throw new Error("You must be signed in");
       }
 
       const items = cartItems.map((item) => ({
@@ -191,7 +191,7 @@ const Cart = () => {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Błąd podczas tworzenia płatności");
+        throw new Error(error.error || "Could not create payment");
       }
 
       const { url } = await response.json();
@@ -199,11 +199,11 @@ const Cart = () => {
       if (url) {
         window.location.href = url;
       } else {
-        throw new Error("Nie otrzymano linku do płatności");
+        throw new Error("No payment link received");
       }
     } catch (error: any) {
       console.error("Checkout error:", error);
-      toast.error(error.message || "Błąd podczas przechodzenia do płatności");
+      toast.error(error.message || "Could not proceed to payment");
     } finally {
       setCheckoutLoading(false);
     }
@@ -226,13 +226,13 @@ const Cart = () => {
       <Navbar />
       <main className="flex-1">
         <div className="container py-8">
-          <h1 className="mb-8 text-3xl font-bold">Koszyk</h1>
+          <h1 className="mb-8 text-3xl font-bold">Basket</h1>
 
           {cartItems.length === 0 ? (
             <Card className="p-12 text-center">
-              <p className="mb-4 text-muted-foreground">Twój koszyk jest pusty</p>
+              <p className="mb-4 text-muted-foreground">Your basket is empty</p>
               <Button onClick={() => navigate("/products")}>
-                Przeglądaj produkty
+                Browse products
               </Button>
             </Card>
           ) : (
@@ -250,7 +250,7 @@ const Cart = () => {
                           />
                         ) : (
                           <div className="flex h-full w-full items-center justify-center text-xs">
-                            Brak zdjęcia
+                            No image
                           </div>
                         )}
                       </div>
@@ -261,17 +261,17 @@ const Cart = () => {
                             {item.products.product_type === "digital" ? (
                               <span className="flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
                                 <Download className="h-3 w-3" />
-                                Cyfrowy
+                                Digital
                               </span>
                             ) : (
                               <span className="flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
                                 <Package className="h-3 w-3" />
-                                Fizyczny
+                                Physical
                               </span>
                             )}
                           </div>
                           {item.products.status === "sold" && (
-                            <p className="text-sm text-destructive">Niedostępny</p>
+                            <p className="text-sm text-destructive">Unavailable</p>
                           )}
                         </div>
                         <div className="flex items-center justify-between">
@@ -294,12 +294,12 @@ const Cart = () => {
 
               <div className="lg:col-span-1">
                 <Card className="sticky top-24 p-6">
-                  <h2 className="mb-4 text-xl font-semibold">Podsumowanie</h2>
+                  <h2 className="mb-4 text-xl font-semibold">Summary</h2>
                   
                   {/* Shipping Method - only if physical products */}
                   {hasPhysicalProducts && (
                     <div className="mb-6 space-y-3">
-                      <h3 className="font-medium">Metoda wysyłki</h3>
+                      <h3 className="font-medium">Shipping method</h3>
                       <div className="space-y-2">
                         <label className="flex cursor-pointer items-center justify-between rounded-lg border p-3 hover:bg-accent">
                           <div className="flex items-center gap-2">
@@ -365,12 +365,12 @@ const Cart = () => {
                   {/* Shipping Address - only if physical products */}
                   {hasPhysicalProducts && (
                     <div className="mb-6 space-y-2">
-                      <Label htmlFor="shipping_address">Adres dostawy *</Label>
+                      <Label htmlFor="shipping_address">Delivery address *</Label>
                       <Textarea
                         id="shipping_address"
                         value={shippingAddress}
                         onChange={(e) => setShippingAddress(e.target.value)}
-                        placeholder="Imię i nazwisko&#10;Ulica i numer&#10;Kod pocztowy, Miasto&#10;Kraj"
+                        placeholder="Full name&#10;Street and number&#10;Postcode, City&#10;Country"
                         rows={4}
                         required={hasPhysicalProducts}
                       />
@@ -380,29 +380,29 @@ const Cart = () => {
                   {hasDigitalProducts && !hasPhysicalProducts && (
                     <div className="mb-6 flex items-center gap-2 rounded-lg bg-primary/10 p-3 text-sm">
                       <Download className="h-5 w-5 text-primary" />
-                      <span>Produkty cyfrowe - bez wysyłki</span>
+                      <span>Digital items — no shipping</span>
                     </div>
                   )}
 
                   <div className="mb-4 space-y-2">
-                    <Label htmlFor="coupon">Kod rabatowy</Label>
+                    <Label htmlFor="coupon">Discount code</Label>
                     {appliedCoupon ? (
                       <div className="flex items-center justify-between rounded-lg border border-primary/30 bg-primary/10 p-3">
                         <span className="font-mono font-bold text-primary">{appliedCoupon.code}</span>
                         <Button variant="ghost" size="sm" onClick={() => { setAppliedCoupon(null); setCouponCode(""); }}>
-                          Usuń
+                          Remove
                         </Button>
                       </div>
                     ) : (
                       <div className="flex gap-2">
                         <Input
                           id="coupon"
-                          placeholder="np. LATO20"
+                          placeholder="e.g. SUMMER20"
                           value={couponCode}
                           onChange={(e) => setCouponCode(e.target.value)}
                         />
                         <Button variant="outline" onClick={applyCoupon} disabled={couponLoading}>
-                          Zastosuj
+                          Apply
                         </Button>
                       </div>
                     )}
@@ -410,30 +410,30 @@ const Cart = () => {
 
                   <div className="space-y-3">
                     <div className="flex justify-between text-muted-foreground">
-                      <span>Produkty</span>
+                      <span>Items</span>
                       <span>£{subtotal.toFixed(2)}</span>
                     </div>
                     {hasPhysicalProducts && (
                       <div className="flex justify-between text-muted-foreground">
                         <span>
-                          Wysyłka ({shippingMethod === "evri" ? "Evri" : shippingMethod === "royal_mail" ? "Royal Mail" : "InPost"})
+                          Shipping ({shippingMethod === "evri" ? "Evri" : shippingMethod === "royal_mail" ? "Royal Mail" : "InPost"})
                         </span>
                         <span>£{shippingCost.toFixed(2)}</span>
                       </div>
                     )}
                     {discount > 0 && (
                       <div className="flex justify-between text-primary font-medium">
-                        <span>Rabat ({appliedCoupon?.code})</span>
+                        <span>Discount ({appliedCoupon?.code})</span>
                         <span>-£{discount.toFixed(2)}</span>
                       </div>
                     )}
                     <div className="border-t pt-3">
                       <div className="flex justify-between text-xl font-bold">
-                        <span>Razem</span>
+                        <span>Total</span>
                         <span className="text-primary">£{total.toFixed(2)}</span>
                       </div>
                       <p className="mt-1 text-xs text-muted-foreground">
-                        Prowizja platformy (5%): £{platformFee.toFixed(2)}
+                        Platform fee (5%): £{platformFee.toFixed(2)}
                       </p>
                     </div>
                   </div>
@@ -447,18 +447,18 @@ const Cart = () => {
                     {checkoutLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Przetwarzanie...
+                        Processing...
                       </>
                     ) : (
                       <>
                         <Shield className="mr-2 h-4 w-4" />
-                        Przejdź do płatności
+                        Proceed to payment
                       </>
                     )}
                   </Button>
 
                   <p className="mt-4 text-center text-xs text-muted-foreground">
-                    Płatność bezpieczna przez Stripe
+                    Secure payment via Stripe
                   </p>
                 </Card>
               </div>

@@ -39,7 +39,7 @@ export const WishlistButton = ({ productId, className, size = "icon" }: Props) =
         e.stopPropagation();
         toggle(productId);
       }}
-      aria-label={active ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
+      aria-label={active ? "Remove from wishlist" : "Add to wishlist"}
     >
       <Heart
         className={cn(

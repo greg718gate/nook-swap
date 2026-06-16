@@ -88,7 +88,7 @@ const EditProduct = () => {
       if (error) throw error;
 
       if (data.seller_id !== userId) {
-        toast.error("Nie masz uprawnień do edycji tego produktu");
+        toast.error("You do not have permission to edit this product");
         navigate("/profile");
         return;
       }
@@ -106,7 +106,7 @@ const EditProduct = () => {
       });
       setExistingImages(data.images || []);
     } catch (error: any) {
-      toast.error("Nie udało się załadować produktu");
+      toast.error("Could not load product");
       navigate("/profile");
     } finally {
       setInitialLoading(false);
@@ -118,17 +118,17 @@ const EditProduct = () => {
     const totalImages = existingImages.length - imagesToDelete.length + newImages.length + files.length;
     
     if (totalImages > MAX_IMAGES) {
-      toast.error(`Możesz mieć maksymalnie ${MAX_IMAGES} zdjęć`);
+      toast.error(`You can have at most ${MAX_IMAGES} photos`);
       return;
     }
 
     const validFiles = files.filter(file => {
       if (!file.type.startsWith('image/')) {
-        toast.error(`${file.name} nie jest obrazem`);
+        toast.error(`${file.name} is not an image`);
         return false;
       }
       if (file.size > 5 * 1024 * 1024) {
-        toast.error(`${file.name} jest zbyt duży (max 5MB)`);
+        toast.error(`${file.name} is too large (max 5MB)`);
         return false;
       }
       return true;
@@ -195,7 +195,7 @@ const EditProduct = () => {
     const totalImages = remainingExisting.length + newImages.length;
 
     if (totalImages < MIN_IMAGES) {
-      toast.error(`Musisz mieć przynajmniej ${MIN_IMAGES} zdjęcie produktu`);
+      toast.error(`You must have at least ${MIN_IMAGES} product photo`);
       return;
     }
 
@@ -225,7 +225,7 @@ const EditProduct = () => {
 
       if (error) throw error;
 
-      toast.success("Produkt został zaktualizowany!");
+      toast.success("Product updated!");
       navigate("/profile");
     } catch (error: any) {
       toast.error(error.message);
@@ -247,7 +247,7 @@ const EditProduct = () => {
 
       if (error) throw error;
 
-      toast.success("Produkt został usunięty");
+      toast.success("Product deleted");
       navigate("/profile");
     } catch (error: any) {
       toast.error(error.message);
@@ -278,24 +278,24 @@ const EditProduct = () => {
         <div className="container py-8">
           <div className="mx-auto max-w-2xl">
             <div className="flex items-center justify-between mb-8">
-              <h1 className="text-3xl font-bold">Edytuj Produkt</h1>
+              <h1 className="text-3xl font-bold">Edit Product</h1>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" size="sm">
                     <Trash2 className="h-4 w-4 mr-2" />
-                    Usuń
+                    Delete
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Czy na pewno chcesz usunąć?</AlertDialogTitle>
+                    <AlertDialogTitle>Delete this product?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Ta akcja jest nieodwracalna. Produkt zostanie trwale usunięty.
+                      This action cannot be undone. The product will be permanently removed.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Anuluj</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDelete}>Usuń</AlertDialogAction>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
@@ -316,9 +316,9 @@ const EditProduct = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="active">Aktywny</SelectItem>
-                      <SelectItem value="inactive">Nieaktywny</SelectItem>
-                      <SelectItem value="sold">Sprzedany</SelectItem>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="inactive">Inactive</SelectItem>
+                      <SelectItem value="sold">Sold</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -326,7 +326,7 @@ const EditProduct = () => {
                 {/* Images */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <Label>Zdjęcia Produktu *</Label>
+                    <Label>Product Photos *</Label>
                     <span className="text-sm text-muted-foreground">
                       {totalCurrentImages}/{MAX_IMAGES} (min. {MIN_IMAGES})
                     </span>
@@ -349,7 +349,7 @@ const EditProduct = () => {
                         </button>
                         {index === 0 && newImages.length === 0 && (
                           <span className="absolute bottom-2 left-2 text-xs bg-primary text-primary-foreground px-2 py-1 rounded">
-                            Główne
+                            Main
                           </span>
                         )}
                       </div>
@@ -370,7 +370,7 @@ const EditProduct = () => {
                           <X className="h-4 w-4" />
                         </button>
                         <span className="absolute bottom-2 left-2 text-xs bg-accent text-accent-foreground px-2 py-1 rounded">
-                          Nowe
+                          New
                         </span>
                       </div>
                     ))}
@@ -378,7 +378,7 @@ const EditProduct = () => {
                     {totalCurrentImages < MAX_IMAGES && (
                       <label className="aspect-square flex flex-col items-center justify-center border-2 border-dashed border-muted-foreground/30 rounded-lg cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-all">
                         <ImagePlus className="h-8 w-8 text-muted-foreground mb-2" />
-                        <span className="text-sm text-muted-foreground">Dodaj zdjęcie</span>
+                        <span className="text-sm text-muted-foreground">Add photo</span>
                         <input
                           type="file"
                           accept="image/*"
@@ -393,7 +393,7 @@ const EditProduct = () => {
 
                 {/* Title */}
                 <div className="space-y-2">
-                  <Label htmlFor="title">Tytuł *</Label>
+                  <Label htmlFor="title">Title *</Label>
                   <Input
                     id="title"
                     value={formData.title}
@@ -407,7 +407,7 @@ const EditProduct = () => {
 
                 {/* Description */}
                 <div className="space-y-2">
-                  <Label htmlFor="description">Opis *</Label>
+                  <Label htmlFor="description">Description *</Label>
                   <Textarea
                     id="description"
                     value={formData.description}
@@ -426,7 +426,7 @@ const EditProduct = () => {
                 {/* Price and Condition */}
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="price">Cena (£) *</Label>
+                    <Label htmlFor="price">Price (£) *</Label>
                     <Input
                       id="price"
                       type="number"
@@ -441,7 +441,7 @@ const EditProduct = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Stan *</Label>
+                    <Label>Condition *</Label>
                     <Select
                       value={formData.condition}
                       onValueChange={(value) =>
@@ -452,10 +452,10 @@ const EditProduct = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="new">Nowy</SelectItem>
-                        <SelectItem value="like-new">Jak nowy</SelectItem>
-                        <SelectItem value="good">Dobry</SelectItem>
-                        <SelectItem value="fair">Używany</SelectItem>
+                        <SelectItem value="new">New</SelectItem>
+                        <SelectItem value="like-new">Like new</SelectItem>
+                        <SelectItem value="good">Good</SelectItem>
+                        <SelectItem value="fair">Fair</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -463,7 +463,7 @@ const EditProduct = () => {
 
                 {/* Category */}
                 <div className="space-y-2">
-                  <Label>Kategoria</Label>
+                  <Label>Category</Label>
                   <Select
                     value={formData.category_id}
                     onValueChange={(value) =>
@@ -471,7 +471,7 @@ const EditProduct = () => {
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Wybierz kategorię" />
+                      <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
                       {categories.map((category) => (
@@ -539,10 +539,10 @@ const EditProduct = () => {
                     {loading || uploadingImages ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        {uploadingImages ? "Przesyłanie..." : "Zapisywanie..."}
+                        {uploadingImages ? "Uploading..." : "Saving..."}
                       </>
                     ) : (
-                      "Zapisz Zmiany"
+                      "Save Changes"
                     )}
                   </Button>
                   <Button
@@ -550,7 +550,7 @@ const EditProduct = () => {
                     variant="outline"
                     onClick={() => navigate("/profile")}
                   >
-                    Anuluj
+                    Cancel
                   </Button>
                 </div>
               </form>

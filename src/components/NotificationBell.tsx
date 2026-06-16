@@ -9,7 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNotifications, type Notification } from "@/hooks/useNotifications";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
-import { pl } from "date-fns/locale";
+import { enGB } from "date-fns/locale";
 import { useState } from "react";
 
 const iconFor = (type: string) => {
@@ -58,17 +58,17 @@ export const NotificationBell = ({ userId }: Props) => {
       </PopoverTrigger>
       <PopoverContent align="end" className="w-[360px] max-w-[92vw] p-0">
         <div className="flex items-center justify-between p-3 border-b">
-          <h3 className="font-semibold text-sm">Powiadomienia</h3>
+          <h3 className="font-semibold text-sm">Notifications</h3>
           {unreadCount > 0 && (
             <Button variant="ghost" size="sm" onClick={markAllAsRead} className="h-7 text-xs gap-1">
-              <Check className="h-3.5 w-3.5" /> Oznacz wszystkie
+              <Check className="h-3.5 w-3.5" /> Mark all read
             </Button>
           )}
         </div>
         <ScrollArea className="max-h-[60vh]">
           {notifications.length === 0 ? (
             <div className="p-8 text-center text-sm text-muted-foreground">
-              Brak powiadomień
+              No notifications
             </div>
           ) : (
             <ul className="divide-y">
@@ -89,7 +89,7 @@ export const NotificationBell = ({ userId }: Props) => {
                         <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{n.body}</p>
                       )}
                       <p className="text-[11px] text-muted-foreground mt-1">
-                        {formatDistanceToNow(new Date(n.created_at), { addSuffix: true, locale: pl })}
+                        {formatDistanceToNow(new Date(n.created_at), { addSuffix: true, locale: enGB })}
                       </p>
                     </div>
                     {!n.is_read && <span className="h-2 w-2 rounded-full bg-accent-orange mt-2 shrink-0" />}

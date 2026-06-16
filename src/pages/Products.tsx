@@ -160,8 +160,8 @@ const Products = () => {
   return (
     <div className="flex min-h-screen flex-col">
       <SeoHead
-        title="Przeglądaj produkty | VelvetBazzar UK"
-        description="Tysiące unikalnych produktów: moda, vintage, handmade i więcej. Bezpieczne zakupy w UK."
+        title="Browse products | VelvetBazzar UK"
+        description="Discover pre-loved fashion, vintage finds and more. Safe UK marketplace shopping in GBP."
       />
       <Navbar />
       <main className="flex-1">
@@ -200,7 +200,7 @@ const Products = () => {
           {/* Filters + Sort */}
           <div className="mb-6 flex flex-wrap items-end gap-3">
             <div className="flex-1 min-w-[200px]">
-              <p className="text-xs text-muted-foreground mb-1">Cena (£)</p>
+              <p className="text-xs text-muted-foreground mb-1">Price (£)</p>
               <div className="flex gap-2">
                 <Input
                   type="number"
@@ -217,36 +217,36 @@ const Products = () => {
               </div>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground mb-1">Stan</p>
+              <p className="text-xs text-muted-foreground mb-1">Condition</p>
               <Select value={conditionFilter} onValueChange={setConditionFilter}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Wszystkie</SelectItem>
-                  <SelectItem value="new">Nowy</SelectItem>
-                  <SelectItem value="like_new">Jak nowy</SelectItem>
-                  <SelectItem value="good">Dobry</SelectItem>
-                  <SelectItem value="fair">Akceptowalny</SelectItem>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="new">New</SelectItem>
+                  <SelectItem value="like_new">Like new</SelectItem>
+                  <SelectItem value="good">Good</SelectItem>
+                  <SelectItem value="fair">Fair</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground mb-1">Sortuj</p>
+              <p className="text-xs text-muted-foreground mb-1">Sort</p>
               <Select value={sortBy} onValueChange={handleSortChange}>
                 <SelectTrigger className="w-[200px]">
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="newest">Najnowsze</SelectItem>
-                  <SelectItem value="price_asc">Cena: rosnąco</SelectItem>
-                  <SelectItem value="price_desc">Cena: malejąco</SelectItem>
+                  <SelectItem value="newest">Newest</SelectItem>
+                  <SelectItem value="price_asc">Price: low to high</SelectItem>
+                  <SelectItem value="price_desc">Price: high to low</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <p className="text-sm text-muted-foreground mb-4">
-            {!loading && `${products.length} produkt${products.length !== 1 ? "ów" : ""}`}
+            {!loading && `${products.length} product${products.length !== 1 ? "s" : ""}`}
           </p>
 
           {loading ? (
@@ -294,10 +294,10 @@ const Products = () => {
                     {loadingMore ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Ładowanie...
+                        Loading...
                       </>
                     ) : (
-                      "Załaduj więcej"
+                      "Load more"
                     )}
                   </Button>
                 </div>

@@ -64,13 +64,12 @@ const CheckoutSuccess = () => {
   };
 
   const handleDownload = async (purchase: Purchase) => {
-    // Server-side check + atomic increment via RPC
     const { data: rpcData, error: rpcError } = await supabase
       .rpc("request_digital_download", { _purchase_id: purchase.id });
 
     if (rpcError || !rpcData || rpcData.length === 0) {
       console.error("Download error:", rpcError);
-      toast.error("Nie udało się pobrać pliku. Sprawdź limit pobrań lub skontaktuj się ze sprzedawcą.");
+      toast.error("Could not download file. Check your download limit or contact the seller.");
       return;
     }
 
@@ -82,7 +81,7 @@ const CheckoutSuccess = () => {
 
     if (error) {
       console.error("Download error:", error);
-      toast.error("Nie udało się pobrać pliku.");
+      toast.error("Could not download file.");
       return;
     }
 
@@ -95,7 +94,6 @@ const CheckoutSuccess = () => {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    // Refresh purchases to update download count
     fetchPurchases();
   };
 
@@ -116,18 +114,18 @@ const CheckoutSuccess = () => {
             </div>
 
             <h1 className="mb-4 text-3xl font-bold">
-              Dziękujemy za zamówienie!
+              Thank you for your order!
             </h1>
             <p className="mb-8 text-muted-foreground">
-              Twoja płatność została potwierdzona. Otrzymasz e-mail z
-              potwierdzeniem zamówienia.
+              Your payment has been confirmed. You will receive an email with
+              your order confirmation.
             </p>
 
             {digitalPurchases.length > 0 && (
               <Card className="mb-8 p-6 text-left">
                 <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold">
                   <Download className="h-5 w-5" />
-                  Produkty cyfrowe do pobrania
+                  Digital downloads
                 </h2>
                 <div className="space-y-4">
                   {digitalPurchases.map((purchase) => (
@@ -138,7 +136,7 @@ const CheckoutSuccess = () => {
                       <div>
                         <p className="font-medium">{purchase.products?.title}</p>
                         <p className="text-sm text-muted-foreground">
-                          Pobrano: {purchase.download_count}/{purchase.max_downloads}
+                          Downloaded: {purchase.download_count}/{purchase.max_downloads}
                         </p>
                       </div>
                       <Button
@@ -147,7 +145,7 @@ const CheckoutSuccess = () => {
                         size="sm"
                       >
                         <Download className="mr-2 h-4 w-4" />
-                        Pobierz
+                        Download
                       </Button>
                     </div>
                   ))}
@@ -158,25 +156,25 @@ const CheckoutSuccess = () => {
             <Card className="mb-8 p-6 text-left">
               <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold">
                 <Package className="h-5 w-5" />
-                Co dalej?
+                What happens next?
               </h2>
               <ul className="space-y-3 text-muted-foreground">
                 <li className="flex items-start gap-2">
                   <ArrowRight className="mt-1 h-4 w-4 flex-shrink-0 text-primary" />
                   <span>
-                    Sprzedawca został powiadomiony o Twoim zamówieniu
+                    The seller has been notified about your order
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <ArrowRight className="mt-1 h-4 w-4 flex-shrink-0 text-primary" />
                   <span>
-                    Otrzymasz e-mail z informacją o wysyłce
+                    You will receive an email when your order is dispatched
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <ArrowRight className="mt-1 h-4 w-4 flex-shrink-0 text-primary" />
                   <span>
-                    Możesz śledzić status zamówienia w swoim profilu
+                    You can track order status in your profile
                   </span>
                 </li>
               </ul>
@@ -184,10 +182,10 @@ const CheckoutSuccess = () => {
 
             <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
               <Button asChild size="lg">
-                <Link to="/profile?tab=orders">Moje zamówienia</Link>
+                <Link to="/profile?tab=orders">My orders</Link>
               </Button>
               <Button asChild variant="outline" size="lg">
-                <Link to="/products">Kontynuuj zakupy</Link>
+                <Link to="/products">Continue shopping</Link>
               </Button>
             </div>
           </div>

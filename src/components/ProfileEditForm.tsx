@@ -57,11 +57,11 @@ export const ProfileEditForm = ({ profile, onSaved }: ProfileEditFormProps) => {
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      toast.error("Proszę wybrać plik graficzny");
+      toast.error("Please choose an image file");
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("Maksymalny rozmiar pliku to 5MB");
+      toast.error("Maximum file size is 5MB");
       return;
     }
 
@@ -81,9 +81,9 @@ export const ProfileEditForm = ({ profile, onSaved }: ProfileEditFormProps) => {
         .getPublicUrl(filePath);
 
       setAvatarUrl(`${urlData.publicUrl}?t=${Date.now()}`);
-      toast.success("Zdjęcie zostało przesłane");
+      toast.success("Photo uploaded");
     } catch (err: unknown) {
-      toast.error("Nie udało się przesłać zdjęcia");
+      toast.error("Could not upload photo");
       console.error(err);
     } finally {
       setUploading(false);
@@ -92,11 +92,11 @@ export const ProfileEditForm = ({ profile, onSaved }: ProfileEditFormProps) => {
 
   const handleSave = async () => {
     if (bio.length > 500) {
-      toast.error("Bio może mieć maksymalnie 500 znaków");
+      toast.error("Bio can be at most 500 characters");
       return;
     }
     if (location.length > 100) {
-      toast.error("Lokalizacja może mieć maksymalnie 100 znaków");
+      toast.error("Location can be at most 100 characters");
       return;
     }
 
@@ -126,17 +126,17 @@ export const ProfileEditForm = ({ profile, onSaved }: ProfileEditFormProps) => {
     setSaving(false);
 
     if (error) {
-      toast.error("Nie udało się zapisać zmian");
+      toast.error("Could not save changes");
       console.error(error);
     } else {
-      toast.success("Profil został zaktualizowany");
+      toast.success("Profile updated");
       onSaved();
     }
   };
 
   return (
     <Card className="p-6 space-y-6">
-      <h2 className="text-2xl font-bold">Edytuj Profil</h2>
+      <h2 className="text-2xl font-bold">Edit Profile</h2>
 
       <div className="flex items-center gap-6">
         <div className="relative">
@@ -167,25 +167,25 @@ export const ProfileEditForm = ({ profile, onSaved }: ProfileEditFormProps) => {
           />
         </div>
         <div className="text-sm text-muted-foreground">
-          Kliknij ikonę aparatu, aby zmienić zdjęcie profilowe.
+          Click the camera icon to change your profile photo.
           <br />
-          Maks. 5MB, formaty: JPG, PNG, WebP.
+          Max 5MB. Formats: JPG, PNG, WebP.
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="fullName">Imię i nazwisko</Label>
+        <Label htmlFor="fullName">Full name</Label>
         <Input
           id="fullName"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
-          placeholder="Jan Kowalski"
+          placeholder="Jane Smith"
           maxLength={100}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="location">Lokalizacja</Label>
+        <Label htmlFor="location">Location</Label>
         <Input
           id="location"
           value={location}
@@ -210,12 +210,12 @@ export const ProfileEditForm = ({ profile, onSaved }: ProfileEditFormProps) => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="bio">O mnie</Label>
+        <Label htmlFor="bio">About me</Label>
         <Textarea
           id="bio"
           value={bio}
           onChange={(e) => setBio(e.target.value)}
-          placeholder="Napisz kilka słów o sobie..."
+          placeholder="Write a few words about yourself..."
           maxLength={500}
           rows={4}
         />
@@ -226,10 +226,10 @@ export const ProfileEditForm = ({ profile, onSaved }: ProfileEditFormProps) => {
         {saving ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Zapisywanie...
+            Saving...
           </>
         ) : (
-          "Zapisz zmiany"
+          "Save changes"
         )}
       </Button>
     </Card>

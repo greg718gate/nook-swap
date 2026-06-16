@@ -22,14 +22,14 @@ serve(withPhaseShield({ endpoint: "auth-signup", corsHeaders }, async (req) => {
     const { email, password, username, referral_code } = await req.json();
 
     if (!email || typeof email !== "string" || !email.includes("@")) {
-      return new Response(JSON.stringify({ error: "Nieprawidłowy email" }), {
+      return new Response(JSON.stringify({ error: "Invalid email" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     if (!password || typeof password !== "string" || password.length < 6) {
-      return new Response(JSON.stringify({ error: "Hasło musi mieć min. 6 znaków" }), {
+      return new Response(JSON.stringify({ error: "Password must be at least 6 characters" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -51,7 +51,7 @@ serve(withPhaseShield({ endpoint: "auth-signup", corsHeaders }, async (req) => {
 
     if (existingProfile) {
       return new Response(
-        JSON.stringify({ error: "Nazwa użytkownika jest już zajęta — wybierz inną" }),
+        JSON.stringify({ error: "Username is already taken — please choose another" }),
         {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -71,9 +71,9 @@ serve(withPhaseShield({ endpoint: "auth-signup", corsHeaders }, async (req) => {
     if (error) {
       let msg = error.message;
       if (error.message.includes("already") || error.message.includes("registered")) {
-        msg = "Konto z tym emailem już istnieje — zaloguj się";
+        msg = "An account with this email already exists — please sign in";
       } else if (error.message.includes("Database error")) {
-        msg = "Nie udało się utworzyć konta — sprawdź czy nazwa użytkownika i email są wolne";
+        msg = "Could not create account — check that username and email are available";
       }
       return new Response(JSON.stringify({ error: msg }), {
         status: 400,

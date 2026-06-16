@@ -18,7 +18,7 @@ const FAQ = () => {
             <HelpCircle className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Najczęściej Zadawane Pytania
+            Frequently Asked Questions
           </h1>
         </div>
 
@@ -26,153 +26,168 @@ const FAQ = () => {
           <Accordion type="single" collapsible className="space-y-4">
             <AccordionItem value="item-1" className="border-b border-border/50 pb-4">
               <AccordionTrigger className="text-lg font-semibold text-foreground hover:text-primary">
-                Jak zacząć sprzedawać na VelvetBazzar.co.uk?
+                How do I start selling on VelvetBazzar.co.uk?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground leading-relaxed pt-2">
-                Aby zacząć sprzedawać, musisz najpierw założyć konto. Następnie kliknij przycisk "Sprzedaj" w menu, 
-                wypełnij formularz z opisem produktu, dodaj zdjęcia i ustaw cenę. Po zatwierdzeniu, Twoje ogłoszenie 
-                pojawi się na platformie.
+                Create an account first, then click &quot;Sell&quot; in the menu. Fill in the listing
+                form with a product description, add photos, and set your price. Once published,
+                your listing will appear on the marketplace.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-2" className="border-b border-border/50 pb-4">
               <AccordionTrigger className="text-lg font-semibold text-foreground hover:text-primary">
-                Czy mogę anulować zamówienie?
+                Can I cancel an order?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground leading-relaxed pt-2">
-                Możesz anulować zamówienie tylko przed wysyłką produktu przez sprzedającego. Skontaktuj się ze 
-                sprzedającym jak najszybciej. Po wysłaniu produktu możesz skorzystać z prawa do zwrotu (14 dni).
+                You can cancel an order only before the seller dispatches the item. Contact the
+                seller as soon as possible. After dispatch, you may still have a 14-day right to
+                return under UK consumer law.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-3" className="border-b border-border/50 pb-4">
               <AccordionTrigger className="text-lg font-semibold text-foreground hover:text-primary">
-                Jakie metody płatności są dostępne?
+                What payment methods are available?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground leading-relaxed pt-2">
-                Akceptujemy karty debetowe i kredytowe (Visa, Mastercard, Amex) przez Stripe.
-                Wszystkie płatności są w funtach brytyjskich (£). Transakcje są szyfrowane i bezpieczne.
+                We accept debit and credit cards (Visa, Mastercard, Amex) via Stripe.
+                All payments are in British pounds (£). Transactions are encrypted and secure.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-4" className="border-b border-border/50 pb-4">
               <AccordionTrigger className="text-lg font-semibold text-foreground hover:text-primary">
-                Ile kosztuje wystawienie produktu?
+                How much does it cost to list a product?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground leading-relaxed pt-2">
-                Wystawienie produktu na VelvetBazzar.co.uk jest całkowicie darmowe! Pobieramy jedynie małą prowizję od 
-                sprzedaży (3-5% w zależności od kategorii) tylko wtedy, gdy produkt zostanie sprzedany.
+                Listing on VelvetBazzar.co.uk is completely free. We only charge a{" "}
+                <strong className="text-foreground">5% platform fee</strong> when your item sells
+                (this can be reduced with Velvet Coins — see below).
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-velvet-coins" className="border-b border-border/50 pb-4">
+              <AccordionTrigger className="text-lg font-semibold text-foreground hover:text-primary">
+                What are Velvet Coins and how do they work?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground leading-relaxed pt-2">
+                Velvet Coins (VC) are a platform-only reward currency — not crypto and not cash.
+                You earn VC when you sign up, complete your first sale, or refer friends. Sellers
+                can redeem VC to lower the standard 5% selling fee: 100 VC reduces the fee by 1
+                percentage point (e.g. from 5% to 4%), up to 250 VC per sale (minimum 2.5% fee).
+                Manage your balance, referral link, and redemptions in Profile → Velvet Coins.
+                Full rules are in our{" "}
+                <a href="/terms" className="text-primary hover:underline">Terms of Service</a>.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-5" className="border-b border-border/50 pb-4">
               <AccordionTrigger className="text-lg font-semibold text-foreground hover:text-primary">
-                Jak długo trwa wysyłka?
+                How long does delivery take?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground leading-relaxed pt-2">
-                Czas wysyłki zależy od wybranej metody dostawy i lokalizacji. Zazwyczaj:
+                Delivery times depend on the carrier and location. Typically:
                 <ul className="list-disc list-inside mt-2 space-y-1">
                   <li>InPost Lockers: 1–2 working days (UK)</li>
                   <li>Royal Mail: 1–3 working days (UK)</li>
                   <li>Evri: 2–4 working days (UK)</li>
                 </ul>
-                Sprzedający wysyła produkt w ciągu 3 dni roboczych od otrzymania płatności.
+                Sellers dispatch within 3 working days of receiving payment.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-6" className="border-b border-border/50 pb-4">
               <AccordionTrigger className="text-lg font-semibold text-foreground hover:text-primary">
-                Co zrobić, jeśli otrzymam uszkodzony produkt?
+                What if I receive a damaged item?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground leading-relaxed pt-2">
-                Jeśli produkt jest uszkodzony, zrób zdjęcia i natychmiast skontaktuj się ze sprzedającym oraz naszym 
-                wsparciem w ciągu 48 godzin. Rozpatrzymy reklamację i pomożemy w uzyskaniu zwrotu lub wymiany.
+                If an item arrives damaged, take photos and contact the seller and our support
+                team within 48 hours. We will review your claim and help arrange a refund or
+                replacement where appropriate.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-7" className="border-b border-border/50 pb-4">
               <AccordionTrigger className="text-lg font-semibold text-foreground hover:text-primary">
-                Jak śledzić moją przesyłkę?
+                How do I track my parcel?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground leading-relaxed pt-2">
-                Po wysłaniu produktu przez sprzedającego otrzymasz numer śledzenia na email. Możesz również sprawdzić 
-                status przesyłki w swoim profilu w sekcji "Moje zamówienia".
+                After the seller dispatches your order, you will receive a tracking number by
+                email. You can also check delivery status in your profile under &quot;My Orders&quot;.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-8" className="border-b border-border/50 pb-4">
               <AccordionTrigger className="text-lg font-semibold text-foreground hover:text-primary">
-                Czy mogę negocjować cenę z sprzedającym?
+                Can I negotiate the price with a seller?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground leading-relaxed pt-2">
-                Tak! Możesz skontaktować się ze sprzedającym przez wiadomości i zapytać o możliwość negocjacji ceny. 
-                Niektórzy sprzedający są otwarci na negocjacje, szczególnie przy zakupie kilku produktów.
+                Yes. Message the seller to ask about a better price. Some sellers are open to
+                negotiation, especially when you buy multiple items.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-9" className="border-b border-border/50 pb-4">
               <AccordionTrigger className="text-lg font-semibold text-foreground hover:text-primary">
-                Jak działa system ocen i recenzji?
+                How do ratings and reviews work?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground leading-relaxed pt-2">
-                Po zakończeniu transakcji, zarówno kupujący jak i sprzedający mogą wystawić sobie nawzajem ocenę 
-                (1-5 gwiazdek) i napisać recenzję. Oceny są publiczne i pomagają budować zaufanie w społeczności.
+                After a transaction completes, buyers and sellers can rate each other (1–5 stars)
+                and leave a review. Ratings are public and help build trust in the community.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-10" className="border-b border-border/50 pb-4">
               <AccordionTrigger className="text-lg font-semibold text-foreground hover:text-primary">
-                Co zrobić, jeśli mam problem ze sprzedającym?
+                What if I have a problem with a seller?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground leading-relaxed pt-2">
-                Jeśli napotkasz problem, najpierw spróbuj rozwiązać go bezpośrednio ze sprzedającym przez wiadomości. 
-                Jeśli to nie pomoże, skontaktuj się z naszym zespołem wsparcia pod adresem support@velvetbazzar.co.uk -
-                jesteśmy tu, aby pomóc!
+                Try to resolve the issue directly with the seller via messages first. If that
+                does not help, contact our support team at support@velvetbazzar.co.uk — we are
+                here to help.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-11" className="border-b border-border/50 pb-4">
               <AccordionTrigger className="text-lg font-semibold text-foreground hover:text-primary">
-                Czy mogę sprzedawać produkty używane?
+                Can I sell used items?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground leading-relaxed pt-2">
-                Tak! VelvetBazzar.co.uk jest świetnym miejscem do sprzedaży produktów używanych. Po prostu uczciwie opisz stan 
-                produktu przy wystawianiu ogłoszenia (nowy, jak nowy, używany, wymaga naprawy).
+                Yes. VelvetBazzar.co.uk is a great place to sell pre-owned items. Describe the
+                condition honestly when listing (new, like new, good, fair).
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-12" className="border-b border-border/50 pb-4">
               <AccordionTrigger className="text-lg font-semibold text-foreground hover:text-primary">
-                Jak mogę zwiększyć szanse na sprzedaż?
+                How can I improve my chances of selling?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground leading-relaxed pt-2">
-                Kilka wskazówek:
+                A few tips:
                 <ul className="list-disc list-inside mt-2 space-y-1">
-                  <li>Dodaj wysokiej jakości zdjęcia z różnych kątów</li>
-                  <li>Napisz szczegółowy i uczciwy opis</li>
-                  <li>Ustal konkurencyjną cenę</li>
-                  <li>Odpowiadaj szybko na wiadomości</li>
-                  <li>Oferuj darmową wysyłkę, jeśli możesz</li>
-                  <li>Zbuduj pozytywną reputację przez dobre oceny</li>
+                  <li>Add high-quality photos from multiple angles</li>
+                  <li>Write a detailed, honest description</li>
+                  <li>Price competitively</li>
+                  <li>Reply to messages quickly</li>
+                  <li>Offer free shipping if you can</li>
+                  <li>Build a positive reputation through good reviews</li>
                 </ul>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
 
           <div className="mt-8 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/30 p-6">
-            <h3 className="text-lg font-bold text-foreground mb-2">Nie znalazłeś odpowiedzi?</h3>
+            <h3 className="text-lg font-bold text-foreground mb-2">Still have a question?</h3>
             <p className="text-muted-foreground mb-4">
-              Jeśli masz inne pytanie, skontaktuj się z nami:
+              If you need more help, get in touch:
             </p>
             <div className="space-y-2 text-sm">
               <p className="text-muted-foreground">
-                📧 Email: <span className="text-foreground font-semibold">support@velvetbazzar.co.uk</span>
+                Email: <span className="text-foreground font-semibold">support@velvetbazzar.co.uk</span>
               </p>
               <p className="text-muted-foreground">
-                📞 Telefon: <span className="text-foreground font-semibold">+48 123 456 789</span>
-              </p>
-              <p className="text-muted-foreground">
-                🕐 Pon-Pt: 9:00-18:00, Sob: 10:00-14:00
+                We aim to reply within 1–2 working days.
               </p>
             </div>
           </div>

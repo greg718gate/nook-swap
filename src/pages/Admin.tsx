@@ -51,7 +51,7 @@ const Admin = () => {
       _role: "admin",
     });
     if (!isAdmin) {
-      toast.error("Brak uprawnień administratora");
+      toast.error("Admin access required");
       navigate("/");
       return;
     }
@@ -71,9 +71,9 @@ const Admin = () => {
 
   const updateReport = async (id: string, status: string) => {
     const { error } = await supabase.from("reports").update({ status }).eq("id", id);
-    if (error) toast.error("Nie udało się zaktualizować");
+    if (error) toast.error("Could not update");
     else {
-      toast.success("Zaktualizowano");
+      toast.success("Updated");
       load();
     }
   };
@@ -97,24 +97,24 @@ const Admin = () => {
         <div className="container py-10">
           <div className="mb-6 flex items-center gap-3">
             <ShieldAlert className="h-7 w-7 text-primary" />
-            <h1 className="text-3xl font-bold">Panel Administratora</h1>
+            <h1 className="text-3xl font-bold">Admin Panel</h1>
           </div>
 
           <Tabs defaultValue="reports">
             <TabsList>
-              <TabsTrigger value="reports">Zgłoszenia ({reports.filter(r => r.status === "pending").length})</TabsTrigger>
-              <TabsTrigger value="orders">Zamówienia</TabsTrigger>
+              <TabsTrigger value="reports">Reports ({reports.filter(r => r.status === "pending").length})</TabsTrigger>
+              <TabsTrigger value="orders">Orders</TabsTrigger>
             </TabsList>
 
             <TabsContent value="reports" className="space-y-3 mt-4">
-              {reports.length === 0 && <p className="text-muted-foreground">Brak zgłoszeń.</p>}
+              {reports.length === 0 && <p className="text-muted-foreground">No reports.</p>}
               {reports.map((r) => (
                 <Card key={r.id}>
                   <CardHeader className="pb-3 flex flex-row items-start justify-between">
                     <div>
                       <CardTitle className="text-base">{r.target_type.toUpperCase()} — {r.reason}</CardTitle>
                       <p className="text-xs text-muted-foreground mt-1">
-                        ID: {r.target_id.slice(0, 8)} · {new Date(r.created_at).toLocaleString("pl-PL")}
+                        ID: {r.target_id.slice(0, 8)} · {new Date(r.created_at).toLocaleString("en-GB")}
                       </p>
                     </div>
                     <Badge variant={r.status === "pending" ? "destructive" : "secondary"}>{r.status}</Badge>
@@ -123,8 +123,8 @@ const Admin = () => {
                     {r.description && <p className="text-sm">{r.description}</p>}
                     {r.status === "pending" && (
                       <div className="flex gap-2">
-                        <Button size="sm" onClick={() => updateReport(r.id, "resolved")}>Rozwiąż</Button>
-                        <Button size="sm" variant="outline" onClick={() => updateReport(r.id, "dismissed")}>Odrzuć</Button>
+                        <Button size="sm" onClick={() => updateReport(r.id, "resolved")}>Resolve</Button>
+                        <Button size="sm" variant="outline" onClick={() => updateReport(r.id, "dismissed")}>Dismiss</Button>
                       </div>
                     )}
                   </CardContent>
@@ -140,7 +140,7 @@ const Admin = () => {
                     <div className="text-sm">£{Number(o.total_amount).toFixed(2)}</div>
                     <Badge>{o.status}</Badge>
                     <div className="text-xs text-muted-foreground">
-                      {new Date(o.created_at).toLocaleDateString("pl-PL")}
+                      {new Date(o.created_at).toLocaleDateString("en-GB")}
                     </div>
                   </CardContent>
                 </Card>

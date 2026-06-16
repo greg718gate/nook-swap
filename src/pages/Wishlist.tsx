@@ -32,19 +32,19 @@ const Wishlist = () => {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <SeoHead title="Moje ulubione | VelvetBazzar" description="Zapisane produkty na później." />
+      <SeoHead title="My wishlist | VelvetBazzar" description="Saved products for later." />
       <Navbar />
       <main className="flex-1">
         <div className="container py-8">
           <h1 className="mb-6 text-3xl font-bold flex items-center gap-2">
-            <Heart className="h-7 w-7 text-destructive fill-destructive" /> Ulubione
+            <Heart className="h-7 w-7 text-destructive fill-destructive" /> Wishlist
           </h1>
           {loading ? (
-            <p className="text-muted-foreground">Ładowanie...</p>
+            <p className="text-muted-foreground">Loading...</p>
           ) : products.length === 0 ? (
             <Card className="p-12 text-center">
-              <p className="mb-4 text-muted-foreground">Nie masz jeszcze ulubionych produktów</p>
-              <Button onClick={() => navigate("/products")}>Przeglądaj produkty</Button>
+              <p className="mb-4 text-muted-foreground">You have no saved items yet</p>
+              <Button onClick={() => navigate("/products")}>Browse products</Button>
             </Card>
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
