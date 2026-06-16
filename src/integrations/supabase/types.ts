@@ -335,15 +335,19 @@ export type Database = {
           platform_fee: number | null
           refund_amount: number | null
           seller_payout: number | null
+          shipment_id: string | null
+          shipment_status: string | null
           shipped_at: string | null
           shipping_address: string | null
           shipping_cost: number | null
+          shipping_label_url: string | null
           shipping_method: string | null
           status: string | null
           stripe_payment_intent_id: string | null
           stripe_session_id: string | null
           total_amount: number
           tracking_number: string | null
+          tracking_url: string | null
           updated_at: string
         }
         Insert: {
@@ -357,15 +361,19 @@ export type Database = {
           platform_fee?: number | null
           refund_amount?: number | null
           seller_payout?: number | null
+          shipment_id?: string | null
+          shipment_status?: string | null
           shipped_at?: string | null
           shipping_address?: string | null
           shipping_cost?: number | null
+          shipping_label_url?: string | null
           shipping_method?: string | null
           status?: string | null
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
           total_amount: number
           tracking_number?: string | null
+          tracking_url?: string | null
           updated_at?: string
         }
         Update: {
@@ -379,15 +387,19 @@ export type Database = {
           platform_fee?: number | null
           refund_amount?: number | null
           seller_payout?: number | null
+          shipment_id?: string | null
+          shipment_status?: string | null
           shipped_at?: string | null
           shipping_address?: string | null
           shipping_cost?: number | null
+          shipping_label_url?: string | null
           shipping_method?: string | null
           status?: string | null
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
           total_amount?: number
           tracking_number?: string | null
+          tracking_url?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -563,6 +575,12 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           created_at: string | null
+          dispatch_city: string | null
+          dispatch_country: string | null
+          dispatch_line1: string | null
+          dispatch_line2: string | null
+          dispatch_name: string | null
+          dispatch_postcode: string | null
           first_sale_rewarded: boolean
           full_name: string | null
           id: string
@@ -582,6 +600,12 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
+          dispatch_city?: string | null
+          dispatch_country?: string | null
+          dispatch_line1?: string | null
+          dispatch_line2?: string | null
+          dispatch_name?: string | null
+          dispatch_postcode?: string | null
           first_sale_rewarded?: boolean
           full_name?: string | null
           id: string
@@ -601,6 +625,12 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
+          dispatch_city?: string | null
+          dispatch_country?: string | null
+          dispatch_line1?: string | null
+          dispatch_line2?: string | null
+          dispatch_name?: string | null
+          dispatch_postcode?: string | null
           first_sale_rewarded?: boolean
           full_name?: string | null
           id?: string
