@@ -38,7 +38,9 @@ function timingSafeEqual(a: string, b: string): boolean {
 }
 
 export function perfCounterNs(): bigint {
-  return BigInt(Math.round((performance.timeOrigin + performance.now()) * 1e6));
+  const origin = Number.isFinite(performance.timeOrigin) ? performance.timeOrigin : Date.now();
+  const now = Number.isFinite(performance.now()) ? performance.now() : 0;
+  return BigInt(Math.round((origin + now) * 1e6));
 }
 
 export async function mintPhaseToken(anchorNs: bigint): Promise<{
