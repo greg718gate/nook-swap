@@ -1,0 +1,21 @@
+Fasthosts — zmiany DNS dla velvetbazzar.co.uk
+==============================================
+
+Zaloguj się na fasthosts.co.uk → Twoje domeny → velvetbazzar.co.uk → Zarządzaj DNS
+
+1. USUŃ stare rekordy wskazujące na Lovable (A, CNAME, TXT jeśli były od Lovable)
+
+2. DODAJ 4 rekordy typu A (host: @ lub puste):
+
+   185.199.108.153
+   185.199.109.153
+   185.199.110.153
+   185.199.111.153
+
+3. OPCJONALNIE www — rekord CNAME:
+   Host: www
+   Wartość: greg718gate.github.io
+
+Zapisz. Propagacja DNS: zwykle 15 min – 24 h.
+
+Po propagacji velvetbazzar.co.uk będzie wskazywać na nową stronę (GitHub, bez Lovable).
