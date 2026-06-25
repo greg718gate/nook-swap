@@ -51,6 +51,7 @@ CREATE INDEX IF NOT EXISTS idx_orders_ship_deadline
 
 ALTER TABLE public.order_disputes ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Buyers and sellers can view their disputes" ON public.order_disputes;
 CREATE POLICY "Buyers and sellers can view their disputes"
   ON public.order_disputes FOR SELECT
   USING (

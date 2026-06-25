@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS public.velvet_coin_ledger (
 
 ALTER TABLE public.velvet_coin_ledger ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own velvet coin ledger" ON public.velvet_coin_ledger;
 CREATE POLICY "Users can view own velvet coin ledger"
   ON public.velvet_coin_ledger FOR SELECT
   USING (auth.uid() = user_id);
