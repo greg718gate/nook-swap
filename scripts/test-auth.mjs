@@ -1,4 +1,4 @@
-const url = "https://nmgiyvauguilbwtqlexj.supabase.co";
+const url = "https://kwyegfqyjfuvxtdkgldb.supabase.co";
 const anon =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZ2l5dmF1Z3VpbGJ3dHFsZXhqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE2Nzc3NDgsImV4cCI6MjA3NzI1Mzc0OH0.pZ0Lv94aBkLwBUfhF-cw_XjQPH4Y-0gjAQi9yKZfKus";
 

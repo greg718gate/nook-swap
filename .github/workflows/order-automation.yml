@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Trigger order-automation edge function
         env:
-          SUPABASE_URL: https://nmgiyvauguilbwtqlexj.supabase.co
+          SUPABASE_URL: https://kwyegfqyjfuvxtdkgldb.supabase.co
           ORDER_AUTOMATION_SECRET: ${{ secrets.ORDER_AUTOMATION_SECRET }}
         run: |
           if [ -z "$ORDER_AUTOMATION_SECRET" ]; then

@@ -22,7 +22,7 @@ Od teraz **nie musisz płacić Lovable** za każdy publish. Wystarczy jednorazow
 2. **Add New Project** → importuj repo `greg718gate/nook-swap`
 3. Framework: **Vite** (wykryje sam)
 4. Dodaj zmienne środowiskowe (Settings → Environment Variables):
-   - `VITE_SUPABASE_URL` = `https://nmgiyvauguilbwtqlexj.supabase.co`
+   - `VITE_SUPABASE_URL` = `https://kwyegfqyjfuvxtdkgldb.supabase.co`
    - `VITE_SUPABASE_PUBLISHABLE_KEY` = (z pliku `.env` w projekcie)
 5. **Deploy**
 6. **Domains** → dodaj `velvetbazzar.co.uk`
@@ -82,7 +82,7 @@ npx wrangler pages deploy dist --project-name=velvetbazzar   # Cloudflare
 ```
 
 ```bash
-npx supabase functions deploy auth-signup --project-ref nmgiyvauguilbwtqlexj
+npx supabase functions deploy auth-signup --project-ref kwyegfqyjfuvxtdkgldb
 ```
 
 ---
