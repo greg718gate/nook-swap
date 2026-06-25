@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.76.1";
 import { withPhaseShield } from "../_shared/phase-shield/mod.ts";
+import { scanMessageContent } from "../_shared/message-guard.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -229,14 +230,22 @@ async function sendMessage(
 
   await assertParticipant(admin, userId, conversationId);
 
+  const guard = scanMessageContent(trimmed);
+
   const { error } = await admin.from("messages").insert({
     conversation_id: conversationId,
     sender_id: userId,
     content: trimmed,
+    off_platform_flagged: guard.flagged,
+    off_platform_reasons: guard.flagged ? guard.reasons : null,
   });
 
   if (error) throw error;
-  return { success: true };
+  return {
+    success: true,
+    offPlatformWarning: guard.warning,
+    offPlatformFlagged: guard.flagged,
+  };
 }
 
 async function markRead(

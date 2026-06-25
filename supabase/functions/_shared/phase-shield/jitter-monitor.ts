@@ -2,6 +2,9 @@ import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supa
 import {
   HARMONIC_LOCK_THRESHOLD,
   JITTER_HISTORY_LEN,
+  NETWORK_GRACE_DAILY_CAP,
+  NETWORK_JITTER_AVG_MS,
+  NETWORK_JITTER_GRACE_MS,
   PHASE_TOLERANCE_RAD,
   RIEMANN_CARRIER_HZ,
   RIGID_LOOP_CV_THRESHOLD,
@@ -12,6 +15,11 @@ import { zeroPhaseResidualRad } from "./compensated-phase.ts";
 import { zeroPhaseFir } from "./fir-filter.ts";
 import { ensurePhaseShieldTables } from "./provision.ts";
 import { perfCounterNs } from "./token.ts";
+import {
+  clientIpFromRequest,
+  jwtSubFromRequest,
+  maskIp,
+} from "../request-context.ts";
 
 export type JitterVerdict = {
   pass: boolean;
@@ -21,6 +29,8 @@ export type JitterVerdict = {
   phaseRad: number;
   zeroPhaseResidual: number;
   harmonicLock: number;
+  networkVolatile: boolean;
+  graceApplied: boolean;
 };
 
 function coefficientOfVariation(values: number[]): number {
@@ -44,7 +54,15 @@ function harmonicLockScore(deltasMs: number[]): number {
   return hits / deltasMs.length;
 }
 
-function analyzeDeltas(deltasMs: number[]): {
+function isNetworkVolatile(deltasMs: number[]): boolean {
+  if (deltasMs.length < 3) return false;
+  const recent = deltasMs.slice(-6);
+  const max = Math.max(...recent);
+  const avg = recent.reduce((a, b) => a + b, 0) / recent.length;
+  return max >= NETWORK_JITTER_GRACE_MS || avg >= NETWORK_JITTER_AVG_MS;
+}
+
+function analyzeDeltas(deltasMs: number[], networkVolatile: boolean): {
   zeroPhaseResidual: number;
   phaseRad: number;
   harmonicLock: number;
@@ -64,7 +82,8 @@ function analyzeDeltas(deltasMs: number[]): {
     tail[1],
     tail[0] === 0 ? Number.EPSILON : tail[0],
   );
-  const phaseViolation = zeroPhaseResidual > PHASE_TOLERANCE_RAD;
+  const tolerance = networkVolatile ? PHASE_TOLERANCE_RAD * 2.2 : PHASE_TOLERANCE_RAD;
+  const phaseViolation = zeroPhaseResidual > tolerance;
 
   return { zeroPhaseResidual, phaseRad, harmonicLock, rigidLoop, phaseViolation };
 }
@@ -77,12 +96,16 @@ function adminClient(): SupabaseClient {
 }
 
 export function clientKeyFromRequest(req: Request): string {
-  const forwarded = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
-  const ip = forwarded || req.headers.get("cf-connecting-ip") || "unknown";
+  const ip = clientIpFromRequest(req);
   const ua = req.headers.get("user-agent") || "na";
   let hash = 0;
   for (let i = 0; i < ua.length; i++) hash = (hash * 31 + ua.charCodeAt(i)) | 0;
   return `${ip}:${hash.toString(16)}`;
+}
+
+function graceWindowExpired(resetAt: string | null): boolean {
+  if (!resetAt) return true;
+  return Date.now() - new Date(resetAt).getTime() > 24 * 60 * 60 * 1000;
 }
 
 export async function verifyRequestJitter(
@@ -100,16 +123,23 @@ export async function verifyRequestJitter(
       phaseRad: ZERO_PHASE_TARGET_RAD,
       zeroPhaseResidual: 0,
       harmonicLock: 0,
+      networkVolatile: false,
+      graceApplied: false,
     };
   }
 
   const supabase = adminClient();
   const clientKey = clientKeyFromRequest(req);
+  const userId = jwtSubFromRequest(req);
+  const ipMasked = maskIp(clientIpFromRequest(req));
+  const userAgent = (req.headers.get("user-agent") || "").slice(0, 512);
   const requestNs = perfCounterNs();
 
   const { data: state } = await supabase
     .from("phase_shield_state")
-    .select("request_count, delta_history_ms, last_request_ns")
+    .select(
+      "request_count, delta_history_ms, last_request_ns, network_grace_count, network_grace_reset_at",
+    )
     .eq("client_key", clientKey)
     .maybeSingle();
 
@@ -125,11 +155,20 @@ export async function verifyRequestJitter(
     while (history.length > JITTER_HISTORY_LEN) history.shift();
   }
 
-  const analysis = analyzeDeltas(history);
+  const networkVolatile = isNetworkVolatile(history);
+  const analysis = analyzeDeltas(history, networkVolatile);
   const requestCount = prevCount + 1;
 
   let pass = true;
   let dropReason: string | null = null;
+  let graceApplied = false;
+
+  let graceCount = state?.network_grace_count ?? 0;
+  let graceResetAt = state?.network_grace_reset_at ?? null;
+  if (graceWindowExpired(graceResetAt)) {
+    graceCount = 0;
+    graceResetAt = new Date().toISOString();
+  }
 
   if (requestCount > WARMUP_REQUESTS && history.length >= 6) {
     if (analysis.phaseViolation) {
@@ -142,6 +181,16 @@ export async function verifyRequestJitter(
       pass = false;
       dropReason = "rigid_timing_loop";
     }
+
+    // Network grace: trains / mobile BTS handoffs — not bot signatures on stable RTT
+    if (!pass && networkVolatile && dropReason !== "rigid_timing_loop") {
+      if (graceCount < NETWORK_GRACE_DAILY_CAP || userId) {
+        pass = true;
+        graceApplied = true;
+        graceCount += 1;
+        dropReason = "network_grace_applied";
+      }
+    }
   }
 
   await supabase.from("phase_shield_state").upsert({
@@ -149,6 +198,8 @@ export async function verifyRequestJitter(
     request_count: requestCount,
     delta_history_ms: history,
     last_request_ns: Number(requestNs),
+    network_grace_count: graceCount,
+    network_grace_reset_at: graceResetAt,
     updated_at: new Date().toISOString(),
   });
 
@@ -162,6 +213,10 @@ export async function verifyRequestJitter(
     harmonic_lock: analysis.harmonicLock,
     dropped: !pass,
     drop_reason: dropReason,
+    user_id: userId,
+    ip_masked: ipMasked,
+    user_agent: userAgent || null,
+    network_volatile: networkVolatile,
   });
 
   return {
@@ -172,5 +227,7 @@ export async function verifyRequestJitter(
     phaseRad: analysis.phaseRad,
     zeroPhaseResidual: analysis.zeroPhaseResidual,
     harmonicLock: analysis.harmonicLock,
+    networkVolatile,
+    graceApplied,
   };
 }

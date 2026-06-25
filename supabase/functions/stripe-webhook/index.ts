@@ -69,6 +69,9 @@ serve(async (req: Request) => {
         : null;
 
       // Create order
+      const shipByDeadline = new Date();
+      shipByDeadline.setDate(shipByDeadline.getDate() + 7);
+
       const { data: order, error: orderError } = await supabase
         .from("orders")
         .insert({
@@ -81,6 +84,7 @@ serve(async (req: Request) => {
           platform_fee: platformFee,
           seller_payout: sellerPayout,
           status: "paid",
+          ship_by_deadline: shipByDeadline.toISOString(),
         })
         .select()
         .single();
@@ -268,6 +272,37 @@ serve(async (req: Request) => {
       }
 
       console.log("Order processed successfully:", order.id);
+    }
+
+    if (event.type === "charge.dispute.created") {
+      const dispute = event.data.object as Stripe.Dispute;
+      const paymentIntentId =
+        typeof dispute.payment_intent === "string"
+          ? dispute.payment_intent
+          : dispute.payment_intent?.id;
+
+      if (paymentIntentId) {
+        const { data: order } = await supabase
+          .from("orders")
+          .select("id, buyer_id")
+          .eq("stripe_payment_intent_id", paymentIntentId)
+          .maybeSingle();
+
+        if (order) {
+          await supabase
+            .from("orders")
+            .update({
+              dispute_status: "stripe_dispute",
+              stripe_dispute_id: dispute.id,
+              auto_release_frozen: true,
+            })
+            .eq("id", order.id);
+
+          console.log(
+            `Stripe dispute ${dispute.id} linked to order ${order.id} — evidence collection pending`,
+          );
+        }
+      }
     }
 
     return new Response(JSON.stringify({ received: true }), {

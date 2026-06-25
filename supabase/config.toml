@@ -45,3 +45,9 @@ verify_jwt = false
 
 [functions.phase-shield-handshake]
 verify_jwt = false
+
+[functions.order-disputes]
+verify_jwt = false
+
+[functions.order-automation]
+verify_jwt = false

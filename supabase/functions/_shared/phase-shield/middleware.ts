@@ -31,15 +31,6 @@ function mergeCors(extra?: Record<string, string>): Record<string, string> {
   };
 }
 
-function dropPackage(cors: Record<string, string>): Response {
-  return new Response(
-    JSON.stringify({ error: "Request rejected — integrity check failed" }),
-    {
-      status: DROP_HTTP_STATUS,
-      headers: { ...cors, "Content-Type": "application/json" },
-    },
-  );
-}
 
 async function attachPhaseHeaders(
   response: Response,
@@ -96,9 +87,21 @@ export function withPhaseShield(
 
         if (!jitter.pass) {
           console.warn(
-            `[phase-shield] DROP ${options.endpoint} reason=${jitter.dropReason} harmonic=${jitter.harmonicLock.toFixed(3)} residual=${jitter.zeroPhaseResidual.toFixed(4)}`,
+            `[phase-shield] DROP ${options.endpoint} reason=${jitter.dropReason} harmonic=${jitter.harmonicLock.toFixed(3)} residual=${jitter.zeroPhaseResidual.toFixed(4)} volatile=${jitter.networkVolatile}`,
           );
-          const dropped = dropPackage(cors);
+          const dropped = new Response(
+            JSON.stringify({
+              error: "Request rejected — integrity check failed",
+              code: "PHASE_DROP",
+              hint: jitter.networkVolatile
+                ? "Unstable connection detected. Wait a moment and try again."
+                : "Please refresh the page and try again.",
+            }),
+            {
+              status: DROP_HTTP_STATUS,
+              headers: { ...cors, "Content-Type": "application/json" },
+            },
+          );
           return attachPhaseHeaders(
             dropped,
             cors,
@@ -109,9 +112,27 @@ export function withPhaseShield(
         if (jitter.requestCount > WARMUP_REQUESTS) {
           const tokenOk = await verifyPhaseToken(token, anchor);
           if (!tokenOk) {
-            console.warn(`[phase-shield] DROP ${options.endpoint} invalid_phase_token`);
-            const dropped = dropPackage(cors);
-            return attachPhaseHeaders(dropped, cors, "drop:invalid_token");
+            // Authenticated users on volatile networks get one token grace per session window
+            const hasAuth = !!req.headers.get("Authorization");
+            if (hasAuth && jitter.networkVolatile && jitter.graceApplied) {
+              console.warn(
+                `[phase-shield] token grace ${options.endpoint} (volatile network, authenticated)`,
+              );
+            } else {
+              console.warn(`[phase-shield] DROP ${options.endpoint} invalid_phase_token`);
+              const dropped = new Response(
+                JSON.stringify({
+                  error: "Request rejected — integrity check failed",
+                  code: "PHASE_TOKEN_INVALID",
+                  hint: "Refresh the page to renew your session shield.",
+                }),
+                {
+                  status: DROP_HTTP_STATUS,
+                  headers: { ...cors, "Content-Type": "application/json" },
+                },
+              );
+              return attachPhaseHeaders(dropped, cors, "drop:invalid_token");
+            }
           }
         }
       }

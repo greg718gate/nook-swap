@@ -10,6 +10,7 @@ export interface Message {
   content: string;
   created_at: string;
   is_read: boolean;
+  off_platform_flagged?: boolean;
 }
 
 export interface Conversation {
@@ -58,7 +59,7 @@ export const useMessages = (userId: string | undefined) => {
       ) {
         toast.info('New message!', {
           action: {
-            label: 'Zobacz',
+            label: 'View',
             onClick: () => {
               window.location.href = '/profile?tab=messages';
             },
@@ -99,11 +100,18 @@ export const useMessages = (userId: string | undefined) => {
     if (!userId) return false;
 
     try {
-      await callMessagingApi({
+      const result = await callMessagingApi<{
+        success: boolean;
+        offPlatformWarning?: string | null;
+      }>({
         action: 'send_message',
         conversationId,
         content,
       });
+
+      if (result.offPlatformWarning) {
+        toast.warning(result.offPlatformWarning, { duration: 8000 });
+      }
 
       supabase.functions.invoke('notify-new-message', {
         body: { conversationId, messageContent: content },

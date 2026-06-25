@@ -84,6 +84,24 @@ export function createPhaseShieldFetch(
 
     const response = await baseFetch(input, { ...init, headers });
     absorbPhaseShieldHeaders(response.clone());
+
+    if (response.status === 403 && isSupabaseFunctionsUrl(url)) {
+      try {
+        const clone = response.clone();
+        const body = await clone.json() as { code?: string };
+        if (body.code === "PHASE_DROP" || body.code === "PHASE_TOKEN_INVALID") {
+          handshakePromise = null;
+          const supabaseUrl = url.split("/functions/v1/")[0];
+          const anonKey = headers.get("apikey") || headers.get("Authorization")?.replace("Bearer ", "");
+          if (anonKey) {
+            await bootstrapPhaseShield(supabaseUrl, anonKey);
+          }
+        }
+      } catch {
+        /* ignore parse errors */
+      }
+    }
+
     return response;
   };
 }

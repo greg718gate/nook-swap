@@ -1,0 +1,26 @@
+name: Order automation (ghosting refunds + dispute deadlines)
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger order-automation edge function
+        env:
+          SUPABASE_URL: https://nmgiyvauguilbwtqlexj.supabase.co
+          ORDER_AUTOMATION_SECRET: ${{ secrets.ORDER_AUTOMATION_SECRET }}
+        run: |
+          if [ -z "$ORDER_AUTOMATION_SECRET" ]; then
+            echo "::warning::ORDER_AUTOMATION_SECRET not set — skip daily automation"
+            exit 0
+          fi
+          curl -sf -X POST \
+            -H "Authorization: Bearer $ORDER_AUTOMATION_SECRET" \
+            -H "Content-Type: application/json" \
+            "$SUPABASE_URL/functions/v1/order-automation" \
+            -d '{}' | tee result.json
+          cat result.json

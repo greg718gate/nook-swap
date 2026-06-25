@@ -6,10 +6,16 @@ export const ZERO_PHASE_TARGET_RAD = 0.0;
 export const PHASE_TOLERANCE_RAD = 0.38;
 
 export const DROP_HTTP_STATUS = 403;
-export const WARMUP_REQUESTS = 8;
+/** Warmup before jitter/token enforcement (mobile packet-loss margin). */
+export const WARMUP_REQUESTS = 12;
 export const JITTER_HISTORY_LEN = 14;
 export const RIGID_LOOP_CV_THRESHOLD = 0.009;
 export const HARMONIC_LOCK_THRESHOLD = 0.9;
+/** Public-network grace: skip phase/harmonic drops when RTT spikes (train/Wi‑Fi). */
+export const NETWORK_JITTER_GRACE_MS = 800;
+export const NETWORK_JITTER_AVG_MS = 400;
+/** Max network-grace passes per client per 24h before hard drop. */
+export const NETWORK_GRACE_DAILY_CAP = 6;
 export const TPDF_DITHER_AMPLITUDE_US = 820;
 export const TOKEN_TTL_NS = 180_000_000_000n;
 

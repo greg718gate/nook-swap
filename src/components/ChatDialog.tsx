@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, User, Package } from "lucide-react";
+import { Send, User, Package, ShieldAlert } from "lucide-react";
 import { Message, Conversation, useConversationMessages } from "@/hooks/useMessages";
 import { formatDistanceToNow } from "date-fns";
 import { enGB } from "date-fns/locale";
@@ -135,6 +135,12 @@ export const ChatDialog = ({
                         {message.content}
                       </p>
                     </div>
+                    {!isOwn && message.off_platform_flagged && (
+                      <p className="mt-1 flex items-start gap-1 text-xs text-amber-700 dark:text-amber-400">
+                        <ShieldAlert className="h-3 w-3 mt-0.5 shrink-0" />
+                        Keep payments on VelvetBazzar — off-platform deals are not protected.
+                      </p>
+                    )}
                     <p className="text-xs text-muted-foreground mt-1">
                       {formatDistanceToNow(new Date(message.created_at), {
                         addSuffix: true,

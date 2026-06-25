@@ -52,8 +52,15 @@ async function runProvision(): Promise<boolean> {
   }
 }
 
-/** Idempotent — runs migration SQL on production via SUPABASE_DB_URL (edge default secret). */
-export function ensurePhaseShieldTables(): Promise<boolean> {
+/** Idempotent — prefers CI migrations; DDL only when tables missing. */
+export async function ensurePhaseShieldTables(): Promise<boolean> {
+  if (Deno.env.get("PHASE_SHIELD_SKIP_PROVISION") === "true") {
+    return verifyPhaseShieldTablesExist();
+  }
+
+  const exists = await verifyPhaseShieldTablesExist();
+  if (exists) return true;
+
   if (!provisionPromise) {
     provisionPromise = runProvision();
   }

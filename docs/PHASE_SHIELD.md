@@ -56,7 +56,20 @@ Migration `20260617140000_phase_shield.sql`:
 
 ## Warmup
 
-Jitter analysis and token enforcement begin after **8 requests** per client key (mobile packet-loss safe margin).
+Jitter analysis and token enforcement begin after **12 requests** per client key (mobile packet-loss safe margin).
+
+## Network grace (public Wi‑Fi / trains)
+
+When inter-request deltas exceed **800ms** (volatile RTT), phase/harmonic drops are softened:
+- Up to **6 grace passes per client per 24h** (logged as `network_grace_applied`)
+- Authenticated users may receive token grace on unstable connections
+- `rigid_timing_loop` (bot scripts) still hard-drops
+
+Set `PHASE_SHIELD_SKIP_PROVISION=true` after CI migrations to skip cold-start DDL.
+
+## Jitter audit log fields
+
+`phase_shield_jitter_log` includes: `drop_reason`, `user_id` (if JWT present), `ip_masked`, `user_agent`, `network_volatile`.
 
 ## Production migration status
 

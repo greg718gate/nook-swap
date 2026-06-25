@@ -44,6 +44,7 @@ const Sell = () => {
     shipping_evri: "",
     shipping_royal_mail: "",
     shipping_inpost: "",
+    seller_type: "private" as "private" | "business",
   });
 
   useEffect(() => {
@@ -57,9 +58,13 @@ const Sell = () => {
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("dispatch_line1, dispatch_city, dispatch_postcode")
+        .select("dispatch_line1, dispatch_city, dispatch_postcode, seller_type")
         .eq("id", currentUser.id)
         .maybeSingle();
+
+      if (profile?.seller_type === "business" || profile?.seller_type === "private") {
+        setFormData((prev) => ({ ...prev, seller_type: profile.seller_type as "private" | "business" }));
+      }
 
       if (!hasCompleteDispatchAddress(profile)) {
         toast.error("Add your UK address before selling");
@@ -288,7 +293,13 @@ const Sell = () => {
         shipping_evri: formData.product_type === "physical" ? (parseFloat(formData.shipping_evri) || 0) : 0,
         shipping_royal_mail: formData.product_type === "physical" ? (parseFloat(formData.shipping_royal_mail) || 0) : 0,
         shipping_inpost: formData.product_type === "physical" ? (parseFloat(formData.shipping_inpost) || 0) : 0,
+        seller_type: formData.seller_type,
       });
+
+      await supabase
+        .from("profiles")
+        .update({ seller_type: formData.seller_type })
+        .eq("id", user.id);
 
       if (error) throw error;
 
@@ -443,6 +454,34 @@ const Sell = () => {
                       <SelectItem value="digital">Digital (download)</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+
+                {/* UK seller classification (Consumer Rights Act) */}
+                <div className="space-y-2">
+                  <Label>I am selling as *</Label>
+                  <Select
+                    value={formData.seller_type}
+                    onValueChange={(value: "private" | "business") =>
+                      setFormData({ ...formData, seller_type: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="private">
+                        Private individual (C2C — buyer beware applies)
+                      </SelectItem>
+                      <SelectItem value="business">
+                        Business / trader (full UK consumer rights apply)
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    {formData.seller_type === "business"
+                      ? "Buyers may have a 14-day return right and other protections under UK consumer law."
+                      : "Private sales between individuals — items should be accurately described."}
+                  </p>
                 </div>
 
                 {/* Digital File Upload */}

@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Loader2, Package, Truck, CheckCircle2, XCircle, Star } from "lucide-react";
+import { Loader2, Package, Truck, CheckCircle2, XCircle, Star, AlertTriangle } from "lucide-react";
 
 interface OrderItem {
   id: string;
@@ -32,6 +32,8 @@ interface Order {
   confirmed_at: string | null;
   refund_amount: number | null;
   created_at: string;
+  dispute_status: string | null;
+  ship_by_deadline: string | null;
   order_items: OrderItem[];
 }
 
@@ -53,6 +55,7 @@ const statusLabel: Record<string, string> = {
   cancelled: "Cancelled",
   refunded: "Refunded",
   pending: "Pending",
+  disputed: "Dispute open",
 };
 
 const MyOrders = () => {
@@ -102,6 +105,69 @@ const MyOrders = () => {
       toast.success("Thank you for confirming delivery!");
       const { data: { session } } = await supabase.auth.getSession();
       if (session) await fetchOrders(session.user.id);
+    }
+  };
+
+  const invokeDispute = async (body: Record<string, unknown>) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return null;
+    const { data, error } = await supabase.functions.invoke("order-disputes", {
+      body,
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    });
+    if (error || (data as { error?: string })?.error) {
+      throw new Error((data as { error?: string })?.error || "Request failed");
+    }
+    return data;
+  };
+
+  const handleOpenDispute = async (orderId: string) => {
+    const reason = prompt(
+      "Describe the problem with this order (item not as described, not received, etc.):",
+    );
+    if (!reason || reason.trim().length < 10) {
+      if (reason !== null) toast.error("Please provide at least 10 characters");
+      return;
+    }
+    setActioning(orderId);
+    try {
+      const data = await invokeDispute({
+        action: "open_dispute",
+        order_id: orderId,
+        reason: reason.trim(),
+      });
+      toast.success((data as { message?: string })?.message || "Dispute opened");
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) await fetchOrders(session.user.id);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not open dispute");
+    } finally {
+      setActioning(null);
+    }
+  };
+
+  const handleSubmitEvidence = async (orderId: string) => {
+    const evidence = prompt(
+      "Add details or describe evidence (photos, tracking, item condition):",
+    );
+    if (!evidence || evidence.trim().length < 10) {
+      if (evidence !== null) toast.error("Please provide at least 10 characters");
+      return;
+    }
+    setActioning(orderId);
+    try {
+      const data = await invokeDispute({
+        action: "submit_buyer_evidence",
+        order_id: orderId,
+        evidence: evidence.trim(),
+      });
+      toast.success((data as { message?: string })?.message || "Evidence submitted");
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) await fetchOrders(session.user.id);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not submit evidence");
+    } finally {
+      setActioning(null);
     }
   };
 
@@ -206,13 +272,40 @@ const MyOrders = () => {
                         )}
                       </div>
                     )}
+                    {o.dispute_status && o.dispute_status !== "resolved" && (
+                      <div className="rounded-md border border-amber-300 bg-amber-50 dark:bg-amber-950/30 p-3 text-sm text-amber-900 dark:text-amber-200">
+                        <div className="flex items-center gap-2 font-medium">
+                          <AlertTriangle className="h-4 w-4" />
+                          Dispute in progress — funds frozen
+                        </div>
+                        {o.dispute_status === "open" && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="mt-2"
+                            onClick={() => handleSubmitEvidence(o.id)}
+                            disabled={actioning === o.id}
+                          >
+                            Submit evidence (48h deadline)
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                    {o.ship_by_deadline && o.status === "paid" && !o.tracking_number && (
+                      <p className="text-xs text-muted-foreground">
+                        Seller must dispatch by{" "}
+                        {new Date(o.ship_by_deadline).toLocaleDateString("en-GB")}
+                        {" "}or you receive an automatic refund.
+                      </p>
+                    )}
                     {o.refund_amount && Number(o.refund_amount) > 0 && (
                       <div className="text-sm text-red-600">
                         Refunded: £{Number(o.refund_amount).toFixed(2)}
                       </div>
                     )}
                     <div className="flex flex-wrap gap-2 pt-2">
-                      {(o.status === "shipped" || o.status === "delivered") && (
+                      {(o.status === "shipped" || o.status === "delivered") &&
+                        !o.dispute_status && (
                         <Button
                           size="sm"
                           onClick={() => handleConfirm(o.id)}
@@ -220,6 +313,18 @@ const MyOrders = () => {
                         >
                           <CheckCircle2 className="mr-2 h-4 w-4" />
                           Confirm delivery
+                        </Button>
+                      )}
+                      {["paid", "shipped", "delivered"].includes(o.status) &&
+                        !o.dispute_status && (
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => handleOpenDispute(o.id)}
+                          disabled={actioning === o.id}
+                        >
+                          <AlertTriangle className="mr-2 h-4 w-4" />
+                          I have a problem
                         </Button>
                       )}
                       {(o.status === "paid" || o.status === "shipped") && (

@@ -4,12 +4,38 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.76.1";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, shippo-api-version",
+    "authorization, x-client-info, apikey, content-type, shippo-api-version, x-shipping-webhook-secret",
 };
+
+function verifyWebhookSecret(req: Request): boolean {
+  const secret = Deno.env.get("SHIPPING_WEBHOOK_SECRET");
+  if (!secret) {
+    console.error("SHIPPING_WEBHOOK_SECRET not configured — rejecting webhook");
+    return false;
+  }
+
+  const auth = req.headers.get("authorization");
+  const headerSecret =
+    req.headers.get("x-shipping-webhook-secret") ||
+    (auth?.startsWith("Bearer ") ? auth.slice(7) : null);
+
+  if (!headerSecret || headerSecret !== secret) {
+    console.warn("shipping-webhook: invalid or missing shared secret");
+    return false;
+  }
+  return true;
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  if (!verifyWebhookSecret(req)) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 
   try {
@@ -59,6 +85,9 @@ serve(async (req) => {
     if (orderStatus) update.status = orderStatus;
     if (orderStatus === "delivered") {
       update.delivered_at = new Date().toISOString();
+    }
+    if (orderStatus === "shipped") {
+      update.shipped_at = new Date().toISOString();
     }
 
     const trackingUrl = data.tracking_url_provider as string | undefined;
