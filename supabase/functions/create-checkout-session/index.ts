@@ -253,7 +253,7 @@ const handler = withPhaseShield({ endpoint: "create-checkout-session", corsHeade
       stripeDiscounts = [{ coupon: stripeCoupon.id }];
     }
 
-    const origin = req.headers.get("origin") || "https://nook-swap.lovable.app";
+    const origin = req.headers.get("origin") || "https://velvetbazzar.co.uk";
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],

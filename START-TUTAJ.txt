@@ -1,0 +1,48 @@
+VELVETBAZZAR — START TUTAJ (zapisz / wydrukuj)
+
+========================================
+LOGOWANIE DO CURSOR (bez hasła)
+========================================
+1. Otwórz Cursor
+2. Kliknij "Continue with Google" (kontynuuj przez Google)
+3. Konto: grzegorzniepsuj47@gmail.com
+NIE musisz znać hasła do Cursor — wystarczy Google.
+
+========================================
+TWÓJ SKLEP NIE ZNIKA
+========================================
+- Strona: https://velvetbazzar.co.uk
+- Folder projektu na PC: nook-swap-main
+- GitHub: greg718gate/nook-swap
+- Baza (Supabase): supabase.com — projekt velvetbazzar
+
+Usunięcie Cursor = tylko program znika.
+Sklep, baza, strona — zostają.
+
+========================================
+JAK OTWIERAĆ CURSOR
+========================================
+Start (Windows) → wpisz "Cursor" → Enter
+NIE klikaj CursorSetup.exe z Pobranych.
+
+========================================
+JAK CURSOR NIE DZIAŁA PO RESTARCIE
+========================================
+NIE odinstalowuj od razu.
+Napisz w Cursorze (albo na PC): "Cursor nie działa po restarcie"
+Pomożemy krok po kroku.
+
+========================================
+CO JEST ZROBIONE
+========================================
+✓ Własny Supabase (bez Lovable)
+✓ Auth ustawiony
+✓ Baza + funkcje wgrane
+
+NA PÓŹNIEJ:
+- Test rejestracji na velvetbazzar.co.uk
+- Stripe (klucze w Supabase) — napisz "stripe"
+
+========================================
+LOVABLE — NIE POTRZEBNY
+========================================

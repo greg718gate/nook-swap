@@ -53,7 +53,7 @@ Po pushu na GitHub baza i funkcje wdrażają się same.
 | `SHIPPING_WEBHOOK_SECRET` | wymyśl długie hasło lub wygeneruj |
 | `ORDER_AUTOMATION_SECRET` | to samo — inne niż shipping |
 | `PHASE_SHIELD_SKIP_PROVISION` | wpisz: `true` |
-| `LOVABLE_API_KEY` | opcjonalnie — tylko dla AI w sklepie |
+| `OPENAI_API_KEY` | opcjonalnie — AI chat i auto-tag (OpenAI, bez Lovable) |
 
 ---
 

@@ -1,14 +1,27 @@
-STATUS: LIVE — przeniesienie na własny Supabase
+STATUS: VelvetBazzar — stan na 28.06.2026
 
-Frontend: https://velvetbazzar.co.uk (GitHub Pages)
-Backend: **kwyegfqyjfuvxtdkgldb** (Twój supabase.com — BEZ Lovable)
+## Domena
+- Docelowo: https://velvetbazzar.co.uk (GitHub Pages + Fasthosts DNS)
+- **Blokada HTTPS:** www.velvetbazzar.co.uk wskazuje na stary serwer (213.171.195.105) — patrz FASTHOSTS-DNS.txt
 
-## Zrobione w kodzie
-- Przełączono project_id na kwyegfqyjfuvxtdkgldb
-- GitHub Pages buduje z nowym adresem Supabase
+## Backend (100% bez Lovable)
+- Supabase: kwyegfqyjfuvxtdkgldb
+- Stripe: STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET w Edge Functions secrets
+- Webhook: velvetbazzar-webhook → stripe-webhook
 
-## Ty musisz (patrz KONFIGURACJA-TWOJ-SUPABASE.md)
-1. SUPABASE_ACCESS_TOKEN w GitHub Secrets
-2. Auth URL w Supabase
-3. Stripe webhook → nowy adres
-4. Secrety w Supabase Edge Functions
+## Deploy
+- Frontend: push main → GitHub Pages
+- Edge functions: push main → deploy-supabase-functions.yml
+- Migracje: deploy-migrations.yml
+
+## Secrety Supabase (Edge Functions)
+| Secret | Status |
+|--------|--------|
+| STRIPE_SECRET_KEY | użytkownik dodał |
+| STRIPE_WEBHOOK_SECRET | użytkownik dodał |
+| RESEND_API_KEY | opcjonalnie (maile) |
+| OPENAI_API_KEY | opcjonalnie (AI chat) |
+
+## Auth Supabase
+Site URL: https://velvetbazzar.co.uk
+Redirect: https://velvetbazzar.co.uk/**

@@ -31,10 +31,18 @@ serve(withPhaseShield({ endpoint: "auto-tag-product", corsHeaders }, async (req)
     }
 
     const { imageUrl, title, description } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
 
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY is not configured');
+    if (!OPENAI_API_KEY) {
+      return new Response(JSON.stringify({
+        category: "General",
+        tags: [],
+        suggestedTitle: title || "",
+        condition: "used",
+        insights: "AI tagging unavailable — add OPENAI_API_KEY in Supabase secrets to enable.",
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     console.log('Analyzing product with AI:', { imageUrl: imageUrl ? 'provided' : 'none', title, description });
@@ -81,14 +89,14 @@ ${imageUrl ? 'See image above.' : 'No image provided.'}`
       content: userContent
     });
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'gpt-4o-mini',
         messages: messages,
         temperature: 0.7,
       }),

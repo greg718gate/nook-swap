@@ -82,7 +82,7 @@ serve(withPhaseShield({ endpoint: "create-stripe-connect-account", corsHeaders }
     }
 
     // Create onboarding link
-    const origin = req.headers.get("origin") || "https://nook-swap.lovable.app";
+    const origin = req.headers.get("origin") || "https://velvetbazzar.co.uk";
     const accountLink = await stripe.accountLinks.create({
       account: accountId,
       refresh_url: `${origin}/profile?tab=edit`,
