@@ -1,7 +1,9 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import {
   withPhaseShield,
-  RIEMANN_CARRIER_HZ,
+  F_EXACT_HZ,
+  F_ZETA_CORE_HZ,
+  F_DELTA_DNA_ZETA_HZ,
   SENTINEL_PROTOCOL_VERSION,
   PHI,
   GAMMA_GOLD,
@@ -26,7 +28,9 @@ serve(
         ok: true,
         shield: "SENTINEL-718",
         protocol: SENTINEL_PROTOCOL_VERSION,
-        carrier_hz: RIEMANN_CARRIER_HZ,
+        f_exact_hz: F_EXACT_HZ,
+        f_zeta_core_hz: F_ZETA_CORE_HZ,
+        f_delta_dna_zeta_hz: F_DELTA_DNA_ZETA_HZ,
         phi: PHI,
         gamma: GAMMA_GOLD,
         gatca_mean_coherence: gatcaIntervalCoherence(),

@@ -1,14 +1,14 @@
 import {
   FLOAT64_EPS_COMPENSATION,
+  F_EXACT_HZ,
   PHASE_SHIFT_ZETA,
-  RIEMANN_CARRIER_HZ,
   ZERO_PHASE_TARGET_RAD,
 } from "./constants.ts";
 
-/** Kahan-style drift compensation for ω·t at f_exact (718.570125… Hz) */
+/** Kahan-style drift compensation for ω·t at f_exact (718.574441… Hz — DNA key) */
 export function compensatedCarrierPhase(timestampNs: bigint): number {
   const tSec = Number(timestampNs) / 1e9;
-  const omega = 2 * Math.PI * RIEMANN_CARRIER_HZ;
+  const omega = 2 * Math.PI * F_EXACT_HZ;
 
   const raw = omega * tSec;
   const cycles = Math.floor(raw / (2 * Math.PI));

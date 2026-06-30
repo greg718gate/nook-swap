@@ -1,11 +1,11 @@
 import {
   COHERENCE_THRESHOLD,
-  F_EXACT_DNA_HZ,
+  F_EXACT_HZ,
+  F_ZETA_CORE_HZ,
   GAMMA_GOLD,
   GATCA_POSITIONS,
   MTDNA_LENGTH,
   PHI,
-  RIEMANN_CARRIER_HZ,
   RIEMANN_ZERO_448_HZ,
 } from "./constants.ts";
 
@@ -21,8 +21,8 @@ export function sentinelCarrierFrequenciesHz(): number[] {
     gateBaseFrequencyHz(i)
   );
   return [
-    RIEMANN_CARRIER_HZ,
-    F_EXACT_DNA_HZ,
+    F_EXACT_HZ,
+    F_ZETA_CORE_HZ,
     RIEMANN_ZERO_448_HZ,
     ...gates,
   ];
@@ -53,14 +53,13 @@ function nearestHarmonicRatio(value: number, target: number): { mult: number; er
  * Returns mean coherence index (0–1) for the 17 intervals.
  */
 export function gatcaIntervalCoherence(): number {
-  const fExact = F_EXACT_DNA_HZ;
   const pureRatios = [2, 1.5, 4 / 3, 1.25, PHI, GAMMA_GOLD];
   let sum = 0;
   let count = 0;
 
   for (let i = 0; i < GATCA_POSITIONS.length - 1; i++) {
     const distance = GATCA_POSITIONS[i + 1] - GATCA_POSITIONS[i];
-    const coefficient = distance / fExact;
+    const coefficient = distance / F_EXACT_HZ;
     let minError = 10;
     for (const base of pureRatios) {
       for (let m = 1; m <= 24; m++) {
@@ -99,10 +98,10 @@ export function harmonicLockScoreSentinel(deltasMs: number[]): number {
 
 /**
  * Map a single delta (ms) to best GATCA-interval coherence (0–1).
- * Used to flag unnaturally stable “DNA-tuned” bot timing.
+ * Uses primary f_exact DNA key (ms scaled vs Hz reference).
  */
 export function deltaGatcaCoherence(deltaMs: number): number {
-  const coefficient = deltaMs / RIEMANN_CARRIER_HZ;
+  const coefficient = deltaMs / F_EXACT_HZ;
   const { error } = nearestHarmonicRatio(coefficient, 1);
   return Math.max(0, 1 - error);
 }
@@ -117,7 +116,7 @@ export function meanDeltaGatcaCoherence(deltasMs: number[]): number {
 export function torusClosureCoherence(): number {
   const b18 = GATCA_POSITIONS[GATCA_POSITIONS.length - 1];
   const distance = MTDNA_LENGTH - b18 + GATCA_POSITIONS[0];
-  const coefficient = distance / F_EXACT_DNA_HZ;
+  const coefficient = distance / F_EXACT_HZ;
   const { error } = nearestHarmonicRatio(coefficient, 1);
   return Math.max(0, 1 - error);
 }

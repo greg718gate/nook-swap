@@ -6,7 +6,7 @@ Closed middleware protecting critical VelvetBazzar edge functions.
 
 ```
 supabase/functions/_shared/phase-shield/
-  constants.ts          — f_exact 718.570125… Hz, φ, γ, 448th/429th zeros, 18 GATCA gates
+  constants.ts          — f_exact 718.574441… Hz (DNA), f_zeta_core 718.570125… Hz, φ, γ, 18 GATCA
   gatca-resonance.ts    — 18-bram harmonic ladder + coherence ≥94% bot detection
   compensated-phase.ts  — ω·t + PHASE_SHIFT_ZETA + float64 residual (448th zero)
   fir-filter.ts         — zero-phase FIR (filtfilt analogue)
@@ -18,16 +18,17 @@ supabase/functions/_shared/phase-shield/
 
 ## Mathematical core (mpmath 50 dps → float64 runtime)
 
-| Constant | Value |
-|----------|-------|
-| `f_exact` | 718.570125154268855… Hz |
-| 448th zero ℑ(ρ) | 743.895013142473659… |
-| 429th zero ℑ(ρ) | 718.7427865454858… |
-| φ | 1.618033988749895 |
-| γ = 1/φ | 0.6180339887498949 |
-| `PHASE_SHIFT_ZETA` | arg ζ(½ + i·t₄₄₈) |
-| GATCA gates | 18 positions on mtDNA rCRS |
-| Coherence threshold | 94% (13/17 intervals >94% in reference analysis) |
+| Constant | Role | Value |
+|----------|------|-------|
+| **`f_exact` (primary)** | DNA rCRS key — phase ω, GATCA intervals, HMAC | **718.57444149021338871** Hz |
+| **`f_zeta_core` (secondary)** | Zeta-Core Ψ line — harmonic ladder anchor | 718.570125154268855… Hz |
+| Δf DNA−Zeta | | 0.00431633594453371 Hz |
+| 448th zero ℑ(ρ) | Gate 18 carrier | 743.895013142473659… |
+| 429th zero ℑ(ρ) | Neighbour reference | 718.7427865454858… |
+| φ / γ | Fractal constants | 1.618… / 0.618… |
+| `PHASE_SHIFT_ZETA` | arg ζ(½ + i·t₄₄₈) | 0.946199509129625 rad |
+| GATCA gates | 18 positions mtDNA rCRS | see `GATCA_POSITIONS` |
+| Coherence threshold | Bot lock detection | 94% |
 
 High-precision literals are stored as strings for audit/HMAC; Deno uses float64 + `PRECISION_RESIDUAL_448` compensation.
 
