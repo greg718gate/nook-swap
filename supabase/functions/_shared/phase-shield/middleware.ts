@@ -1,4 +1,5 @@
 import { enforceRateLimit } from "../rate-limit.ts";
+import { isAllowedOrigin, originForbiddenResponse } from "../origin-guard.ts";
 import {
   DROP_HTTP_STATUS,
   PHASE_CORS_ALLOW_HEADERS,
@@ -21,6 +22,8 @@ export type PhaseShieldOptions = {
   corsHeaders?: Record<string, string>;
   /** Skip token validation (handshake/bootstrap only) */
   bootstrap?: boolean;
+  /** Skip Origin/Referer check (webhooks, cron) */
+  skipOriginCheck?: boolean;
 };
 
 function mergeCors(extra?: Record<string, string>): Record<string, string> {
@@ -84,6 +87,10 @@ export function withPhaseShield(
     if (rateLimited) {
       for (const [k, v] of Object.entries(cors)) rateLimited.headers.set(k, v);
       return rateLimited;
+    }
+
+    if (!options.skipOriginCheck && req.method !== "OPTIONS" && !isAllowedOrigin(req)) {
+      return originForbiddenResponse(cors);
     }
 
     try {

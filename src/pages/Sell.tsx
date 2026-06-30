@@ -19,6 +19,7 @@ import {
 import { toast } from "sonner";
 import { Sparkles, Loader2, X, Upload, ImagePlus, FileUp } from "lucide-react";
 import { hasCompleteDispatchAddress } from "@/lib/profileSetup";
+import { validateImageFile, validateDigitalFile } from "@/lib/uploadValidation";
 
 const MAX_IMAGES = 5;
 const MIN_IMAGES = 1;
@@ -147,32 +148,33 @@ const Sell = () => {
     }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    
+    e.target.value = "";
+
     if (images.length + files.length > MAX_IMAGES) {
       toast.error(`You can add up to ${MAX_IMAGES} photos`);
       return;
     }
 
-    const validFiles = files.filter(file => {
-      if (!file.type.startsWith('image/')) {
-        toast.error(`${file.name} is not an image`);
-        return false;
+    const validFiles: File[] = [];
+    for (const file of files) {
+      const err = await validateImageFile(file);
+      if (err) {
+        toast.error(err);
+        continue;
       }
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error(`${file.name} is too large (max 5MB)`);
-        return false;
-      }
-      return true;
-    });
+      validFiles.push(file);
+    }
 
-    setImages(prev => [...prev, ...validFiles]);
+    if (validFiles.length === 0) return;
 
-    validFiles.forEach(file => {
+    setImages((prev) => [...prev, ...validFiles]);
+
+    validFiles.forEach((file) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreviews(prev => [...prev, reader.result as string]);
+        setImagePreviews((prev) => [...prev, reader.result as string]);
       };
       reader.readAsDataURL(file);
     });
@@ -219,10 +221,12 @@ const Sell = () => {
 
   const handleDigitalFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = "";
     if (!file) return;
 
-    if (file.size > 100 * 1024 * 1024) {
-      toast.error("File is too large (max 100MB)");
+    const err = validateDigitalFile(file);
+    if (err) {
+      toast.error(err);
       return;
     }
 

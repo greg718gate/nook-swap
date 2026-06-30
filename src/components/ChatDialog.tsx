@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, User, Package, ShieldAlert } from "lucide-react";
 import { Message, Conversation, useConversationMessages } from "@/hooks/useMessages";
-import { formatDistanceToNow } from "date-fns";
+import { sanitizeUserText } from "@/lib/sanitize";
 import { enGB } from "date-fns/locale";
 
 interface ChatDialogProps {
@@ -50,7 +50,7 @@ export const ChatDialog = ({
     if (!input.trim() || !conversation || sending) return;
 
     setSending(true);
-    const success = await onSendMessage(conversation.id, input.trim());
+    const success = await onSendMessage(conversation.id, sanitizeUserText(input.trim()));
     if (success) {
       setInput('');
     }
@@ -132,7 +132,7 @@ export const ChatDialog = ({
                       }`}
                     >
                       <p className="text-sm whitespace-pre-wrap break-words">
-                        {message.content}
+                        {sanitizeUserText(message.content)}
                       </p>
                     </div>
                     {!isOwn && message.off_platform_flagged && (

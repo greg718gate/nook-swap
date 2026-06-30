@@ -4,26 +4,35 @@
 
 | # | Warstwa | Status |
 |---|---------|--------|
-| 1 | **Rate limiting** — `api_rate_limits` + RPC `check_rate_limit`, 429 na Phase Shield endpointach | ✅ |
-| 2 | **Hasła** — min. 10 znaków, litera + cyfra (`password-policy.ts` + Auth UI) | ✅ |
-| 3 | **Uploady** — MIME whitelist + rozmiar na bucketach `product-images` (5 MB) i `digital-products` (100 MB) | ✅ |
+| 1 | **Rate limiting** — `api_rate_limits` + RPC `check_rate_limit` | ✅ |
+| 2 | **Hasła** — min. 10 znaków, litera + cyfra | ✅ |
+| 3 | **Uploady** — MIME whitelist + rozmiar na bucketach | ✅ |
 | 4 | **CSP** — meta Content-Security-Policy w `index.html` | ✅ |
-| — | Phase Shield (jitter, token, network grace) | ✅ (bez zmian — czekamy na Twoje dane o zerach Riemanna) |
+| 5 | **Origin guard** — blokada nieznanych Origin/Referer na edge functions | ✅ |
+| 6 | **Magic bytes** — walidacja nagłówków plików przy uploadzie (Sell/Edit) | ✅ |
+| 7 | **XSS** — `sanitizeUserText` w czacie (defence in depth) | ✅ |
+| 8 | **MFA / 2FA** — panel w Profil → Edit + logowanie z kodem TOTP | ✅ |
+| 9 | **Turnstile** — widget na rejestracji + weryfikacja w `auth-signup` (gdy klucze ustawione) | ✅ |
+| — | Phase Shield SENTINEL-718 v2.2 | ✅ |
 | — | Stripe izolacja, webhook HMAC, ceny po stronie serwera | ✅ |
 | — | RLS, message-guard, shipping webhook secret | ✅ |
 
-## Następne kroki (kolejność)
+## Twoja kolej (Fasthosts)
 
-| # | Co | Wymaga |
-|---|-----|--------|
-| 5 | **Cloudflare** przed `velvetbazzar.co.uk` (WAF, DDoS, ukrycie origin) | Fasthosts DNS → Cloudflare |
-| 6 | **www** CNAME → `greg718gate.github.io` | Fasthosts (rano) |
-| 7 | **MFA / 2FA** w Supabase Auth | Dashboard + opcjonalnie UI |
-| 8 | **CAPTCHA** (Turnstile) na rejestracji | Cloudflare konto |
-| 9 | **Phase Shield SENTINEL-718 v2.2** — f_exact DNA 718.574441… Hz primary | ✅ wdrożone |
-| 10 | **Skan AV** uploadów | opcjonalnie później |
+| # | Co | Plik |
+|---|-----|------|
+| 1 | **www** CNAME → `greg718gate.github.io` | `FASTHOSTS-DNS.txt` |
+| 2 | **Cloudflare** (opcjonalnie) — nameservery + Turnstile klucze | `docs/CLOUDFLARE-SETUP.md` |
 
-## Nie dotyczy (architektura chmurowa)
+## Opcjonalnie później
 
-- Baza **nie** jest na domowym PC — Supabase w EU.
-- Brak „ukrycia domowego IP routera” — nie hostujecie z domu.
+| # | Co |
+|---|-----|
+| — | Skan AV uploadów |
+| — | DOMPurify jeśli pojawi się rich text |
+| — | Pełny CSRF token (obecnie JWT + Origin guard) |
+
+## Nie dotyczy
+
+- Baza na Supabase EU — nie hostujecie z domu.
+- Webhooki Stripe idą na Supabase, nie na GitHub Pages.

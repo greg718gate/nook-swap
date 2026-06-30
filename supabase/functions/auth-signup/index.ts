@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.76.1";
 import { withPhaseShield } from "../_shared/phase-shield/mod.ts";
 import { validatePassword } from "../_shared/password-policy.ts";
+import { verifyTurnstileToken } from "../_shared/turnstile.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -20,7 +21,15 @@ function normalizeUsername(raw: string, email: string): string {
 
 serve(withPhaseShield({ endpoint: "auth-signup", corsHeaders }, async (req) => {
   try {
-    const { email, password, username, referral_code } = await req.json();
+    const { email, password, username, referral_code, turnstile_token } = await req.json();
+
+    const turnstileOk = await verifyTurnstileToken(turnstile_token);
+    if (!turnstileOk) {
+      return new Response(JSON.stringify({ error: "CAPTCHA verification failed — try again" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     if (!email || typeof email !== "string" || !email.includes("@")) {
       return new Response(JSON.stringify({ error: "Invalid email" }), {

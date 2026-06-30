@@ -18,6 +18,7 @@ import {
 import { toast } from "sonner";
 import { Loader2, X, ImagePlus, Trash2 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
+import { validateImageFile } from "@/lib/uploadValidation";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -113,33 +114,34 @@ const EditProduct = () => {
     }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
+    e.target.value = "";
     const totalImages = existingImages.length - imagesToDelete.length + newImages.length + files.length;
-    
+
     if (totalImages > MAX_IMAGES) {
       toast.error(`You can have at most ${MAX_IMAGES} photos`);
       return;
     }
 
-    const validFiles = files.filter(file => {
-      if (!file.type.startsWith('image/')) {
-        toast.error(`${file.name} is not an image`);
-        return false;
+    const validFiles: File[] = [];
+    for (const file of files) {
+      const err = await validateImageFile(file);
+      if (err) {
+        toast.error(err);
+        continue;
       }
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error(`${file.name} is too large (max 5MB)`);
-        return false;
-      }
-      return true;
-    });
+      validFiles.push(file);
+    }
 
-    setNewImages(prev => [...prev, ...validFiles]);
+    if (validFiles.length === 0) return;
 
-    validFiles.forEach(file => {
+    setNewImages((prev) => [...prev, ...validFiles]);
+
+    validFiles.forEach((file) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setNewImagePreviews(prev => [...prev, reader.result as string]);
+        setNewImagePreviews((prev) => [...prev, reader.result as string]);
       };
       reader.readAsDataURL(file);
     });

@@ -26,6 +26,7 @@ import { useMessages } from "@/hooks/useMessages";
 import { ProfileEditForm } from "@/components/ProfileEditForm";
 import { StripeConnectSection } from "@/components/StripeConnectSection";
 import { VelvetCoinSection } from "@/components/VelvetCoinSection";
+import { MfaSecurityPanel } from "@/components/MfaSecurityPanel";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -370,6 +371,7 @@ const Profile = () => {
                 profile={profile}
                 onSaved={() => fetchProfile(user.id)}
               />
+              <MfaSecurityPanel />
               <StripeConnectSection
                 userId={user.id}
                 stripeOnboarded={profile.stripe_onboarded}

@@ -15,7 +15,7 @@ import {
   validateDispatchAddress,
   type DispatchAddressValues,
 } from "@/components/DispatchAddressFields";
-import { Checkbox } from "@/components/ui/checkbox";
+import { TurnstileWidget, isTurnstileEnabled } from "@/components/TurnstileWidget";
 
 const emptyDispatch = (): DispatchAddressValues => ({
   dispatch_name: "",
@@ -35,6 +35,10 @@ const Auth = () => {
   const [username, setUsername] = useState("");
   const [dispatch, setDispatch] = useState<DispatchAddressValues>(emptyDispatch);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [mfaRequired, setMfaRequired] = useState(false);
+  const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
+  const [mfaCode, setMfaCode] = useState("");
   const referralCode = searchParams.get("ref")?.trim().toUpperCase() || "";
 
   useEffect(() => {
@@ -95,12 +99,18 @@ const Auth = () => {
         return;
       }
 
+      if (isTurnstileEnabled() && !turnstileToken) {
+        toast.error("Complete the security check before signing up");
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke("auth-signup", {
         body: {
           email: email.trim().toLowerCase(),
           password,
           username: trimmedUsername,
           referral_code: referralCode || undefined,
+          turnstile_token: turnstileToken ?? undefined,
         },
       });
 
@@ -131,12 +141,41 @@ const Auth = () => {
     setLoading(true);
 
     try {
+      if (mfaRequired && mfaFactorId) {
+        const { data: challenge, error: chErr } = await supabase.auth.mfa.challenge({
+          factorId: mfaFactorId,
+        });
+        if (chErr) throw chErr;
+        const { error: verifyErr } = await supabase.auth.mfa.verify({
+          factorId: mfaFactorId,
+          challengeId: challenge.id,
+          code: mfaCode.trim(),
+        });
+        if (verifyErr) throw verifyErr;
+        toast.success("Signed in successfully!");
+        navigate(await getPostLoginPath());
+        return;
+      }
+
       const { error } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
         password,
       });
 
       if (error) throw error;
+
+      const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      if (aal?.nextLevel === "aal2" && aal.currentLevel !== "aal2") {
+        const { data: factors, error: fErr } = await supabase.auth.mfa.listFactors();
+        if (fErr) throw fErr;
+        const totp = factors?.totp?.find((f) => f.status === "verified");
+        if (totp) {
+          setMfaRequired(true);
+          setMfaFactorId(totp.id);
+          toast.message("Enter the 6-digit code from your authenticator app");
+          return;
+        }
+      }
 
       toast.success("Signed in successfully!");
       navigate(await getPostLoginPath());
@@ -164,6 +203,8 @@ const Auth = () => {
             
             <TabsContent value="signin">
               <form onSubmit={handleSignIn} className="space-y-4">
+                {!mfaRequired ? (
+                  <>
                 <div className="space-y-2">
                   <Label htmlFor="signin-email">Email</Label>
                   <Input
@@ -196,8 +237,35 @@ const Auth = () => {
                     </button>
                   </div>
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Signing in..." : "Sign in"}
+                  </>
+                ) : (
+                  <div className="space-y-2">
+                    <Label htmlFor="mfa-signin-code">Authenticator code</Label>
+                    <Input
+                      id="mfa-signin-code"
+                      inputMode="numeric"
+                      maxLength={6}
+                      value={mfaCode}
+                      onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, ""))}
+                      placeholder="000000"
+                      required
+                      autoFocus
+                    />
+                    <button
+                      type="button"
+                      className="text-xs text-muted-foreground hover:underline"
+                      onClick={() => {
+                        setMfaRequired(false);
+                        setMfaFactorId(null);
+                        setMfaCode("");
+                      }}
+                    >
+                      Back to password
+                    </button>
+                  </div>
+                )}
+                <Button type="submit" className="w-full" disabled={loading || (mfaRequired && mfaCode.length < 6)}>
+                  {loading ? "Signing in..." : mfaRequired ? "Verify code" : "Sign in"}
                 </Button>
               </form>
             </TabsContent>
@@ -284,7 +352,15 @@ const Auth = () => {
                     </Link>
                   </Label>
                 </div>
-                <Button type="submit" className="w-full" disabled={loading || !acceptedTerms}>
+                <TurnstileWidget
+                  onToken={(t) => setTurnstileToken(t)}
+                  onExpire={() => setTurnstileToken(null)}
+                />
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={loading || !acceptedTerms || (isTurnstileEnabled() && !turnstileToken)}
+                >
                   {loading ? "Creating account..." : "Create account"}
                 </Button>
               </form>

@@ -4,6 +4,9 @@ project_id = "kwyegfqyjfuvxtdkgldb"
 site_url = "https://velvetbazzar.co.uk"
 additional_redirect_urls = ["https://velvetbazzar.co.uk/**", "http://localhost:8080/**", "http://localhost:5173/**"]
 
+[auth.mfa]
+max_enrolled_factors = 10
+
 [functions.auto-tag-product]
 verify_jwt = false
 
