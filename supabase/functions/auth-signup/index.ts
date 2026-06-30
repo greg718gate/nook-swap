@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.76.1";
 import { withPhaseShield } from "../_shared/phase-shield/mod.ts";
+import { validatePassword } from "../_shared/password-policy.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -28,8 +29,16 @@ serve(withPhaseShield({ endpoint: "auth-signup", corsHeaders }, async (req) => {
       });
     }
 
-    if (!password || typeof password !== "string" || password.length < 6) {
-      return new Response(JSON.stringify({ error: "Password must be at least 6 characters" }), {
+    if (!password || typeof password !== "string") {
+      return new Response(JSON.stringify({ error: "Password is required" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      return new Response(JSON.stringify({ error: passwordError }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

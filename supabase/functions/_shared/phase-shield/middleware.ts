@@ -1,3 +1,4 @@
+import { enforceRateLimit } from "../rate-limit.ts";
 import {
   DROP_HTTP_STATUS,
   PHASE_CORS_ALLOW_HEADERS,
@@ -77,6 +78,12 @@ export function withPhaseShield(
           ...phaseResponseHeaders(anchorNs, token, compensation, "preflight"),
         },
       });
+    }
+
+    const rateLimited = await enforceRateLimit(req, options.endpoint);
+    if (rateLimited) {
+      for (const [k, v] of Object.entries(cors)) rateLimited.headers.set(k, v);
+      return rateLimited;
     }
 
     try {

@@ -15,6 +15,19 @@ supabase/functions/_shared/phase-shield/
   middleware.ts         — withPhaseShield() wrapper (Drop Package Protocol)
 ```
 
+## Rate limiting (classic)
+
+All `withPhaseShield` endpoints also call `check_rate_limit` RPC (`api_rate_limits` table):
+
+| Endpoint | Window | Max |
+|----------|--------|-----|
+| `auth-signup` | 1 h | 8 / IP |
+| `create-checkout-session` | 1 min | 20 / user |
+| `messaging-api` | 1 min | 80 / user |
+| default | 1 min | 120 / IP or user |
+
+Returns HTTP **429** with `Retry-After` when exceeded.
+
 ## Protected endpoints
 
 - `auth-signup`, `create-checkout-session`, `messaging-api`, `velvet-coin-api`

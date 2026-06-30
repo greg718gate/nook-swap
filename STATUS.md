@@ -22,6 +22,12 @@ STATUS: VelvetBazzar — stan na 28.06.2026
 | RESEND_API_KEY | opcjonalnie (maile) |
 | OPENAI_API_KEY | opcjonalnie (AI chat) |
 
+## Bezpieczeństwo (28.06)
+- Rate limiting na edge functions — patrz `docs/SECURITY_ROADMAP.md`
+- Hasła: min 10 znaków + litera + cyfra
+- Storage: MIME whitelist na bucketach
+- CSP w index.html
+
 ## Auth Supabase
 Site URL: https://velvetbazzar.co.uk
 Redirect: https://velvetbazzar.co.uk/**

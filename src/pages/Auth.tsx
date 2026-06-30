@@ -236,8 +236,11 @@ const Auth = () => {
                       onChange={(e) => setPassword(e.target.value)}
                       className="pr-10"
                       required
-                      minLength={6}
+                      minLength={10}
                     />
+                    <p className="text-xs text-muted-foreground">
+                      At least 10 characters with a letter and a number.
+                    </p>
                     <button
                       type="button"
                       onClick={() => setShowPassword((prev) => !prev)}
