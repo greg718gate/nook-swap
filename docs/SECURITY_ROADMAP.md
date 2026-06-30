@@ -20,7 +20,7 @@
 | 6 | **www** CNAME → `greg718gate.github.io` | Fasthosts (rano) |
 | 7 | **MFA / 2FA** w Supabase Auth | Dashboard + opcjonalnie UI |
 | 8 | **CAPTCHA** (Turnstile) na rejestracji | Cloudflare konto |
-| 9 | **Phase Shield** — aktualizacja stałych po Twoim dokumencie o zerach Riemanna | Twój plik / opis |
+| 9 | **Phase Shield SENTINEL-718 v2.1** — φ, γ, 18 GATCA, 448th zero, gatca_resonance_lock | ✅ wdrożone |
 | 10 | **Skan AV** uploadów | opcjonalnie później |
 
 ## Nie dotyczy (architektura chmurowa)

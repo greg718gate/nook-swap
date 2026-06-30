@@ -1,7 +1,8 @@
 import {
+  F_EXACT_HZ_LITERAL,
   FLOAT64_EPS_COMPENSATION,
   PHASE_HEADERS,
-  RIEMANN_CARRIER_HZ,
+  SENTINEL_PROTOCOL_VERSION,
   TOKEN_TTL_NS,
 } from "./constants.ts";
 import { compensatedCarrierPhase } from "./compensated-phase.ts";
@@ -50,7 +51,7 @@ export async function mintPhaseToken(anchorNs: bigint): Promise<{
 }> {
   const phase = compensatedCarrierPhase(anchorNs);
   const payload =
-    `${anchorNs.toString()}|${phase.toFixed(17)}|${RIEMANN_CARRIER_HZ}|vb`;
+    `${anchorNs.toString()}|${phase.toFixed(17)}|${F_EXACT_HZ_LITERAL}|${SENTINEL_PROTOCOL_VERSION}|vb`;
   const key = await phaseHmacKey();
   const sig = await crypto.subtle.sign(
     "HMAC",
@@ -95,5 +96,6 @@ export function phaseResponseHeaders(
     [PHASE_HEADERS.anchor]: anchorNs.toString(),
     [PHASE_HEADERS.compensation]: compensation.toExponential(6),
     [PHASE_HEADERS.integrity]: integrity,
+    [PHASE_HEADERS.protocol]: `SENTINEL-718/v${SENTINEL_PROTOCOL_VERSION}`,
   };
 }

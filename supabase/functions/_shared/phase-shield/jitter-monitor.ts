@@ -6,13 +6,17 @@ import {
   NETWORK_JITTER_AVG_MS,
   NETWORK_JITTER_GRACE_MS,
   PHASE_TOLERANCE_RAD,
-  RIEMANN_CARRIER_HZ,
+  PHI,
   RIGID_LOOP_CV_THRESHOLD,
   WARMUP_REQUESTS,
   ZERO_PHASE_TARGET_RAD,
 } from "./constants.ts";
 import { zeroPhaseResidualRad } from "./compensated-phase.ts";
 import { zeroPhaseFir } from "./fir-filter.ts";
+import {
+  harmonicLockScoreSentinel,
+  isArtificialGatcaLock,
+} from "./gatca-resonance.ts";
 import { ensurePhaseShieldTables } from "./provision.ts";
 import { perfCounterNs } from "./token.ts";
 import {
@@ -43,15 +47,7 @@ function coefficientOfVariation(values: number[]): number {
 }
 
 function harmonicLockScore(deltasMs: number[]): number {
-  if (deltasMs.length < 3) return 0;
-  const periodMs = 1000 / RIEMANN_CARRIER_HZ;
-  let hits = 0;
-  for (const d of deltasMs) {
-    const ratio = d / periodMs;
-    const nearest = Math.round(ratio);
-    if (nearest > 0 && Math.abs(ratio - nearest) < 0.025) hits++;
-  }
-  return hits / deltasMs.length;
+  return harmonicLockScoreSentinel(deltasMs);
 }
 
 function isNetworkVolatile(deltasMs: number[]): boolean {
@@ -68,6 +64,7 @@ function analyzeDeltas(deltasMs: number[], networkVolatile: boolean): {
   harmonicLock: number;
   rigidLoop: boolean;
   phaseViolation: boolean;
+  gatcaLock: boolean;
 } {
   const harmonicLock = harmonicLockScore(deltasMs);
   const cv = coefficientOfVariation(deltasMs);
@@ -82,10 +79,14 @@ function analyzeDeltas(deltasMs: number[], networkVolatile: boolean): {
     tail[1],
     tail[0] === 0 ? Number.EPSILON : tail[0],
   );
-  const tolerance = networkVolatile ? PHASE_TOLERANCE_RAD * 2.2 : PHASE_TOLERANCE_RAD;
+  const tolerance = networkVolatile
+    ? PHASE_TOLERANCE_RAD * PHI
+    : PHASE_TOLERANCE_RAD;
   const phaseViolation = zeroPhaseResidual > tolerance;
 
-  return { zeroPhaseResidual, phaseRad, harmonicLock, rigidLoop, phaseViolation };
+  const gatcaLock = isArtificialGatcaLock(deltasMs);
+
+  return { zeroPhaseResidual, phaseRad, harmonicLock, rigidLoop, phaseViolation, gatcaLock };
 }
 
 function adminClient(): SupabaseClient {
@@ -177,13 +178,17 @@ export async function verifyRequestJitter(
     } else if (analysis.harmonicLock >= HARMONIC_LOCK_THRESHOLD) {
       pass = false;
       dropReason = "harmonic_bot_signature";
+    } else if (analysis.gatcaLock) {
+      pass = false;
+      dropReason = "gatca_resonance_lock";
     } else if (analysis.rigidLoop) {
       pass = false;
       dropReason = "rigid_timing_loop";
     }
 
     // Network grace: trains / mobile BTS handoffs — not bot signatures on stable RTT
-    if (!pass && networkVolatile && dropReason !== "rigid_timing_loop") {
+    if (!pass && networkVolatile && dropReason !== "rigid_timing_loop" &&
+      dropReason !== "gatca_resonance_lock") {
       if (graceCount < NETWORK_GRACE_DAILY_CAP || userId) {
         pass = true;
         graceApplied = true;

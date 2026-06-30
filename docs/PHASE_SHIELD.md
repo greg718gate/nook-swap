@@ -1,19 +1,43 @@
-# Anti-Bot Phase Shield
+# SENTINEL-718 Phase Shield (BRAMA-718-UNIFIED v2.1)
 
-Closed middleware module protecting critical VelvetBazzar edge functions.
+Closed middleware protecting critical VelvetBazzar edge functions.
 
 ## Architecture
 
 ```
 supabase/functions/_shared/phase-shield/
-  constants.ts          — Riemann 718.5701251542 Hz carrier, FIR kernel
-  compensated-phase.ts  — float64 drift compensation (448th-zero eps)
-  fir-filter.ts         — zero-phase FIR (forward/backward pass)
+  constants.ts          — f_exact 718.570125… Hz, φ, γ, 448th/429th zeros, 18 GATCA gates
+  gatca-resonance.ts    — 18-bram harmonic ladder + coherence ≥94% bot detection
+  compensated-phase.ts  — ω·t + PHASE_SHIFT_ZETA + float64 residual (448th zero)
+  fir-filter.ts         — zero-phase FIR (filtfilt analogue)
   dither.ts             — TPDF response timing mask
-  token.ts              — HMAC phase token mint/verify
-  jitter-monitor.ts     — perf_counter_ns jitter + DB audit log
-  middleware.ts         — withPhaseShield() wrapper (Drop Package Protocol)
+  token.ts              — HMAC phase token (payload includes f_exact literal)
+  jitter-monitor.ts     — jitter audit + gatca_resonance_lock drops
+  middleware.ts         — withPhaseShield() + rate limit
 ```
+
+## Mathematical core (mpmath 50 dps → float64 runtime)
+
+| Constant | Value |
+|----------|-------|
+| `f_exact` | 718.570125154268855… Hz |
+| 448th zero ℑ(ρ) | 743.895013142473659… |
+| 429th zero ℑ(ρ) | 718.7427865454858… |
+| φ | 1.618033988749895 |
+| γ = 1/φ | 0.6180339887498949 |
+| `PHASE_SHIFT_ZETA` | arg ζ(½ + i·t₄₄₈) |
+| GATCA gates | 18 positions on mtDNA rCRS |
+| Coherence threshold | 94% (13/17 intervals >94% in reference analysis) |
+
+High-precision literals are stored as strings for audit/HMAC; Deno uses float64 + `PRECISION_RESIDUAL_448` compensation.
+
+## Drop reasons
+
+- `harmonic_bot_signature` — timing locked to carrier ladder
+- `gatca_resonance_lock` — artificial DNA-interval coherence (≥94% + harmonic ≥85%)
+- `rigid_timing_loop` — near-zero CV (scripted interval)
+- `nonlinear_phase_shift` — zero-phase FIR residual exceeded
+- `network_grace_applied` — softened drop on volatile RTT (logged, not blocked)
 
 ## Rate limiting (classic)
 

@@ -1,5 +1,16 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { withPhaseShield, RIEMANN_CARRIER_HZ } from "../_shared/phase-shield/mod.ts";
+import {
+  withPhaseShield,
+  RIEMANN_CARRIER_HZ,
+  SENTINEL_PROTOCOL_VERSION,
+  PHI,
+  GAMMA_GOLD,
+  COHERENCE_THRESHOLD,
+} from "../_shared/phase-shield/mod.ts";
+import {
+  gatcaIntervalCoherence,
+  torusClosureCoherence,
+} from "../_shared/phase-shield/gatca-resonance.ts";
 import {
   ensurePhaseShieldTables,
   verifyPhaseShieldTablesExist,
@@ -13,8 +24,14 @@ serve(
     return new Response(
       JSON.stringify({
         ok: true,
-        shield: "anti-bot-phase",
+        shield: "SENTINEL-718",
+        protocol: SENTINEL_PROTOCOL_VERSION,
         carrier_hz: RIEMANN_CARRIER_HZ,
+        phi: PHI,
+        gamma: GAMMA_GOLD,
+        gatca_mean_coherence: gatcaIntervalCoherence(),
+        torus_closure_coherence: torusClosureCoherence(),
+        coherence_threshold: COHERENCE_THRESHOLD,
         tables_ready: verified,
       }),
       { headers: { "Content-Type": "application/json" } },
